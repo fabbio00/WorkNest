@@ -1,4 +1,4 @@
-# WorkNest- Overview
+# WorkNest-Overview
 **WorkNest** is a web application designed to facilitate the booking of desks and meeting rooms within a co-working space by end users and companies. The application allows users to browse available workspaces, make bookings, manage their reservations, and create communities. Companies have access to a dedicated section for managing employees and their bookings. WorkNest also includes an administration section for managing user data, bookings, and agreements with other companies. The application is built using `Vue.js` for the frontend, `Java` with `Spring` framework for the backend, and `PostgreSQL` for the database.
 
 
