@@ -25,6 +25,11 @@ To streamline the development and deployment process, we utilize Docker with Doc
 
 - **PostgreSQL**: An open-source relational database management system.
 
+### Containerization and Orchestration:
+
+- **Docker**: A platform for developing, shipping, and running applications in containers. Docker simplifies the deployment of the application components (frontend, backend, and database) by encapsulating them in containers, which can be easily deployed and managed.
+- **Docker Compose**: A tool for defining and running multi-container Docker applications. With Docker Compose, you can configure all the components of the application in a single YAML file and start them with a single command.
+
 
 # Architectural Approach
 - **MVC Pattern**: The application architecture follows the Model-View-Controller (MVC) pattern to separate concerns and improve maintainability.
