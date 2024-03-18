@@ -17,7 +17,7 @@ To streamline the development and deployment process, we utilize Docker with Doc
 
 ### Backend:
 
-- **Java/Spring**: A powerful and comprehensive framework for building enterprise-level applications.
+- **Java/Spring**: A powerful and comprehensive framework for building enterprise-level applications based on Java.
 - **Maven**: A build automation tool for managing Java projects and dependencies.
 
 
