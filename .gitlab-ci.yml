@@ -1,0 +1,12 @@
+# .gitlab-ci.yml
+#This is a try to create automatic merge requests
+
+stages:
+  - create_merge_request
+
+create_merge_request:
+  stage: create_merge_request
+  script:
+    - 'curl --request POST --form "source_branch=$CI_COMMIT_REF_NAME" --form "target_branch=sprint1" --form "title=Automatic Merge Request" --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" "https://gitlab.com/andena_marini_salvo/WorkNest/55731880/merge_requests"'
+  only:
+    - sprint1
