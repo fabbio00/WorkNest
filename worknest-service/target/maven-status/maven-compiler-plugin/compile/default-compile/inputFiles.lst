@@ -1,1 +1,8 @@
-/Users/riccardo/Desktop/Progetto_Lab_Prog/WorkNest/worknest-service/src/main/java/com/ams/worknest/WorknestApplication.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/services/UserService.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/repositories/UserRepository.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/model/dto/UserDto.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/model/resources/UserResource.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/controllers/UserController.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/services/impl/UserServiceImpl.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/model/entities/User.java
+/Users/federicosalvo/Desktop/WorkNest/worknest-service/src/main/java/com/ams/worknest/WorknestApplication.java

@@ -8,11 +8,12 @@ CREATE TABLE IF NOT EXISTS company (
     CONSTRAINT company_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS worknest_user (
 	id uuid NOT NULL,
 	name varchar(30) NOT NULL,
 	surname varchar(30) NOT NULL,
 	email varchar(30) NOT NULL,
+	password varchar(50) NOT NULL,
 	tax_code varchar(50) NOT NULL,
 	type varchar(30) NOT NULL,
 	barrier_free_flag boolean,
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS user_info (
     picture bytea,
     stack varchar(255),
     CONSTRAINT user_info_pkey PRIMARY KEY (id),
-    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES "user"(id)
+    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES worknest_user(id)
 );
 
 CREATE TABLE IF NOT EXISTS workstation (
@@ -55,7 +56,7 @@ CREATE TABLE IF NOT EXISTS booking (
     user_id uuid NOT NULL,
     workstation_id uuid NOT NULL,
     CONSTRAINT booking_pkey PRIMARY KEY (id),
-    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES worknest_user(id),
     CONSTRAINT workstation_fkey FOREIGN KEY (workstation_id) REFERENCES workstation(id)
 );
 
@@ -69,7 +70,7 @@ CREATE TABLE IF NOT EXISTS economic_transaction (
     user_id uuid,
     company_id uuid,
     CONSTRAINT economic_transaction_pkey PRIMARY KEY (id),
-    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES worknest_user(id),
     CONSTRAINT company_fkey FOREIGN KEY (company_id) REFERENCES company(id)
 );
 
@@ -102,8 +103,8 @@ CREATE TABLE IF NOT EXISTS friend_relationship (
     user_id1 uuid NOT NULL,
     user_id2 uuid NOT NULL,
     CONSTRAINT friend_relationship_pkey PRIMARY KEY (user_id1, user_id2),
-    CONSTRAINT user_fkey1 FOREIGN KEY (user_id1) REFERENCES "user"(id),
-    CONSTRAINT user_fkey2 FOREIGN KEY (user_id2) REFERENCES "user"(id)
+    CONSTRAINT user_fkey1 FOREIGN KEY (user_id1) REFERENCES worknest_user(id),
+    CONSTRAINT user_fkey2 FOREIGN KEY (user_id2) REFERENCES worknest_user(id)
 );
 
 CREATE TABLE IF NOT EXISTS ticket (
@@ -116,6 +117,6 @@ CREATE TABLE IF NOT EXISTS ticket (
     user_id uuid NOT NULL,
     owner_user_id uuid,
     CONSTRAINT ticket_pkey PRIMARY KEY (id),
-    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES "user"(id),
-    CONSTRAINT owner_user_fkey FOREIGN KEY (owner_user_id) REFERENCES "user"(id)
+    CONSTRAINT user_fkey FOREIGN KEY (user_id) REFERENCES worknest_user(id),
+    CONSTRAINT owner_user_fkey FOREIGN KEY (owner_user_id) REFERENCES worknest_user(id)
 );
