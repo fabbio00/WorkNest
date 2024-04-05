@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: root
+    password: root
+  flyway:
+    locations: classpath:db/migrations
+    enabled: true

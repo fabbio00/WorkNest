@@ -27,7 +27,7 @@ services:
         - db
 
   db:
-    image: postgres:latest
+    image: postgres:14.11
     environment:
       POSTGRES_DB: db_worknest
       POSTGRES_USER: root
