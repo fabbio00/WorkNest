@@ -1,49 +1,113 @@
-# This file is a template, and might need editing before it works on your project.
-# This is a sample GitLab CI/CD configuration file that should run without any modifications.
-# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
-# it uses echo commands to simulate the pipeline execution.
-#
-# A pipeline is composed of independent jobs that run scripts, grouped into stages.
-# Stages run in sequential order, but jobs within stages run in parallel.
-#
-# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
-#
-# You can copy and paste this template into a new `.gitlab-ci.yml` file.
-# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
-#
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+variables:
+  MAVEN_CLI_OPTS: "--strict-checksums --threads 1C --batch-mode"
+  MAVEN_OPTS: >
+    -Dhttps.protocols=TLSv1.2
+    -Dmaven.repo.local=.m2/repository
+    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+    -Dorg.slf4j.simpleLogger.showDateTime=true
 
-stages:          # List of stages for jobs, and their order of execution
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - ui/node_modules/
+
+stages:
+  - install_dependencies
   - build
   - test
-  - deploy
+  - package
+  - release
+  - generate_documentation
+  - build_container
 
-build-job:       # This job runs in the build stage, which runs first.
+clean:
   stage: build
+  image: maven:3.9.6
   script:
-    - echo "Compiling the code..."
-    - echo "Compile complete."
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS clean
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+compile:
+  stage: build
+  needs: [clean]
+  image: maven:3.9.6
   script:
-    - echo "Running unit tests... This will take about 60 seconds."
-    - sleep 60
-    - echo "Code coverage is 90%"
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS compile
 
-lint-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
+spring_test:
+  stage: test
+  needs: [compile]
+  image: maven:3.9.6
+  services:
+    - name: postgres:14.11
+      alias: postgres
+  variables:
+    POSTGRES_DB: postgres
+    POSTGRES_USER: root
+    POSTGRES_PASSWORD: root
   script:
-    - echo "Linting code... This will take about 10 seconds."
-    - sleep 10
-    - echo "No lint issues found."
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS test
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-  environment: production
+package_be:
+  image: maven:3.9.6
+  stage: package
+  needs: [spring_test]
   script:
-    - echo "Deploying application..."
-    - echo "Application successfully deployed."
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS -DskipTests package
+  artifacts:
+    paths:
+      - worknest-service/target/*.jar
+
+docs_spring:
+  stage: generate_documentation
+  image: maven:3.9.6
+  needs: [package_be]
+  script:
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS $MAVEN_OPTS javadoc:javadoc
+    - mv target/site/apidocs public
+  artifacts:
+    paths:
+      - worknest-service/public
+
+install_dependencies_vue:
+  stage: install_dependencies
+  image: node:21.7.1
+  script:
+    - cd ui
+    - npm ci
+
+
+build_fe:
+  stage: build
+  image: node:21.7.1
+  needs: [install_dependencies_vue]
+  script:
+    - cd ui
+    - npm run build
+  artifacts:
+    paths:
+      - ui/dist/
+
+
+test_vue:
+  stage: test
+  needs: [build_fe]
+  image: node:21.7.1
+  script:
+    - cd ui
+    - npm run test:unit
+
+docs_vue:
+  stage: generate_documentation
+  image: node:21.7.1
+  needs: [build_fe]
+  script:
+    - cd ui
+    - npm run docs
+  artifacts:
+    paths:
+      - ui/docs/
