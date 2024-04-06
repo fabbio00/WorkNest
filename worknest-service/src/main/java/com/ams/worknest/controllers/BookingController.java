@@ -28,10 +28,8 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     @ResponseStatus(HttpStatus.FOUND)
-    public BookingFindResource bookingFindResource(@PathVariable("bookingId") UUID bookingId){
+    public BookingFindResource bookingFindbyId(@PathVariable("bookingId") UUID bookingId){
         return bookingService.findBookingById(bookingId);
     }
-
-
 
 }
