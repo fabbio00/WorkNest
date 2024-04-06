@@ -6,6 +6,7 @@ import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.model.resources.BookingCreateResource;
 import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
@@ -13,7 +14,11 @@ import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -68,5 +73,22 @@ public class BookingServiceImpl implements BookingService {
                 .status(booking.getStatus())
                 .build();
     }
+
+    @Override
+    public List<BookingFindWorkStationResource> findBookingsByDate(LocalDate date) {
+
+        List<Booking> bookings = bookingRepository.findByStartDateOnly(date);
+
+        if (bookings.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return bookings.stream()
+                .map(booking -> BookingFindWorkStationResource.builder()
+                        .workStationId(booking.getWorkStation().getId())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 
 }

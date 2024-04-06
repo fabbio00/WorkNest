@@ -3,13 +3,17 @@ package com.ams.worknest.controllers;
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.resources.BookingCreateResource;
 import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
 import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -30,6 +34,12 @@ public class BookingController {
     @ResponseStatus(HttpStatus.FOUND)
     public BookingFindResource bookingFindbyId(@PathVariable("bookingId") UUID bookingId){
         return bookingService.findBookingById(bookingId);
+    }
+
+    @GetMapping("/findDesks")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindWorkStationResource> getBookingsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return bookingService.findBookingsByDate(date);
     }
 
 }
