@@ -1,9 +1,6 @@
 package com.ams.worknest.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * Data Transfer Object representing user information.
@@ -14,6 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 public class UserDto {
 
     private String name;
@@ -30,7 +28,7 @@ public class UserDto {
 
     private String type;
 
-    private boolean barrieFreeFlag;
+    private boolean barrierFreeFlag;
 
     private String status;
 

@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
                 .password(userDTO.getPassword())
                 .taxCode(userDTO.getTaxCode())
                 .type(userDTO.getType())
-                .barrierFreeFlag(userDTO.isBarrieFreeFlag())
+                .barrierFreeFlag(userDTO.isBarrierFreeFlag())
                 .status(userDTO.getStatus())
                 .registrationDate(zonedDateTime)
                 .build();
