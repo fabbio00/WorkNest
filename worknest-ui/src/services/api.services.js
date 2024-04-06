@@ -15,6 +15,13 @@ class ApiService{
         });
     }
 
+    create_booking(booking){
+        console.log(booking);
+        return axios.post('http://localhost:8080/bookings', booking).then((res) => {
+            return res;
+        });
+    }
+
 }
 
 export default new ApiService();

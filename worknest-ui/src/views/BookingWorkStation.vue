@@ -478,7 +478,10 @@
                         </v-list>
                         </v-card-text>
                         <v-card-actions>
-                        <v-btn color="primary" @click="createBooking">Prenota</v-btn>
+                            <v-btn color="primary" @click="createBooking">Prenota</v-btn>
+                            <v-alert v-model="alertVisible" :type="alertType" :value="true" dismissible>
+                                {{ alertText }}
+                            </v-alert>
                         </v-card-actions>
                     </v-card>
                 </div>
@@ -506,19 +509,39 @@ export default {
                 workstationId: "",
                 userId: ""
             },
-            deskDetails: null
+            deskDetails: null,
+
+            alertVisible: false,
+            alertText: "",
+            alertType: "success"
         }
     },
 
     methods: {
 
-        //metodo che serve per avere il formato della data corretta (YYYY-MM-DD) da passare al backend
+
         formatDate(date) {
             const year = date.getFullYear();
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const day = date.getDate().toString().padStart(2, '0');
 
             return `${year}-${month}-${day}`;
+        },
+
+
+        formatDate2(dateString) {
+            const date = new Date(dateString);
+            
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Aggiungi 1 perché i mesi in JavaScript iniziano da 0
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+        
+            const isoString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+00:00`;
+            
+            return isoString;
         },
 
         findOccupiedDesks() {
@@ -532,7 +555,6 @@ export default {
                     desk.setAttribute('fill', 'green');
                 });
 
-                // Per ogni ID restituito dall'API, trova la corrispondente desk nell'SVG e cambia il colore in rosso
                 occupiedDesks.forEach(id => {
                     const deskElement = document.querySelector(`[data-id="${id}"]`);
                     if (deskElement) {
@@ -559,8 +581,29 @@ export default {
         },
 
 
+        createBooking(){
+            console.log(this.booking.startDate)
+            this.booking.startDate = this.formatDate2(this.booking.startDate)
+            console.log(this.booking.startDate)
+            this.booking.endDate = this.booking.startDate
+            this.booking.status = "active"
+            this.booking.userId = "4c6c4c49-a716-4f88-b940-701c6b5faecd"
 
-        
+            this.$ApiService.create_booking(this.booking).then((res) => {
+                console.log(res)
+            });
+
+            this.$ApiService.create_booking(this.booking).then((res) => {
+                console.log(res)
+                this.alertVisible = true;
+                this.alertText = "Registration was successful!"
+            })
+            .catch((error) => {
+                this.alertType = "error";
+                this.alertText = "Something went wrong try again!"
+            })
+
+        }        
 
     }
 }
