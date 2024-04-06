@@ -5,12 +5,15 @@ import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingFindResource;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
 import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -47,6 +50,23 @@ public class BookingServiceImpl implements BookingService {
                 .workStation(workStation)
                 .build();
 
+    }
+
+    @Override
+    public BookingFindResource findBookingById(UUID bookingId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        return BookingFindResource.builder()
+                .checkIn(booking.getCheckIn())
+                .checkOut(booking.getCheckOut())
+                .endDate(booking.getEndDate())
+                .hasPenalty(booking.isHasPenalty())
+                .startDate(booking.getStartDate())
+                .workStation(booking.getWorkStation())
+                .status(booking.getStatus())
+                .build();
     }
 
 }
