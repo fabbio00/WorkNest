@@ -8,10 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WorknestApplication.class)
-//@AutoConfigureEmbeddedDatabase
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-//@RunWith(SpringJUnit4ClassRunner.class)
 public abstract class BaseMvcTest {
 
 }
