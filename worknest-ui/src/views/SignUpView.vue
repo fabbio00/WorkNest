@@ -61,8 +61,23 @@
     </div>
   </template>
   
-  <script>
-  export default {
+<script>
+    /**
+    * User Registration Form Component
+    * This component is used for the user registration process, including input fields for user details and password validation.
+
+    * @vue-data {Object} user - Contains fields like name, surname, email, username, password, taxCode, companyCode, type, and barrerFreeFlag.
+    * @vue-data {Boolean} isPasswordValid - Indicates whether the password matches the confirmed password.
+    * @vue-data {String} password_confirmed - Stores the password confirmation input by the user.
+
+    * @vue-method {Function} validatePassword - Validates that the user's password and confirmation password match, setting isPasswordValid accordingly.
+    * @vue-method {Function} createUser - Submits the user registration form if the password is validated, otherwise shows an alert.
+
+    * @vue-event {String} user-registration-submit - Emitted when the user submits the registration form and the password is validated.
+    * @subcategory views
+     */
+
+export default {
     data() {
       return {
         user: {
@@ -76,9 +91,9 @@
           type: "Employee",
           barrerFreeFlag: false,
         },
-        isPasswordValid: false,
-        password_confirmed: ""
-      };
+          isPasswordValid: false,
+          password_confirmed: ""
+        };
     },
     methods: {
       validatePassword() {
@@ -94,10 +109,9 @@
           alert("Passwords do not match!");
         }
       }
-    }
   }
+}
 </script>
-  
   
 
 <style>
