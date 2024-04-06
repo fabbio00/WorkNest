@@ -445,6 +445,44 @@
                     </v-col>
                 </v-row>
 
+                <div v-if="deskDetails" class="desk-details">
+                    <v-card elevation="2" class="pa-3" justify="center">
+                        <v-card-title class="headline">Dettagli Scrivania</v-card-title>
+                        <v-card-text>
+                        <v-list>
+                            <v-list-item>
+                                <v-list-item-content>
+                                <v-list-item-title><strong>Nome:</strong> {{ deskDetails.name }}</v-list-item-title>
+                            </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title><strong>Tipo:</strong> {{ deskDetails.type }}</v-list-item-title>
+                            </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title><strong>Equipaggiamento:</strong> {{ deskDetails.equipment }}</v-list-item-title>
+                            </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title><strong>Piano:</strong> {{ deskDetails.floor }}</v-list-item-title>
+                            </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title><strong>Prezzo per Ora:</strong> {{ deskDetails.pricePerH }}€</v-list-item-title>
+                            </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                        </v-card-text>
+                        <v-card-actions>
+                        <v-btn color="primary" @click="createBooking">Prenota</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </div>
+
             </v-col>
         </v-row>
 
@@ -468,6 +506,7 @@ export default {
                 workstationId: "",
                 userId: ""
             },
+            deskDetails: null
         }
     },
 
@@ -504,6 +543,19 @@ export default {
             });
 
             this.isSvgVisible = true;
+        },
+
+
+        bookingDesk(event) {
+            
+            const workStationId = event.target.getAttribute('data-id');
+
+            this.$ApiService.find_desk_by_id(workStationId).then((res) => {
+                console.log(res.data);
+                this.deskDetails = res.data;
+                this.booking.workstationId = workStationId;
+            });
+            
         },
 
 

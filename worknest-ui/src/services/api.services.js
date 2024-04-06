@@ -8,7 +8,13 @@ class ApiService{
             return desks;
         });
     }
-    
+
+    find_desk_by_id(workStationId){
+        return axios.get('http://localhost:8080/workstations/' + workStationId).then((res) => {
+            return res;
+        });
+    }
+
 }
 
 export default new ApiService();
