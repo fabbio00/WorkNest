@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Controller for managing users.
+ * Provides endpoints for creating and retrieving user details.
+ */
 @Slf4j
 @RestController
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -19,6 +23,12 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Create a user with the provided user details.
+     *
+     * @param userDto the user data transfer object containing user details
+     * @return the created user as a resource
+     */
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public UserResource createUser(@RequestBody UserDto userDto) {
@@ -26,6 +36,12 @@ public class UserController {
         return userService.createUser(userDto);
     }
 
+    /**
+     * Retrieve a user by their unique identifier.
+     *
+     * @param id the UUID of the user to retrieve
+     * @return the requested user as a resource
+     */
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserResource getUser(@PathVariable("userId") UUID id) {

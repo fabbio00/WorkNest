@@ -12,12 +12,22 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service implementation for managing user-related operations.
+ * This class provides methods to create and retrieve user information.
+ */
 @Component
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Creates a new user in the database using the information provided in the UserDto.
+     *
+     * @param userDTO Data Transfer Object containing user information.
+     * @return UserResource containing the public-facing user information.
+     */
     public UserResource createUser(UserDto userDTO) {
         ZonedDateTime zonedDateTime = ZonedDateTime.now();
 
@@ -34,8 +44,10 @@ public class UserServiceImpl implements UserService {
                 .registrationDate(zonedDateTime)
                 .build();
 
+        // Save the User entity to the database
         User savedUser = userRepository.save(user);
 
+        // Build and return the UserResource
         return UserResource.builder()
                 .name(savedUser.getName())
                 .email(savedUser.getEmail())
@@ -43,6 +55,12 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    /**
+     * Retrieves a user's public information from the database by their UUID.
+     *
+     * @param id The unique identifier of the user.
+     * @return UserResource containing the public-facing user information, or an empty UserResource if not found.
+     */
     public UserResource getUser(UUID id) {
 
         Optional<User> user = userRepository.findById(id);
