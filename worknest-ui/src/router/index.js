@@ -21,12 +21,13 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const user = localStorage.getItem('user');
-    console.log(user)
-    if (user.id) {
+    const user = localStorage.getItem('userId');
+    const expirationTime = localStorage.getItem('expirationTime');
+    if (user && expirationTime && Date.now() < parseInt(expirationTime)) {
       // User is authenticated, proceed to the route
       next();
     } else {
+      localStorage.removeItem('userId');
       // User is not authenticated, redirect to login
       next('/login');
     }
