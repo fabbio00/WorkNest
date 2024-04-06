@@ -1,5 +1,7 @@
 package com.ams.worknest.model.resources;
 
+import com.ams.worknest.model.entities.User;
+import com.ams.worknest.model.entities.WorkStation;
 import lombok.*;
 
 import java.time.ZonedDateTime;
@@ -15,8 +17,8 @@ public class BookingCreateResource {
 
     private ZonedDateTime endDate;
 
-    //private User user;
+    private User user;
 
-    //private WorkStation workStation;
+    private WorkStation workStation;
 
 }

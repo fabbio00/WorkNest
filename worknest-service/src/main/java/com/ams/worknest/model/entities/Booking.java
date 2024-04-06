@@ -38,20 +38,15 @@ public class Booking {
     @Column(name = "has_penalty")
     private boolean hasPenalty;
 
-    /*
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 
-     */
-
-    /*
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "workstation_id")
     private WorkStation workStation;
 
-     */
 
 }
