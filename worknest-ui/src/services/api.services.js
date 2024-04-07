@@ -12,6 +12,12 @@ class ApiService{
             return "unauthorized";
         });
     }
+
+    create_user(user){
+        return axios.post("http://localhost:8080/users", user).then((res) => {
+            return res;
+        });
+    }
 }
 
 export default new ApiService();
