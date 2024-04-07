@@ -21,7 +21,7 @@
                 <v-row justify="center">
                     <v-col cols="12">
                         <div class="svg-container" style="text-align: center;">
-                            <svg v-show="isSvgVisible" width="900" height="600" xmlns="http://www.w3.org/2000/svg">
+                            <svg v-show="isSvgVisible" width="900" height="600" xmlns="http://www.w3.org/2000/">
                                 <defs>
                                 <filter id="svg_21_blur">
                                 <feGaussianBlur stdDeviation="0" in="SourceGraphic"/>
@@ -437,7 +437,7 @@
                                 </g>
                                 <g id="svg_404">
                                 <rect rx="8" id="svg_401" height="61.33343" width="61.33343" y="396.66771" x="648.00195" stroke="#000" fill="#ffffff"/>
-                                <rect stroke="#000" rx="8" id="svg_403" height="53.33341" width="53.33341" y="400.66771" x="652.00196" fill="green" @click="bookingDesk($event)"/>
+                                <rect data-id="b6b9dc8e-4363-4116-aea7-8ad35c34a111" stroke="#000" rx="8" id="svg_403" height="53.33341" width="53.33341" y="400.66771" x="652.00196" fill="green" @click="bookingDesk($event)"/>
                                 </g>
                                 </g>
                             </svg>
@@ -447,32 +447,32 @@
 
                 <div v-if="deskDetails" class="desk-details">
                     <v-card elevation="2" class="pa-3" justify="center">
-                        <v-card-title class="headline">Dettagli Scrivania</v-card-title>
+                        <v-card-title class="headline">Desk Details</v-card-title>
                         <v-card-text>
                         <v-list>
                             <v-list-item>
                                 <v-list-item-content>
-                                <v-list-item-title><strong>Nome:</strong> {{ deskDetails.name }}</v-list-item-title>
+                                <v-list-item-title><strong>Name desk:</strong> {{ deskDetails.name }}</v-list-item-title>
                             </v-list-item-content>
                             </v-list-item>
                             <v-list-item>
                             <v-list-item-content>
-                                <v-list-item-title><strong>Tipo:</strong> {{ deskDetails.type }}</v-list-item-title>
+                                <v-list-item-title><strong>Type:</strong> {{ deskDetails.type }}</v-list-item-title>
                             </v-list-item-content>
                             </v-list-item>
                             <v-list-item>
                             <v-list-item-content>
-                                <v-list-item-title><strong>Equipaggiamento:</strong> {{ deskDetails.equipment }}</v-list-item-title>
+                                <v-list-item-title><strong>Equipment:</strong> {{ deskDetails.equipment }}</v-list-item-title>
                             </v-list-item-content>
                             </v-list-item>
                             <v-list-item>
                             <v-list-item-content>
-                                <v-list-item-title><strong>Piano:</strong> {{ deskDetails.floor }}</v-list-item-title>
+                                <v-list-item-title><strong>Floor:</strong> {{ deskDetails.floor }}</v-list-item-title>
                             </v-list-item-content>
                             </v-list-item>
                             <v-list-item>
                             <v-list-item-content>
-                                <v-list-item-title><strong>Prezzo per Ora:</strong> {{ deskDetails.pricePerH }}€</v-list-item-title>
+                                <v-list-item-title><strong>Price:</strong> {{ deskDetails.pricePerH * 8}}€</v-list-item-title>
                             </v-list-item-content>
                             </v-list-item>
                         </v-list>
@@ -496,6 +496,40 @@
 
 
 <script>
+
+/**
+ * Vue component for managing desk booking.
+ * This component allows users to view available desks, select a desk for booking,
+ * and create a new booking.
+ *
+ * Features:
+ * - Displays a date picker to select the booking start date.
+ * - Highlights available desks and marks occupied desks.
+ * - Allows users to select a desk and view its details before booking.
+ * - Submits booking details to create a new booking.
+ *
+ * Data properties:
+ * @vue-data {boolean} isSvgVisible - Flag to determine SVG visibility.
+ * @vue-data {Object} booking - Contains details for the booking, including startDate, endDate, status, hasPenalty, workstationId, and userId.
+ * @vue-data {Object|null} deskDetails - Details of the selected desk.
+ * @vue-data {boolean} alertVisible - Flag to control the visibility of alerts.
+ * @vue-data {string} alertText - Text content for the alert.
+ * @vue-data {string} alertType - Type of alert.
+ *
+ * Methods:
+ * @vue-method {Function} formatDate - Formats date to YYYY-MM-DD format.
+ * @vue-method {Function} formatDate2 - Formats date to ISO 8601 format.
+ * @vue-method {Function} findOccupiedDesks - Finds available desks for booking and updates UI accordingly.
+ * @vue-method {Function} bookingDesk - Handles desk booking event, retrieves desk details.
+ * @vue-method {Function} createBooking - Creates a new booking with the provided details.
+ *
+ *
+ * Usage:
+ * This component is used within a Vue application to manage desk booking functionality.
+ * It integrates with backend APIs to retrieve desk availability and create new bookings.
+ * @subcategory views
+ */
+
 export default {
 
     data(){
@@ -510,7 +544,6 @@ export default {
                 userId: ""
             },
             deskDetails: null,
-
             alertVisible: false,
             alertText: "",
             alertType: "success"
@@ -519,7 +552,15 @@ export default {
 
     methods: {
 
-
+        /**
+         * Formats date to YYYY-MM-DD format.
+         * This method takes a Date object and returns a string representation of the date
+         * in the format 'YYYY-MM-DD'. This format is commonly used for sending dates to APIs
+         * or displaying them in input fields.
+         * @param {Date} date - The date to format.
+         * @returns {string} - The formatted date string.
+         */
+        
         formatDate(date) {
             const year = date.getFullYear();
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -528,32 +569,65 @@ export default {
             return `${year}-${month}-${day}`;
         },
 
-
+        
+        /**
+         * Formats date to ISO 8601 format.
+         * This method takes a string representation of a date and formats it to conform to the
+         * ISO 8601 standard. The resulting string includes the date and time in 'YYYY-MM-DDTHH:MM:SSZ' format,
+         * suitable for APIs that expect dates in ISO format.
+         * @param {string} dateString - The date string to format.
+         * @returns {string} - The formatted ISO 8601 date string.
+         */
         formatDate2(dateString) {
             const date = new Date(dateString);
             
             const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Aggiungi 1 perché i mesi in JavaScript iniziano da 0
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const day = date.getDate().toString().padStart(2, '0');
             const hours = date.getHours().toString().padStart(2, '0');
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const seconds = date.getSeconds().toString().padStart(2, '0');
         
-            const isoString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+00:00`;
+            const isoString = `${year}-${month.padStart(2, '0')}-${(parseInt(day)).toString().padStart(2, '0')}T${hours}:${minutes}:${seconds}+00:00`;
             
             return isoString;
         },
+        
 
+        /**
+         * Finds available desks for booking.
+         * This method retrieves the list of available desks for booking based on the selected start date.
+         * It queries the backend API to check for desk availability and updates the UI accordingly.
+         * Additionally, it highlights desks that are unavailable, such as those already booked or restricted
+         * based on user permissions.
+         */
         findOccupiedDesks() {
             const date = this.formatDate(this.booking.startDate);
             console.log(date);
+            const userId = "4c6c4c49-a716-4f88-b940-701c6b5faecd"
+            //const userId = "8fb68f65-6651-497d-b492-fe034f2d9c16"
+
+            this.$ApiService.find_user_by_id(userId).then((u) => {
+                console.log(u.data.type)
+
+                document.querySelectorAll('[data-id]').forEach(desk => {
+                    let workstationId = desk.getAttribute('data-id');
+                    desk.setAttribute('fill', 'green');
+                    desk.style.pointerEvents = 'auto';
+                    this.$ApiService.find_desk_by_id(workstationId).then((ws) => {
+                        console.log(ws.data.type)
+                        if((ws.data.type == "meeting room") && (u.data.type !== "business")){
+                            desk.setAttribute('fill', 'red');
+                            desk.style.pointerEvents = 'none';
+                        }
+                    });
+                    
+                });
+
+            })
 
             this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
                 console.log(occupiedDesks)
-
-                document.querySelectorAll('[data-id]').forEach(desk => {
-                    desk.setAttribute('fill', 'green');
-                });
 
                 occupiedDesks.forEach(id => {
                     const deskElement = document.querySelector(`[data-id="${id}"]`);
@@ -568,8 +642,14 @@ export default {
         },
 
 
+        /**
+         * Handles desk booking event.
+         * This method is triggered when a user clicks on a desk to book it.
+         * It retrieves the details of the selected desk from the backend and displays them to the user,
+         * allowing them to review the desk information before confirming the booking.
+         * @param {Event} event - The click event triggered when selecting a desk.
+         */
         bookingDesk(event) {
-            
             const workStationId = event.target.getAttribute('data-id');
 
             this.$ApiService.find_desk_by_id(workStationId).then((res) => {
@@ -580,7 +660,13 @@ export default {
             
         },
 
-
+        /**
+         * Creates a new booking.
+         * This method is called when the user confirms the booking after selecting a desk.
+         * It sends the booking details to the backend API to create a new booking record.
+         * Upon successful booking creation, it displays a success message to the user.
+         * If an error occurs during the booking process, it displays an error message instead.
+         */
         createBooking(){
             console.log(this.booking.startDate)
             this.booking.startDate = this.formatDate2(this.booking.startDate)
@@ -588,10 +674,6 @@ export default {
             this.booking.endDate = this.booking.startDate
             this.booking.status = "active"
             this.booking.userId = "4c6c4c49-a716-4f88-b940-701c6b5faecd"
-
-            this.$ApiService.create_booking(this.booking).then((res) => {
-                console.log(res)
-            });
 
             this.$ApiService.create_booking(this.booking).then((res) => {
                 console.log(res)

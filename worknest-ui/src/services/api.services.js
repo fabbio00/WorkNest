@@ -22,6 +22,12 @@ class ApiService{
         });
     }
 
+    find_user_by_id(userId){
+        return axios.get('http://localhost:8080/users/' + userId).then((res) => {
+            return res;
+        });
+    }
+
 }
 
 export default new ApiService();
