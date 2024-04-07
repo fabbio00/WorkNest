@@ -20,6 +20,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+
+/**
+ * Implementation of the {@link BookingService} interface.
+ * Provides methods for creating and retrieving booking details.
+ */
 @Component
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -28,6 +34,13 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final WorkStationRepository workStationRepository;
 
+    /**
+     * Creates a booking based on the provided booking data transfer object.
+     *
+     * @param bookingDto the booking data transfer object containing booking details
+     * @return the created booking as a resource
+     * @throws RuntimeException if the user or workstation associated with the booking is not found
+     */
     @Override
     public BookingCreateResource createBooking(BookingCreateDto bookingDto) {
 
@@ -57,6 +70,13 @@ public class BookingServiceImpl implements BookingService {
 
     }
 
+    /**
+     * Retrieves a booking by its unique identifier.
+     *
+     * @param bookingId the UUID of the booking to retrieve
+     * @return the requested booking as a resource
+     * @throws RuntimeException if the booking with the given ID is not found
+     */
     @Override
     public BookingFindResource findBookingById(UUID bookingId) {
 
@@ -74,6 +94,12 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    /**
+     * Retrieves bookings for workstations based on the given date.
+     *
+     * @param date the date for which bookings are to be retrieved
+     * @return a list of workstation bookings for the given date
+     */
     @Override
     public List<BookingFindWorkStationResource> findBookingsByDate(LocalDate date) {
 

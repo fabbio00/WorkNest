@@ -16,6 +16,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+
+/**
+ * Controller for managing bookings.
+ * Provides endpoints for creating and retrieving booking details.
+ */
+
 @Slf4j
 @RestController
 @RequestMapping(value = "/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -24,18 +30,37 @@ public class BookingController {
 
     private final BookingService bookingService;
 
+    /**
+     * Create a booking with the provided booking details.
+     *
+     * @param bookingCreateDto the booking data transfer object containing booking details
+     * @return the created booking as a resource
+     */
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public BookingCreateResource bookingCreation(@RequestBody BookingCreateDto bookingCreateDto){
         return bookingService.createBooking(bookingCreateDto);
     }
 
+    /**
+     * Retrieve a booking by its unique identifier.
+     *
+     * @param bookingId the UUID of the booking to retrieve
+     * @return the requested booking as a resource
+     */
     @GetMapping("/{bookingId}")
     @ResponseStatus(HttpStatus.OK)
     public BookingFindResource bookingFindById(@PathVariable("bookingId") UUID bookingId){
         return bookingService.findBookingById(bookingId);
     }
 
+
+    /**
+     * Retrieve bookings for a specific date.
+     *
+     * @param date the date for which bookings are to be retrieved
+     * @return a list of bookings for the specified date
+     */
     @GetMapping("/findDesks")
     @ResponseStatus(HttpStatus.OK)
     public List<BookingFindWorkStationResource> getBookingsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {

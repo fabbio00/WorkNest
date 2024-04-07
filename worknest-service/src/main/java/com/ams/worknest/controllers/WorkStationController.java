@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Controller for managing workstations.
+ * Provides endpoints for retrieving workstation details.
+ */
 @RestController
 @Slf4j
 @RequestMapping(value = "/workstations", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -18,6 +22,12 @@ public class WorkStationController {
 
     private final WorkStationService workStationService;
 
+    /**
+     * Retrieve a workstation by its unique identifier.
+     *
+     * @param workStationId the UUID of the workstation to retrieve
+     * @return the requested workstation as a resource
+     */
     @GetMapping("/{workStationId}")
     @ResponseStatus(HttpStatus.OK)
     public WorkStationResource getWorkStationById(@PathVariable("workStationId") UUID workStationId){
