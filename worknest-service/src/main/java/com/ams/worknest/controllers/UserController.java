@@ -1,6 +1,8 @@
 package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.resources.UserLoggedResource;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +49,18 @@ public class UserController {
     public UserResource getUser(@PathVariable("userId") UUID id) {
         log.info("GET | /users/{}", id);
         return userService.getUser(id);
+    }
+
+     /**
+     * Perform user login with the provided credentials.
+     *
+     * @param userLoggedDto the user logged data transfer object containing user credentials
+     * @return the logged user information as a resource
+     */
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public UserLoggedResource getLoggedUser(@RequestBody UserLoggedDto userLoggedDto){
+        return userService.userLogin(userLoggedDto);
     }
 
 }
