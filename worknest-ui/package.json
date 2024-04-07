@@ -13,11 +13,14 @@
     "docs": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "axios": "^1.6.8",
+    "crypto-js": "^4.2.0",
     "taffydb": "^2.7.3",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0",
     "vue-docgen-api": "^4.78.0",
+    "vue-router": "^4.3.0",
     "vuetify": "^3.5.9"
   },
   "devDependencies": {
