@@ -22,6 +22,7 @@ public class WorkStationServiceImpl implements WorkStationService {
                 .orElseThrow(() -> new EntityNotFoundException("WorkStation not found with ID: " + workStationId));
 
         return WorkStationResource.builder()
+                .id(workStation.getId())
                 .pricePerH(workStation.getPricePerH())
                 .equipment(workStation.getEquipment())
                 .type(workStation.getType())

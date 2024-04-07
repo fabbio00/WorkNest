@@ -22,6 +22,7 @@ public class UserServiceImpl implements UserService {
         UserResource userResource = new UserResource();
 
         user.ifPresent(u -> {
+            userResource.setId(u.getId());
             userResource.setName(u.getName());
             userResource.setEmail(u.getEmail());
             userResource.setStatus(u.getStatus());

@@ -24,15 +24,15 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public BookingCreateResource bookingCreation(@RequestBody BookingCreateDto bookingCreateDto){
         return bookingService.createBooking(bookingCreateDto);
     }
 
     @GetMapping("/{bookingId}")
-    @ResponseStatus(HttpStatus.FOUND)
-    public BookingFindResource bookingFindbyId(@PathVariable("bookingId") UUID bookingId){
+    @ResponseStatus(HttpStatus.OK)
+    public BookingFindResource bookingFindById(@PathVariable("bookingId") UUID bookingId){
         return bookingService.findBookingById(bookingId);
     }
 
