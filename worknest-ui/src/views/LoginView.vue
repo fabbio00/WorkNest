@@ -20,7 +20,7 @@
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
       <v-text-field density="compact" placeholder="Email" prepend-inner-icon="mdi-email-outline"
-        variant="outlined" v-model="email" tabindex="1"></v-text-field>
+        variant="outlined" v-model="email" tabindex="1" color="indigo"></v-text-field>
 
       <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
         Password
@@ -28,12 +28,12 @@
 
       <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
         density="compact" placeholder="Enter your password" prepend-inner-icon="mdi-lock-outline" variant="outlined"
-        @click:append-inner="visible = !visible" v-model="password"  tabindex="2"></v-text-field>
+        @click:append-inner="visible = !visible" v-model="password"  tabindex="2" color="indigo"></v-text-field>
 
       <v-card class="mb-5" color="surface-variant" variant="tonal">
       </v-card>
 
-      <v-btn class="mb-5" color="blue" size="large" variant="tonal" block @click="login()">
+      <v-btn class="mb-5" color="blue" size="large" variant="tonal" block @click="login()" :append-icon="'mdi-send-variant'">
         Log In
       </v-btn>
 
