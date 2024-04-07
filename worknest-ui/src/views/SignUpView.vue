@@ -133,7 +133,7 @@ const checkPassword = helpers.regex(
  *   <li>Password encryption before submission.</li>  
  *   <li>Redirects to the login page upon successful registration.</li>  
  * </ol>
-
+ *
  *
  * Data properties: 
  * @vue-data {Object} user - Contains user input fields including name, surname, email, username, password, taxCode, companyCode, and barrerFreeFlag.
@@ -196,7 +196,7 @@ export default {
                     password: encryptedPassword
                 };
                 this.$ApiService.create_user(userWithEncryptedPassword).then(res => {
-                    this.$router.push('/login')
+                    this.$router.push('/login');
                 });
             } else {
                 alert("Passwords do not match!");
