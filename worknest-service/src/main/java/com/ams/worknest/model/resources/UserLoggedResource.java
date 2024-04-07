@@ -1,7 +1,7 @@
 package com.ams.worknest.model.resources;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+
 import java.util.UUID;
 
 /**
@@ -9,7 +9,10 @@ import java.util.UUID;
  * Contains the user's unique identifier.
  */
 @Builder(toBuilder = true)
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserLoggedResource {
 
     /**

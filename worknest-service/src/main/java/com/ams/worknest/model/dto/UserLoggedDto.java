@@ -1,12 +1,16 @@
 package com.ams.worknest.model.dto;
 
-import lombok.Data;
+import lombok.*;
 
 /**
  * Data transfer object for user login credentials.
  * Contains fields for user email and password.
  */
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder=true)
 public class UserLoggedDto {
 
     /**
