@@ -9,7 +9,6 @@ import {
 } from "@vuelidate/validators";
 </script>
 
-
 <template>
 
     <v-form @submit.prevent="createUser()">
@@ -121,18 +120,37 @@ const checkPassword = helpers.regex(
 );
 
 /**
-* User Registration Form Component
-* This component is used for the user registration process, including input fields for user details and password validation.
+ * User Registration Form Component  
+ * 
+ * This component handles the user registration process, including collecting user details,
+ * validating input, encrypting the password, and submitting the form data.  
+ * 
+ * Features:
+ * <ol>
+ *   <li>Fields for user information like name, surname, email, username, password, tax code, and company code.</li>  
+ *   <li>Password and confirm password fields with visibility toggle.</li>  
+ *   <li>Form validation including email format and password requirements.</li>  
+ *   <li>Password encryption before submission.</li>  
+ *   <li>Redirects to the login page upon successful registration.</li>  
+ * </ol>
 
-* @vue-data {Object} user - Contains fields like name, surname, email, username, password, taxCode, companyCode, type, and barrerFreeFlag.
-* @vue-data {Boolean} isPasswordValid - Indicates whether the password matches the confirmed password.
-* @vue-data {String} password_confirmed - Stores the password confirmation input by the user.
-
-* @vue-method {Function} validatePassword - Validates that the user's password and confirmation password match, setting isPasswordValid accordingly.
-* @vue-method {Function} createUser - Submits the user registration form if the password is validated, otherwise shows an alert.
-
-* @vue-event {String} user-registration-submit - Emitted when the user submits the registration form and the password is validated.
-* @subcategory views
+ *
+ * Data properties: 
+ * @vue-data {Object} user - Contains user input fields including name, surname, email, username, password, taxCode, companyCode, and barrerFreeFlag.
+ * @vue-data {Boolean} isPasswordValid - Indicates whether the password matches the confirmation password.
+ * @vue-data {String} password_confirmed - Stores the user's input for password confirmation.
+ * @vue-data {Boolean} passwordVisible - Controls the visibility of the password field.
+ * @vue-data {Boolean} passwordConfirmedVisible - Controls the visibility of the confirm password field.
+ * 
+ * Validations:
+ * Uses Vuelidate to validate the user's input. Fields are checked for required values, the email is validated for format, and the password is checked against a defined pattern.
+ * 
+ * Events:
+ * @vue-event {String} user-registration-submit - Emitted when the user submits the registration form and it is validated successfully.
+ * 
+ * Usage:
+ * The component is used as a sign-up form in the user registration process. Users fill in their details, including a valid email address and a password that meets the specified criteria. The form validates the input and upon successful validation, encrypts the password and registers the user.
+ * @subcategory views
  */
 
 export default {
@@ -157,9 +175,19 @@ export default {
         };
     },
     methods: {
-        validatePassword() {
+        /**
+         * Validates the password by checking if it matches the confirmed password.
+         * Updates the `isPasswordValid` data property accordingly.
+         */
+         validatePassword() {
             this.isPasswordValid = this.user.password && this.user.password === this.password_confirmed;
         },
+
+        /**
+         * Creates a new user with the form data after encrypting the password.
+         * Upon successful creation, the user is redirected to the login page.
+         * If the password validation fails, it alerts the user.
+         */
         createUser() {
             if (this.isPasswordValid) {
                 let encryptedPassword = UserServices.encryptPassword(this.user.password);
