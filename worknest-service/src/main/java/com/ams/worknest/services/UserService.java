@@ -7,5 +7,11 @@ import java.util.UUID;
 
 public interface UserService {
 
+    /**
+     * Authenticate a user based on the provided login credentials.
+     *
+     * @param userLoggedDto the data transfer object containing user login credentials
+     * @return the logged-in user information as a resource
+     */
     UserLoggedResource userLogin(UserLoggedDto userLoggedDto);
 }

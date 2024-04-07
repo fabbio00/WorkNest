@@ -17,6 +17,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Authenticate a user based on the provided login credentials.
+     *
+     * @param userLoggedDto the data transfer object containing user login credentials
+     * @return the logged-in user information as a resource
+     * @throws RuntimeException if the user is not found
+     */
     @Override
     public UserLoggedResource userLogin(UserLoggedDto userLoggedDto) {
         User user = userRepository.findByEmailAndPassword(userLoggedDto.getEmail(), userLoggedDto.getPassword())

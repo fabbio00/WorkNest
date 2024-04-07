@@ -18,6 +18,12 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Perform user login with the provided credentials.
+     *
+     * @param userLoggedDto the user logged data transfer object containing user credentials
+     * @return the logged user information as a resource
+     */
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public UserLoggedResource getLoggedUser(@RequestBody UserLoggedDto userLoggedDto){
