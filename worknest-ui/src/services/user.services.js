@@ -7,7 +7,6 @@ class UserService {
 
   encryptPassword(pwd) {
     var data = pwd.slice();
-    
     var encryptedString = CryptoJs.AES.encrypt(data, this.getPrivateKey(), {
       iv: CryptoJs.enc.Base64.parse(""),
       mode: CryptoJs.mode.CBC,
