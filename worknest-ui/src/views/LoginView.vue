@@ -7,7 +7,7 @@
   </Transition>
 
   <body class="my-5">
-    <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg" @keyup.enter="login()">
+    <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg" @keyup.enter="login">
       <Transition enter-active-class="animate__animated animate__flipInX">
         <v-alert v-if="invalidCredentials" border="top" type="warning" class="mb-2">
           Invalid email or password</v-alert>
@@ -28,7 +28,7 @@
       <v-card class="mb-5" color="surface-variant" variant="tonal">
       </v-card>
 
-      <v-btn class="mb-5" color="blue" size="large" variant="tonal" block @click="login()"
+      <v-btn class="mb-5" color="blue" size="large" variant="tonal" block @click="login"
         :append-icon="'mdi-send-variant'">
         Log In
       </v-btn>
@@ -41,23 +41,61 @@
     </v-card>
   </body>
 </template>
+
 <script>
+
 import UserServices from "../services/user.services";
+
+/**
+  * User Login View Component
+  * 
+  * This component handles the user login process, including capturing user credentials,
+  * validating input, encrypting the password, and submitting the login data.
+  * 
+  *
+  * Features:
+  * <ol>
+  *   <li>Email and password fields for user authentication.</li>  
+  *   <li>Visibility toggle for the password field.</li>  
+  *   <li>Alerts user on invalid credentials.</li>  
+  *   <li>Redirects to the main page upon successful login.</li>
+  * </ol>
+  *
+  * Data properties:
+  * @vue-data {Boolean} visible - Controls the visibility of the password field. Default: false.
+  * @vue-data {String} email - The user's email input. Default: "" (empty string).
+  * @vue-data {String} password - The user's password input. Default: "" (empty string).
+  * @vue-data {Boolean} invalidCredentials - Indicates if the credentials provided are invalid. Default: false.
+  * 
+  * Usage:
+  * The component is used as a login form in the user authentication process. Users enter their email and password, which are validated and, upon successful validation, are encrypted and submitted for login.
+  * @subcategory views
+  */
+
 export default {
-  data: () => ({
-    visible: false,
-    email: "",
-    password: "",
-    invalidCredentials: false
-  }),
+  data() {
+    return {
+      visible: false,
+      email: "",
+      password: "",
+      invalidCredentials: false
+    }
+  },
   methods: {
+    /**
+     * login
+     * Called when the user attempts to log in via the login form. It encrypts the provided password and sends the
+     * email and encrypted password to the API for validation. If the response indicates failure (e.g., 'unauthorized'),
+     * it sets the invalidCredentials flag to true, which triggers the display of an error alert.
+     * On successful authentication, the method stores the user's session information and redirects to the homepage.
+     */
     login() {
       this.$ApiService.login(this.email, UserServices.encryptPassword(this.password)).then((res) => {
         if (res == "unauthorized") {
           this.invalidCredentials = true;
         }
         else if (res.data && res.data.id) {
-          const expirationTime = Date.now() + (3 * 3600 * 1000); // 3 ore di durata della sessione
+          const expirationTime = Date.now() + (3 * 3600 * 1000);
           localStorage.setItem('expirationTime', expirationTime);
           localStorage.setItem('userId', res.data.id);
           this.invalidCredentials = false;
