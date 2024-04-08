@@ -51,6 +51,12 @@ class ApiService{
             return res;
         });
     }
+
+    delete_booking(bookingId){
+        return axios.put('http://localhost:8080/bookings/delete/' + bookingId).then((res) => {
+            return res;
+        });
+    }
 }
 
 export default new ApiService();

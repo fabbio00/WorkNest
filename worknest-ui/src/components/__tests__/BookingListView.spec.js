@@ -18,7 +18,8 @@ describe('BookingListView', () => {
           },
         
         ]
-      }))
+      })),
+      delete_booking: vi.fn()
     };
 
     wrapper = shallowMount(BookingListView, {
@@ -51,4 +52,23 @@ describe('BookingListView', () => {
     expect(wrapper.vm.$ApiService.get_list_booking).toHaveBeenCalled();
 
   });
+
+
+  it('should delete the booking and reload the page', async () => {
+    
+    wrapper.setData({
+      editedIndex: 0,
+      editedItem: {
+        bookingId: '1234'
+      },
+      dialogDelete: true 
+    });
+
+    await wrapper.vm.deleteItemConfirm();
+
+    expect(wrapper.vm.$ApiService.delete_booking).toHaveBeenCalledWith('1234');
+
+    expect(wrapper.vm.dialogDelete).toBe(false);
+  });
+
 });
