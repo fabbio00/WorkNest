@@ -93,12 +93,21 @@
  *
  * Data properties:
  * @vue-data {string} userId - The ID of the current user.
+ * @vue-data {boolean} dialog - Flag to control the visibility of the delete confirmation dialog.
+ * @vue-data {boolean} dialogDelete - Flag to control the visibility of the delete confirmation dialog.
+ * @vue-data {boolean} showField - Flag to control the visibility of a field.
  * @vue-data {Array} headers - Array of objects representing table headers.
  * @vue-data {Object} headerProps - Object containing properties for table header styling.
  * @vue-data {Object} itemProps - Object containing properties for table item styling.
  * @vue-data {Array} bookings - Array containing booking data to be displayed in the table.
+ * @vue-data {number} editedIndex - Index of the currently edited booking.
+ * @vue-data {Object} editedItem - Object representing the currently edited booking.
+ * @vue-data {Object} defaultItem - Object representing the default booking item.
  *
  * Methods:
+ * @vue-method {Function} deleteItem - Deletes a booking item.
+ * @vue-method {Function} deleteItemConfirm - Confirms the deletion of a booking item.
+ * @vue-method {Function} closeDelete - Closes the delete confirmation dialog.
  * @vue-method {Function} formatData - Formats the date string to display only the date part.
  * @vue-method {Function} initialize_table - Initializes the table by fetching booking data and populating the bookings array.
  *
@@ -155,6 +164,11 @@
 
     methods: {
 
+     /**
+     * Deletes a booking item.
+     * Opens the delete confirmation dialog for the specified booking item.
+     * @param {Object} item - The booking item to be deleted.
+     */
     deleteItem (item) {
         if(item.status !== "canceled"){
             this.editedIndex = this.bookings.indexOf(item)
@@ -164,6 +178,10 @@
         }
       },
 
+        /**
+         * Confirms the deletion of a booking item.
+         * Deletes the booking item from the database and reloads the page.
+         */
       deleteItemConfirm () {
         //this.bookings.splice(this.editedIndex, 1)
         this.$ApiService.delete_booking(this.editedItem.bookingId)
@@ -171,6 +189,9 @@
         location.reload()
       },
 
+        /**
+         * Closes the delete confirmation dialog.
+         */
       closeDelete () {
         this.dialogDelete = false
       },
