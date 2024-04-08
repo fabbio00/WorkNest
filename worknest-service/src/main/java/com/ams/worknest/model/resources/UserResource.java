@@ -1,5 +1,11 @@
 package com.ams.worknest.model.resources;
 
+import lombok.*;
+
+/**
+ * Resource class representing the public-facing information of a user.
+ * This class is used to encapsulate user data that is safe to expose through the API.
+ */
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +18,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 public class UserResource {
 
     private UUID id;

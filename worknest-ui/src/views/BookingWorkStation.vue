@@ -1,10 +1,10 @@
 <template>
     
     <div class="text-center my-7">
-        <!-- 
-        <img src="/worknest-logo.ico" class="d-inline-flex" style="max-height: 100px;" align="center"></img>
+        
+    <img src="/worknest-logo.ico" class="d-inline-flex" style="max-height: 100px;" align="center"></img>
     <p class="text-h3 d-inline font-italic ml-5" style="vertical-align: middle">Book your desk</p>
-    -->
+    
     </div>
             <Transition enter-active-class="animate__animated animate__fadeIn" enter-leave-class="animate__animated animate__fadeOut" appear>
             <v-row justify="center" v-show="!isSvgVisible">
@@ -490,9 +490,6 @@
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn color="primary" @click="createBooking">Prenota</v-btn>
-                                <!--<v-alert v-model="alertVisible" :type="alertType" :value="true" dismissible>
-                                    {{ alertText }}
-                                </v-alert>-->
                             </v-card-actions>
                         </v-card>
                     </div>
@@ -730,12 +727,11 @@
              * If an error occurs during the booking process, it displays an error message instead.
              */
             createBooking(){
-                console.log(this.booking.startDate)
                 this.booking.startDate = this.formatDate2(this.booking.startDate)
-                console.log(this.booking.startDate)
                 this.booking.endDate = this.booking.startDate
                 this.booking.status = "active"
-                //this.booking.userId = localStorage.getItem("userId")
+                const wsId = this.booking.workstationId
+                console.log("eccolo: " + wsId)
     
                 this.$ApiService.create_booking(this.booking)
                     .then((res) => {
@@ -743,13 +739,22 @@
                         this.alertVisible = true;
                         this.alertType = 'success';
                         this.alertText = "Registration was successful!"
+                
+                        const deskElement = document.querySelector(`[data-id="${wsId}"]`);
+                        if (deskElement) {
+                            deskElement.setAttribute('fill', 'red');
+                            deskElement.style.pointerEvents = 'none';
+                        }
+                        
+
                     })
                     .catch((error) => {
                         this.alertVisible = true;
                         this.alertType = 'error';
                         this.alertText = "Something went wrong, please try again!"
                     })
-    
+                
+                
             }        
     
         }
@@ -766,7 +771,7 @@
   transform: translate(-50%, -50%);
   z-index: 9999;
   background-color: white;
-  padding: 20px; /* Aggiunge un padding di 20px */
+  padding: 20px;
 }
 
 .text-center {
@@ -776,13 +781,12 @@
 }
 
 .text-h4 {
-  margin-top: 20px; /* Aggiunge spazio sopra il testo */
+  margin-top: 20px;
 }
 
 .v-card__text {
-  max-width: 800px; /* Imposta larghezza massima della finestra */
-  overflow-wrap: break-word; /* Permette il testo di andare a capo */
+  max-width: 800px; 
+  overflow-wrap: break-word;
 }
-
 
 </style>
