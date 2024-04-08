@@ -2,11 +2,10 @@ import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
-import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
-import com.ams.worknest.services.BookingService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
@@ -67,6 +66,20 @@ public class BookingControllerTest extends BaseMvcTest{
         mvc.perform(
                         get(BOOKING_ENDPOINT + "/findDesks")
                                 .param("date", date.format(DateTimeFormatter.ISO_DATE))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void getBookingsByUserId() throws Exception {
+
+        Booking savedBooking = savedBookingTemplate();
+
+        mvc.perform(
+                        get(BOOKING_ENDPOINT + "/list/{userId}", savedBooking.getUser().getId())
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

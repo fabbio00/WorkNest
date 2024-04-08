@@ -117,6 +117,13 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieve bookings associated with a specific user.
+     *
+     * @param userId The UUID of the user to retrieve bookings for
+     * @return A list of {@link BookingFindByUserResource} representing bookings made by the user
+     * @throws RuntimeException if the user doesn't exist
+     */
     @Override
     public List<BookingFindByUserResource> findBookingsByUserId(UUID userId) {
 

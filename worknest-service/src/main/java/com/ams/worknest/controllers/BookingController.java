@@ -68,6 +68,12 @@ public class BookingController {
         return bookingService.findBookingsByDate(date);
     }
 
+    /**
+     * Retrieves a list of bookings associated with a specific user.
+     *
+     * @param userId the UUID of the user whose bookings are to be retrieved
+     * @return a list of booking resources associated with the specified user
+     */
     @GetMapping("/list/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public List<BookingFindByUserResource> getBookingsByUserId(@PathVariable("userId") UUID userId){
