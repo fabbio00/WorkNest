@@ -2,8 +2,9 @@
     
     <div class="text-center my-7">
         
-    <img src="/worknest-logo.ico" class="d-inline-flex" style="max-height: 100px;" align="center"></img>
-    <p class="text-h3 d-inline font-italic ml-5" style="vertical-align: middle">Book your desk</p>
+        <img src="/worknest-logo.ico" class="d-inline-flex" style="max-height: 100px;" align="center"></img>
+        <p v-if="!bookingId" class="text-h3 d-inline font-italic ml-5" style="vertical-align: middle">Book your desk</p>
+        <p v-else class="text-h3 d-inline font-italic ml-5" style="vertical-align: middle">Modify your booking</p>
     
     </div>
             <Transition enter-active-class="animate__animated animate__fadeIn" enter-leave-class="animate__animated animate__fadeOut" appear>
@@ -489,7 +490,8 @@
                             </v-list>
                             </v-card-text>
                             <v-card-actions>
-                                <v-btn color="primary" @click="createBooking">Prenota</v-btn>
+                                <v-btn v-if="!bookingId" color="primary" @click="createBooking">Book</v-btn>
+                                <v-btn v-else color="primary" @click="editBooking">Modify</v-btn>
                             </v-card-actions>
                         </v-card>
                     </div>
@@ -532,7 +534,7 @@
         min-width="92"
         variant="outlined"
         rounded
-        @click="alertVisible = false"
+        @click="goToRecap"
       >
         Close
       </v-btn>
@@ -565,7 +567,7 @@
      *
      * Data properties:
      * @vue-data {boolean} isSvgVisible - Flag to determine SVG visibility.
-     * @vue-data {Object} booking - Contains details for the booking, including startDate, endDate, status, hasPenalty, workstationId, and userId.
+     * @vue-data {Object} booking - Contains details for the booking, including startDate, endDate, status, hasPenalty, workStationId, and userId.
      * @vue-data {Object|null} deskDetails - Details of the selected desk.
      * @vue-data {boolean} alertVisible - Flag to control the visibility of alerts.
      * @vue-data {string} alertText - Text content for the alert.
@@ -586,6 +588,11 @@
      */
     
     export default {
+
+        props:{bookingId:{
+            type:String
+        }},
+
     
         data(){
             return {
@@ -595,8 +602,13 @@
                     endDate: null,
                     status: "",
                     hasPenalty: false,
-                    workstationId: "",
+                    workStationId: "",
                     userId: ""
+                },
+                modifyBooking:{
+                    startDate: null,
+                    endDate: null,
+                    workStationId: "",
                 },
                 deskDetails: null,
                 alertVisible: false,
@@ -607,6 +619,7 @@
     
         mounted(){
             this.booking.userId = localStorage.getItem("userId")
+            console.log("id passato: " + this.bookingId)
         },
     
         methods: {
@@ -669,10 +682,10 @@
                     console.log(u.data.type)
     
                     document.querySelectorAll('[data-id]').forEach(desk => {
-                        let workstationId = desk.getAttribute('data-id');
+                        let workStationId = desk.getAttribute('data-id');
                         desk.setAttribute('fill', 'green');
                         desk.style.pointerEvents = 'auto';
-                        this.$ApiService.find_desk_by_id(workstationId).then((ws) => {
+                        this.$ApiService.find_desk_by_id(workStationId).then((ws) => {
                             console.log(ws.data.type)
                             if((ws.data.type == "meeting room") && (u.data.type !== "business")){
                                 desk.setAttribute('fill', 'red');
@@ -709,11 +722,12 @@
              */
             bookingDesk(event) {
                 const workStationId = event.target.getAttribute('data-id');
+                console.log(this.booking.startDate)
     
                 this.$ApiService.find_desk_by_id(workStationId).then((res) => {
                     console.log(res.data);
                     this.deskDetails = res.data;
-                    this.booking.workstationId = workStationId;
+                    this.booking.workStationId = workStationId;
                 });
                 
             },
@@ -729,8 +743,7 @@
                 this.booking.startDate = this.formatDate2(this.booking.startDate)
                 this.booking.endDate = this.booking.startDate
                 this.booking.status = "active"
-                const wsId = this.booking.workstationId
-                console.log("eccolo: " + wsId)
+                const wsId = this.booking.workStationId
     
                 this.$ApiService.create_booking(this.booking)
                     .then((res) => {
@@ -754,7 +767,48 @@
                     })
                 
                 
-            }        
+            },
+            
+            editBooking(){
+
+                console.log(this.booking)
+
+                this.modifyBooking.startDate = this.formatDate2(this.booking.startDate)
+                this.modifyBooking.endDate = this.modifyBooking.startDate
+                this.modifyBooking.workStationId = this.booking.workStationId
+                const wsId = this.modifyBooking.workStationId
+
+                console.log(this.modifyBooking)
+
+                this.$ApiService.modify_booking(this.bookingId, this.modifyBooking)
+                    .then((res) => {
+                            console.log(res)
+                            this.alertVisible = true;
+                            this.alertType = 'success';
+                            this.alertText = "Modify was successful!"
+                    
+                            const deskElement = document.querySelector(`[data-id="${wsId}"]`);
+                            if (deskElement) {
+                                deskElement.setAttribute('fill', 'red');
+                                deskElement.style.pointerEvents = 'none';
+                            }
+                        })
+                        .catch((error) => {
+                        this.alertVisible = true;
+                        this.alertType = 'error';
+                        this.alertText = "Something went wrong, please try again!"
+                    })
+
+            },
+
+            goToRecap(){
+                this.alertVisible = false; 
+                console.log("alert type: " + this.alertType)
+                console.log("bookingId: " + this.bookingId)
+                if(this.alertType == "success" && this.bookingId){
+                    this.$router.push('/bookingList')
+                }
+            }
     
         }
     }

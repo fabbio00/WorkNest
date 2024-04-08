@@ -1,6 +1,7 @@
 package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
+import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.resources.*;
 import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -89,5 +90,13 @@ public class BookingController {
     public BookingDeleteResource bookingDelete(@PathVariable("bookingId") UUID bookingId){
         return bookingService.deleteBooking(bookingId);
     }
+
+    @PutMapping("/edit/{bookingId}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookingEditResource bookingEdit(@PathVariable("bookingId") UUID bookingId, @RequestBody BookingEditDto bookingEditDto){
+        return bookingService.editBooking(bookingId, bookingEditDto);
+    }
+
+
 
 }

@@ -1,6 +1,7 @@
 package com.ams.worknest.services;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
+import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.resources.*;
 
 import java.time.LocalDate;
@@ -18,6 +19,8 @@ public interface BookingService {
     List<BookingFindByUserResource> findBookingsByUserId(UUID userId);
 
     BookingDeleteResource deleteBooking(UUID bookingId);
+
+    BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto);
 
 
 }

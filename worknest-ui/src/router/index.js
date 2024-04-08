@@ -21,10 +21,19 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
+      path: '/booking/:bookingId',
+      name: 'modify_booking',
+      props: route => ({ bookingId: route.params.bookingId }),
+      component: () => import('../views/BookingWorkStation.vue'),
+      meta:{
+        requiresAuth: true
+      }
+    },
+    {
       path: '/booking',
       name: 'booking',
       component: () => import('../views/BookingWorkStation.vue'),
-      meta:{
+      meta: {
         requiresAuth: true
       }
     },

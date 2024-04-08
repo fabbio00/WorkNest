@@ -1,6 +1,7 @@
 package com.ams.worknest.services.impl;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
+import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
@@ -167,6 +168,29 @@ public class BookingServiceImpl implements BookingService {
         return BookingDeleteResource.builder()
                 .bookingId(bookingId)
                 .status(bookingDeleted.getStatus())
+                .build();
+    }
+
+
+    @Override
+    public BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        WorkStation workStation = workStationRepository.findById(bookingEditDto.getWorkStationId())
+                .orElseThrow(() -> new RuntimeException("Workstation not found"));
+
+        booking.setStartDate(bookingEditDto.getStartDate());
+        booking.setEndDate(bookingEditDto.getEndDate());
+        booking.setWorkStation(workStation);
+
+        Booking bookingEdited = bookingRepository.save(booking);
+
+        return BookingEditResource.builder()
+                .startDate(bookingEdited.getStartDate())
+                .endDate(bookingEdited.getEndDate())
+                .workStation(workStation)
                 .build();
     }
 

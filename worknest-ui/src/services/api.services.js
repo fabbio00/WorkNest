@@ -57,6 +57,12 @@ class ApiService{
             return res;
         });
     }
+
+    modify_booking(bookingId, newBooking){
+        return axios.put('http://localhost:8080/bookings/edit/' + bookingId, newBooking).then((res) => {
+            return res;
+        });
+    }
 }
 
 export default new ApiService();
