@@ -5,6 +5,7 @@ import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
 import com.ams.worknest.model.resources.BookingFindResource;
 import com.ams.worknest.model.resources.BookingFindWorkStationResource;
 import com.ams.worknest.repositories.BookingRepository;
@@ -111,6 +112,38 @@ public class BookingServiceImpl implements BookingService {
 
         return bookings.stream()
                 .map(booking -> BookingFindWorkStationResource.builder()
+                        .workStationId(booking.getWorkStation().getId())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieve bookings associated with a specific user.
+     *
+     * @param userId The UUID of the user to retrieve bookings for
+     * @return A list of {@link BookingFindByUserResource} representing bookings made by the user
+     * @throws RuntimeException if the user doesn't exist
+     */
+    @Override
+    public List<BookingFindByUserResource> findBookingsByUserId(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User doesn't exist"));
+
+        List<Booking> bookings = bookingRepository.findByUser(user);
+
+        if (bookings.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return bookings.stream()
+                .map(booking -> BookingFindByUserResource.builder()
+                        .bookingId(booking.getId())
+                        .startDate(booking.getStartDate())
+                        .endDate(booking.getEndDate())
+                        .checkIn(booking.getCheckIn())
+                        .checkOut(booking.getCheckOut())
+                        .status(booking.getStatus())
                         .workStationId(booking.getWorkStation().getId())
                         .build())
                 .collect(Collectors.toList());

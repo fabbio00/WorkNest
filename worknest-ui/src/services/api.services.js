@@ -45,6 +45,12 @@ class ApiService{
             return res;
         });
     }
+
+    get_list_booking(userId){
+        return axios.get('http://localhost:8080/bookings/list/' + userId).then((res) => {
+            return res;
+        });
+    }
 }
 
 export default new ApiService();

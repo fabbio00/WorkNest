@@ -2,6 +2,7 @@ package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
 import com.ams.worknest.model.resources.BookingFindResource;
 import com.ams.worknest.model.resources.BookingFindWorkStationResource;
 import com.ams.worknest.services.BookingService;
@@ -65,6 +66,18 @@ public class BookingController {
     @ResponseStatus(HttpStatus.OK)
     public List<BookingFindWorkStationResource> getBookingsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return bookingService.findBookingsByDate(date);
+    }
+
+    /**
+     * Retrieves a list of bookings associated with a specific user.
+     *
+     * @param userId the UUID of the user whose bookings are to be retrieved
+     * @return a list of booking resources associated with the specified user
+     */
+    @GetMapping("/list/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindByUserResource> getBookingsByUserId(@PathVariable("userId") UUID userId){
+        return bookingService.findBookingsByUserId(userId);
     }
 
 }

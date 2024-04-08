@@ -28,6 +28,14 @@ const router = createRouter({
         requiresAuth: true
       }
     },
+    {
+      path: '/bookingList',
+      name: 'bookingList',
+      component: () => import('../views/BookingListView.vue'),
+      meta:{
+        requiresAuth: true
+      }
+    },
   ]
 })
 
