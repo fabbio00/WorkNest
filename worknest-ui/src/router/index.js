@@ -7,7 +7,8 @@ const router = createRouter({
       path: '/sign-up',
       name: 'sign_up',
       component: () => import('../views/SignUpView.vue')
-    },     {
+    },
+    {
       path: '/',
       name: 'home',
       meta:{
@@ -18,6 +19,14 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue')
+    },
+    {
+      path: '/booking',
+      name: 'booking',
+      component: () => import('../views/BookingWorkStation.vue'),
+      meta:{
+        requiresAuth: true
+      }
     },
   ]
 })

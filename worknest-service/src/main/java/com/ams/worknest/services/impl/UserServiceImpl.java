@@ -71,9 +71,16 @@ public class UserServiceImpl implements UserService {
         UserResource userResource = new UserResource();
 
         user.ifPresent(u -> {
+            userResource.setId(u.getId());
             userResource.setName(u.getName());
             userResource.setEmail(u.getEmail());
+            userResource.setStatus(u.getStatus());
+            userResource.setSurname(u.getSurname());
+            userResource.setType(u.getType());
+            userResource.setBarrier_free_flag(u.isBarrierFreeFlag());
             userResource.setUsername(u.getUsername());
+            userResource.setRegistration_date(u.getRegistrationDate());
+            userResource.setTax_code(u.getTaxCode());
         });
 
         return userResource;
@@ -94,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
      @Override
      public UserLoggedResource userLogin(UserLoggedDto userLoggedDto) {
- 
+
          User user = userRepository.findByEmailAndPassword(userLoggedDto.getEmail(), userLoggedDto.getPassword())
                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found or credentials are incorrect"));
          return new UserLoggedResource(user.getId());
