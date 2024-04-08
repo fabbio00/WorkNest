@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -85,6 +86,21 @@ public class BookingControllerTest extends BaseMvcTest{
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void deleteBooking() throws Exception {
+
+        Booking savedBooking = savedBookingTemplate();
+
+        mvc.perform(
+                        put(BOOKING_ENDPOINT + "/delete/{bookingId}", savedBooking.getId())
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status", is("canceled")));
+
     }
 
 

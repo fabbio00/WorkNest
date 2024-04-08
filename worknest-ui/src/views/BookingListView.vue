@@ -54,12 +54,14 @@
           class="me-2"
           size="small"
           @click="editItem(item)"
+          :class="{disabled:item.status !== 'canceled' ? false : true}"
         >
           mdi-pencil
         </v-icon>
         <v-icon
           size="small"
           @click="deleteItem(item)"
+          :class="{disabled:item.status !== 'canceled' ? false : true}"
         >
           mdi-delete
         </v-icon>
@@ -67,7 +69,7 @@
       <template v-slot:no-data>
         <v-btn
           color="primary"
-          @click="initialize"
+          @click="initialize_table"
         >
           Reset
         </v-btn>
@@ -111,13 +113,13 @@
         userId: "",
         dialog: false,
         dialogDelete: false,
+        showField: true,
         headers: [
             {
             title: 'Date',
             align: 'start',
             sortable: false,
             key: 'startDate',
-            headerClass: 'bold-header'
             },
             { title: 'Check-in', key: 'checkIn'},
             { title: 'Check-out', key: 'checkOut' },
@@ -128,6 +130,22 @@
         headerProps: { class: 'font-weight-bold' },
         itemProps: { class: 'mx-auto'},
         bookings: [],
+        editedIndex: -1,
+        editedItem: {
+            startDate: '',
+            checkIn: 0,
+            checkOut: 0,
+            workStation: 0,
+            status: 0,
+            bookingId: '',
+        },
+        defaultItem: {
+            startDate: '',
+            checkIn: 0,
+            checkOut: 0,
+            workStation: 0,
+            status: 0,
+        },
         }),
 
     mounted(){
@@ -136,6 +154,26 @@
     },
 
     methods: {
+
+    deleteItem (item) {
+        if(item.status !== "canceled"){
+            this.editedIndex = this.bookings.indexOf(item)
+            this.editedItem = Object.assign({}, item)
+            console.log(this.editedItem.bookingId)
+            this.dialogDelete = true
+        }
+      },
+
+      deleteItemConfirm () {
+        //this.bookings.splice(this.editedIndex, 1)
+        this.$ApiService.delete_booking(this.editedItem.bookingId)
+        this.dialogDelete = false
+        location.reload()
+      },
+
+      closeDelete () {
+        this.dialogDelete = false
+      },
         
         /**
          * Formats the date string to display only the date part.
@@ -147,7 +185,6 @@
             const rightDate = date.split('T')[0];
             return rightDate;
         },
-
 
         /**
          * Initializes the table by fetching booking data and populating the bookings array.
@@ -176,6 +213,7 @@
                         checkOut: varCheckOut,
                         workStation: workStation.data.name,
                         status: booking.status,
+                        bookingId: booking.bookingId
                         });
                     });
                 });
@@ -188,3 +226,12 @@
     },
   }
 </script>
+
+<style>
+
+.disabled{
+    color: rgb(214, 214, 214);
+    cursor:unset
+}
+
+</style>

@@ -77,6 +77,13 @@ public class BookingController {
         return bookingService.findBookingsByUserId(userId);
     }
 
+    /**
+     * Delete a booking with the specified ID.
+     *
+     * @param bookingId The UUID of the booking to delete
+     * @return A {@link BookingDeleteResource} representing the deleted booking
+     * @throws RuntimeException if the booking doesn't exist
+     */
     @PutMapping("/delete/{bookingId}")
     @ResponseStatus(HttpStatus.OK)
     public BookingDeleteResource bookingDelete(@PathVariable("bookingId") UUID bookingId){

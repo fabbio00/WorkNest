@@ -147,6 +147,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
+    /**
+     * Deletes a booking with the specified ID and returns the details of the deleted booking.
+     *
+     * @param bookingId The UUID of the booking to be deleted.
+     * @return The resource containing the ID of the deleted booking and its status after deletion.
+     * @throws RuntimeException if the booking with the specified ID is not found.
+     */
     @Override
     public BookingDeleteResource deleteBooking(UUID bookingId) {
 
