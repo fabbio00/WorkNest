@@ -71,28 +71,8 @@ public class BookingControllerTest extends BaseMvcTest{
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray()); //si aspetta una lista di risorse
+                .andExpect(jsonPath("$").isArray());
     }
-
-
-/*
-    @Test
-    void crateBooking() throws Exception{
-        BookingCreateDto bookingCreateDto = bookingDtoCreation();
-
-        ObjectMapper objectMapper1 = new ObjectMapper();
-        String bookingJson = objectMapper.writeValueAsString(bookingCreateDto);
-
-        mvc.perform(
-                post("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(bookingJson))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status", is(bookingCreateDto.getStatus())));
-    }
-
- */
 
 
     Booking savedBookingTemplate(){
@@ -102,15 +82,15 @@ public class BookingControllerTest extends BaseMvcTest{
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter);
 
         User user = User.builder()
-                .barrier_free_flag(true)
+                .barrierFreeFlag(true)
                 .email("prova.user@gmail.com")
                 .password("password")
                 .name("Mario")
                 .surname("Rossi")
                 .username("username")
                 .type("basic_user")
-                .tax_code("FDSAFDAR343")
-                .registration_date(ZonedDateTime.now())
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
                 .status("active")
                 .build();
 
@@ -144,15 +124,15 @@ public class BookingControllerTest extends BaseMvcTest{
 
 
         User user = User.builder()
-                .barrier_free_flag(true)
+                .barrierFreeFlag(true)
                 .email("prova.user@gmail.com")
                 .password("password")
                 .name("Mario")
                 .surname("Rossi")
                 .username("username")
                 .type("basic_user")
-                .tax_code("FDSAFDAR343")
-                .registration_date(ZonedDateTime.now())
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
                 .status("active")
                 .build();
 
