@@ -54,12 +54,14 @@
           class="me-2"
           size="small"
           @click="editItem(item)"
+          :class="{disabled:item.status !== 'canceled' ? false : true}"
         >
           mdi-pencil
         </v-icon>
         <v-icon
           size="small"
           @click="deleteItem(item)"
+          :class="{disabled:item.status !== 'canceled' ? false : true}"
         >
           mdi-delete
         </v-icon>
@@ -67,7 +69,7 @@
       <template v-slot:no-data>
         <v-btn
           color="primary"
-          @click="initialize"
+          @click="initialize_table"
         >
           Reset
         </v-btn>
@@ -91,12 +93,21 @@
  *
  * Data properties:
  * @vue-data {string} userId - The ID of the current user.
+ * @vue-data {boolean} dialog - Flag to control the visibility of the delete confirmation dialog.
+ * @vue-data {boolean} dialogDelete - Flag to control the visibility of the delete confirmation dialog.
+ * @vue-data {boolean} showField - Flag to control the visibility of a field.
  * @vue-data {Array} headers - Array of objects representing table headers.
  * @vue-data {Object} headerProps - Object containing properties for table header styling.
  * @vue-data {Object} itemProps - Object containing properties for table item styling.
  * @vue-data {Array} bookings - Array containing booking data to be displayed in the table.
+ * @vue-data {number} editedIndex - Index of the currently edited booking.
+ * @vue-data {Object} editedItem - Object representing the currently edited booking.
+ * @vue-data {Object} defaultItem - Object representing the default booking item.
  *
  * Methods:
+ * @vue-method {Function} deleteItem - Deletes a booking item.
+ * @vue-method {Function} deleteItemConfirm - Confirms the deletion of a booking item.
+ * @vue-method {Function} closeDelete - Closes the delete confirmation dialog.
  * @vue-method {Function} formatData - Formats the date string to display only the date part.
  * @vue-method {Function} initialize_table - Initializes the table by fetching booking data and populating the bookings array.
  *
@@ -111,13 +122,13 @@
         userId: "",
         dialog: false,
         dialogDelete: false,
+        showField: true,
         headers: [
             {
             title: 'Date',
             align: 'start',
             sortable: false,
             key: 'startDate',
-            headerClass: 'bold-header'
             },
             { title: 'Check-in', key: 'checkIn'},
             { title: 'Check-out', key: 'checkOut' },
@@ -128,6 +139,22 @@
         headerProps: { class: 'font-weight-bold' },
         itemProps: { class: 'mx-auto'},
         bookings: [],
+        editedIndex: -1,
+        editedItem: {
+            startDate: '',
+            checkIn: 0,
+            checkOut: 0,
+            workStation: 0,
+            status: 0,
+            bookingId: '',
+        },
+        defaultItem: {
+            startDate: '',
+            checkIn: 0,
+            checkOut: 0,
+            workStation: 0,
+            status: 0,
+        },
         }),
 
     mounted(){
@@ -136,6 +163,38 @@
     },
 
     methods: {
+
+     /**
+     * Deletes a booking item.
+     * Opens the delete confirmation dialog for the specified booking item.
+     * @param {Object} item - The booking item to be deleted.
+     */
+    deleteItem (item) {
+        if(item.status !== "canceled"){
+            this.editedIndex = this.bookings.indexOf(item)
+            this.editedItem = Object.assign({}, item)
+            console.log(this.editedItem.bookingId)
+            this.dialogDelete = true
+        }
+      },
+
+        /**
+         * Confirms the deletion of a booking item.
+         * Deletes the booking item from the database and reloads the page.
+         */
+      deleteItemConfirm () {
+        //this.bookings.splice(this.editedIndex, 1)
+        this.$ApiService.delete_booking(this.editedItem.bookingId)
+        this.dialogDelete = false
+        location.reload()
+      },
+
+        /**
+         * Closes the delete confirmation dialog.
+         */
+      closeDelete () {
+        this.dialogDelete = false
+      },
         
         /**
          * Formats the date string to display only the date part.
@@ -147,7 +206,6 @@
             const rightDate = date.split('T')[0];
             return rightDate;
         },
-
 
         /**
          * Initializes the table by fetching booking data and populating the bookings array.
@@ -176,6 +234,7 @@
                         checkOut: varCheckOut,
                         workStation: workStation.data.name,
                         status: booking.status,
+                        bookingId: booking.bookingId
                         });
                     });
                 });
@@ -188,3 +247,12 @@
     },
   }
 </script>
+
+<style>
+
+.disabled{
+    color: rgb(214, 214, 214);
+    cursor:unset
+}
+
+</style>

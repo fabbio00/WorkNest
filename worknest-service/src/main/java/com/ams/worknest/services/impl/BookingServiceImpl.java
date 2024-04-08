@@ -4,10 +4,7 @@ import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
-import com.ams.worknest.model.resources.BookingCreateResource;
-import com.ams.worknest.model.resources.BookingFindByUserResource;
-import com.ams.worknest.model.resources.BookingFindResource;
-import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.*;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
@@ -147,6 +144,30 @@ public class BookingServiceImpl implements BookingService {
                         .workStationId(booking.getWorkStation().getId())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Deletes a booking with the specified ID and returns the details of the deleted booking.
+     *
+     * @param bookingId The UUID of the booking to be deleted.
+     * @return The resource containing the ID of the deleted booking and its status after deletion.
+     * @throws RuntimeException if the booking with the specified ID is not found.
+     */
+    @Override
+    public BookingDeleteResource deleteBooking(UUID bookingId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.setStatus("canceled");
+
+        Booking bookingDeleted = bookingRepository.save(booking);
+
+        return BookingDeleteResource.builder()
+                .bookingId(bookingId)
+                .status(bookingDeleted.getStatus())
+                .build();
     }
 
 

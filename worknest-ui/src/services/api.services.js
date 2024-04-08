@@ -52,6 +52,12 @@ class ApiService{
         });
     }
 
+    delete_booking(bookingId){
+        return axios.put('http://localhost:8080/bookings/delete/' + bookingId).then((res) => {
+            return res;
+        });
+    }
+
     send_mail(email) {
         return axios.post('http://localhost:8080/sendEmail', email).then((res) => {
             return res;
