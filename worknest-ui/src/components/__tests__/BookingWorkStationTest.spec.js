@@ -13,7 +13,8 @@ describe('BookingWorkStation', () => {
             find_user_by_id: vi.fn(),
             find_desk_by_id: vi.fn(),
             find_occupied_desks: vi.fn(),
-            create_booking: vi.fn()
+            create_booking: vi.fn(),
+            send_mail: vi.fn(),
           }
         }
       }
@@ -32,7 +33,6 @@ describe('BookingWorkStation', () => {
 
   it('createBooking method creates a booking successfully', async () => {
     
-    // Spy per il metodo create_booking
     const createBookingSpy = vi.fn(() => Promise.resolve('Booking created successfully'));
     wrapper.vm.$ApiService.create_booking = createBookingSpy;
 
@@ -58,14 +58,12 @@ describe('BookingWorkStation', () => {
         }
     };
 
-    // esecuzione metodo createBooking
     await wrapper.vm.createBooking();
 
-    // Verifica che il metodo create_booking sia stato chiamato correttamente
     expect(createBookingSpy).toHaveBeenCalledWith(wrapper.vm.booking);
 
   });
-
-
-
+  
 });
+
+

@@ -1,8 +1,9 @@
+package com.ams.worknest;
+
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
-import com.ams.worknest.model.resources.BookingFindByUserResource;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
@@ -16,19 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @Slf4j
-@ContextConfiguration(classes = BookingControllerTest.class)
-public class BookingControllerTest extends BaseMvcTest{
+@ContextConfiguration(classes = com.ams.worknest.BookingControllerTest.class)
+class BookingControllerTest extends BaseMvcTest {
 
     @Autowired
     MockMvc mvc;

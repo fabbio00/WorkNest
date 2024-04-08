@@ -1,10 +1,7 @@
 package com.ams.worknest.model.resources;
 
-import com.ams.worknest.model.entities.User;
-import com.ams.worknest.model.entities.WorkStation;
 import lombok.*;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
