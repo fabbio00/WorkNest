@@ -80,6 +80,32 @@
 
 
 <script>
+
+/**
+ * Vue component for managing bookings.
+ * This component allows users to view and manage bookings, including displaying booking details in a table format.
+ *
+ * Features:
+ * - Displays a table of bookings with columns for date, check-in time, check-out time, workstation, and status.
+ * - Allows users to view booking details and perform actions such as editing or deleting bookings.
+ *
+ * Data properties:
+ * @vue-data {string} userId - The ID of the current user.
+ * @vue-data {Array} headers - Array of objects representing table headers.
+ * @vue-data {Object} headerProps - Object containing properties for table header styling.
+ * @vue-data {Object} itemProps - Object containing properties for table item styling.
+ * @vue-data {Array} bookings - Array containing booking data to be displayed in the table.
+ *
+ * Methods:
+ * @vue-method {Function} formatData - Formats the date string to display only the date part.
+ * @vue-method {Function} initialize_table - Initializes the table by fetching booking data and populating the bookings array.
+ *
+ * Usage:
+ * This component is used within a Vue application to manage booking data and display it in a table format.
+ * It integrates with backend APIs to fetch booking information and allows users to perform various actions on bookings.
+ * @subcategory views
+ */
+
   export default {
     data: () => ({
         userId: "",
@@ -102,21 +128,6 @@
         headerProps: { class: 'font-weight-bold' },
         itemProps: { class: 'mx-auto'},
         bookings: [],
-        editedIndex: -1,
-        editedItem: {
-            name: '',
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0,
-        },
-        defaultItem: {
-            name: '',
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0,
-        },
         }),
 
     mounted(){
@@ -125,12 +136,25 @@
     },
 
     methods: {
-
+        
+        /**
+         * Formats the date string to display only the date part.
+         * 
+         * @param {string} date - The date string to format.
+         * @returns {string} The formatted date string containing only the date part.
+         */
         formatData(date) {
             const rightDate = date.split('T')[0];
             return rightDate;
         },
 
+
+        /**
+         * Initializes the table by fetching booking data and populating the bookings array.
+         * This method retrieves booking data from the backend API using the user ID stored in the component's data.
+         * It then processes each booking, formatting the date and fetching additional details about the associated workstation.
+         * Finally, it populates the bookings array with the formatted booking data, which is used to render the table.
+         */
         initialize_table() {
             this.$ApiService.get_list_booking(this.userId).then((response) => {
                 const bookings = response.data;
@@ -164,11 +188,3 @@
     },
   }
 </script>
-
-
-<style>
-.bold-header {
-    font-weight: bold;
-}
-
-</style>
