@@ -606,7 +606,6 @@
         },
     
         mounted(){
-            localStorage.setItem("userId", "4c6c4c49-a716-4f88-b940-701c6b5faecd");
             this.booking.userId = localStorage.getItem("userId")
         },
     

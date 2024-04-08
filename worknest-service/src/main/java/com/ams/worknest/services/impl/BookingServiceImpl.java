@@ -131,6 +131,7 @@ public class BookingServiceImpl implements BookingService {
 
         return bookings.stream()
                 .map(booking -> BookingFindByUserResource.builder()
+                        .bookingId(booking.getId())
                         .startDate(booking.getStartDate())
                         .endDate(booking.getEndDate())
                         .checkIn(booking.getCheckIn())

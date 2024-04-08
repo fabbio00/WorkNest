@@ -11,6 +11,8 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class BookingFindByUserResource {
 
+    private UUID bookingId;
+
     private ZonedDateTime startDate;
 
     private ZonedDateTime endDate;
