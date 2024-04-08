@@ -6,3 +6,4 @@ spring:
   flyway:
     locations: classpath:db/migrations
     enabled: true
+
