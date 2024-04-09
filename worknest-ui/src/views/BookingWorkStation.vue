@@ -48,7 +48,7 @@
                                     </g>
                                     <g id="svg_30">
                                     <ellipse stroke="#000" ry="16" rx="16" id="svg_24" cy="109" cx="91" fill="#ffffff" />
-                                    <ellipse data-id="3a6d0494-9f28-4e1d-a79a-d39dbf0b176a" stroke="#000" ry="12" rx="12" id="svg_28" cy="109" cx="91" fill="green" @click="bookingDesk($event)" />
+                                    <ellipse data-id="7fc64ae3-7cf4-48d6-b425-55abeeecef7a" stroke="#000" ry="12" rx="12" id="svg_28" cy="109" cx="91" fill="green" @click="bookingDesk($event)" />
                                     </g>
                                     <g id="svg_33">
                                     <rect stroke="#000" rx="8" filter="url(#svg_21_blur)" id="svg_31" height="56" width="28" y="148" x="81" fill="#f2efef"/>
@@ -722,18 +722,41 @@
              * allowing them to review the desk information before confirming the booking.
              * @param {Event} event - The click event triggered when selecting a desk.
              */
-            bookingDesk(event) {
+             bookingDesk(event) {
                 const workStationId = event.target.getAttribute('data-id');
-                console.log(this.booking.startDate)
-    
+                const date = this.formatDate(this.booking.startDate);
+
                 this.$ApiService.find_desk_by_id(workStationId).then((res) => {
                     console.log(res.data);
                     this.deskDetails = res.data;
-                    this.booking.workStationId = workStationId;
+                    this.booking.workstationId = workStationId;
+
+                    const userId = this.booking.userId;
+                    console.log(userId);
+
+                    this.$ApiService.find_user_by_id(userId).then((u) => {
+                        const emailData = {
+                            to: u.data.email,
+                            subject: 'Desk Booking Confirmation',
+                            text: `Your booking for the ${res.data.name} has been successfully confirmed for ${date}.`
+                        };
+
+                        this.$ApiService.send_mail(emailData).then((emailRes) => {
+                            console.log(emailRes.data);
+                        }).catch((emailError) => {
+                            console.error('Error sending email:', emailError);
+                        });
+
+                    }).catch((userError) => {
+                        console.error('Error finding user:', userError);
+                    });
+
+                }).catch((deskError) => {
+                    console.error('Error finding desk:', deskError);
                 });
-                
             },
-    
+        
+
             /**
              * Creates a new booking.
              * This method is called when the user confirms the booking after selecting a desk.

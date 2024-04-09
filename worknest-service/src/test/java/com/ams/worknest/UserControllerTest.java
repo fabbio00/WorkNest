@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @Transactional
 @ContextConfiguration(classes = com.ams.worknest.UserControllerTest.class)
-class UserControllerTest extends BaseMvcTest{
+class UserControllerTest extends BaseMvcTest {
     @Autowired
     private MockMvc mvc;
 

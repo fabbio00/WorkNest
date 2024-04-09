@@ -58,6 +58,12 @@ class ApiService{
         });
     }
 
+    send_mail(email) {
+        return axios.post('http://localhost:8080/sendEmail', email).then((res) => {
+            return res;
+        });
+    }
+
     modify_booking(bookingId, newBooking){
         return axios.put('http://localhost:8080/bookings/edit/' + bookingId, newBooking).then((res) => {
             return res;
