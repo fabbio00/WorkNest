@@ -81,13 +81,13 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
     }
   },
 
-  beforeMount() {
+  async beforeMount() {
  // Here we check if the route requires authentication and set the sidebar visibility.
     // We also make an API call to fetch user details.
     this.showSideBar = this.$route.meta.requiresAuth === true ? true : false;
     const userId = localStorage.getItem('userId');
     if (userId) {
-      this.$ApiService.find_user_by_id(userId).then((res) => {
+      await this.$ApiService.find_user_by_id(userId).then((res) => {
         this.user = res.data;
       });
     }
