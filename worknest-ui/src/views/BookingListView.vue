@@ -263,4 +263,9 @@
     cursor:unset
 }
 
+td {
+  text-align: left
+}
+
+
 </style>

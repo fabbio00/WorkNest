@@ -181,7 +181,7 @@ class BookingControllerTest extends BaseMvcTest {
                 .status("active")
                 .hasPenalty(false)
                 .userId(savedUser.getId())
-                .workstationId(savedWorkStation.getId())
+                .workStationId(savedWorkStation.getId())
                 .build();
     }
 
