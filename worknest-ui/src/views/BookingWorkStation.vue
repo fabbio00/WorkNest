@@ -48,7 +48,7 @@
                                     </g>
                                     <g id="svg_30">
                                     <ellipse stroke="#000" ry="16" rx="16" id="svg_24" cy="109" cx="91" fill="#ffffff" />
-                                    <ellipse data-id="7fc64ae3-7cf4-48d6-b425-55abeeecef7a" stroke="#000" ry="12" rx="12" id="svg_28" cy="109" cx="91" fill="green" @click="bookingDesk($event)" />
+                                    <ellipse data-id="93a06e73-984f-4fff-abb3-686496e5823e" stroke="#000" ry="12" rx="12" id="svg_28" cy="109" cx="91" fill="green" @click="bookingDesk($event)" />
                                     </g>
                                     <g id="svg_33">
                                     <rect stroke="#000" rx="8" filter="url(#svg_21_blur)" id="svg_31" height="56" width="28" y="148" x="81" fill="#f2efef"/>
@@ -56,7 +56,7 @@
                                     </g>
                                     <g id="svg_36">
                                     <ellipse stroke="#000" ry="16" rx="16" id="svg_34" cy="176" cx="92" fill="#ffffff"/>
-                                    <ellipse data-id="3da9bb25-4c6d-46fa-aa71-8c18a69e305b" stroke="#000" ry="12" rx="12" id="svg_35" cy="176" cx="92" fill="green" @click="bookingDesk($event)"/>
+                                    <ellipse data-id="58f78420-6490-43c8-ac17-1a9e76b2b085" stroke="#000" ry="12" rx="12" id="svg_35" cy="176" cx="92" fill="green" @click="bookingDesk($event)"/>
                                     </g>
                                     <g transform="rotate(-180 141.5 109)" id="svg_51">
                                     <rect stroke="#000" rx="8" filter="url(#svg_21_blur)" id="svg_49" height="56" width="28" y="81" x="134" fill="#f2efef"/>
@@ -64,7 +64,7 @@
                                     </g>
                                     <g id="svg_54">
                                     <ellipse stroke="#000" ry="16" rx="16" id="svg_52" cy="109" cx="138" fill="#ffffff"/>
-                                    <ellipse stroke="#000" ry="12" rx="12" id="svg_53" cy="109" cx="138" fill="green" @click="bookingDesk($event)"/>
+                                    <ellipse data-id="b70c63bd-07cc-4f85-b767-f50ca4d4964e" stroke="#000" ry="12" rx="12" id="svg_53" cy="109" cx="138" fill="green" @click="bookingDesk($event)"/>
                                     </g>
                                     <g transform="rotate(-180 142.5 176)" id="svg_57">
                                     <rect stroke="#000" rx="8" filter="url(#svg_21_blur)" id="svg_55" height="56" width="28" y="148" x="135" fill="#f2efef"/>
@@ -448,7 +448,7 @@
                                     </g>
                                     <g id="svg_404">
                                     <rect rx="8" id="svg_401" height="61.33343" width="61.33343" y="396.66771" x="648.00195" stroke="#000" fill="#ffffff"/>
-                                    <rect data-id="b6b9dc8e-4363-4116-aea7-8ad35c34a111" stroke="#000" rx="8" id="svg_403" height="53.33341" width="53.33341" y="400.66771" x="652.00196" fill="green" @click="bookingDesk($event)"/>
+                                    <rect data-id="6cdece00-bd46-4853-a683-d337c69082f0" stroke="#000" rx="8" id="svg_403" height="53.33341" width="53.33341" y="400.66771" x="652.00196" fill="green" @click="bookingDesk($event)"/>
                                     </g>
                                     </g>
                                 </svg>
@@ -687,6 +687,7 @@
                         let workStationId = desk.getAttribute('data-id');
                         desk.setAttribute('fill', 'green');
                         desk.style.pointerEvents = 'auto';
+                        
                         this.$ApiService.find_desk_by_id(workStationId).then((ws) => {
                             console.log(ws.data.type)
                             if((ws.data.type == "meeting room") && (u.data.type !== "business")){
@@ -729,11 +730,12 @@
                 this.$ApiService.find_desk_by_id(workStationId).then((res) => {
                     console.log(res.data);
                     this.deskDetails = res.data;
-                    this.booking.workstationId = workStationId;
+                    this.booking.workStationId = workStationId;
+                    console.log(this.booking.workStationId)
 
                     const userId = this.booking.userId;
                     console.log(userId);
-
+                                      /*
                     this.$ApiService.find_user_by_id(userId).then((u) => {
                         const emailData = {
                             to: u.data.email,
@@ -750,6 +752,7 @@
                     }).catch((userError) => {
                         console.error('Error finding user:', userError);
                     });
+                    */
 
                 }).catch((deskError) => {
                     console.error('Error finding desk:', deskError);
@@ -769,6 +772,9 @@
                 this.booking.endDate = this.booking.startDate
                 this.booking.status = "active"
                 const wsId = this.booking.workStationId
+                console.log("wsId: " + wsId)
+
+                console.log("booking: " + this.booking)
     
                 this.$ApiService.create_booking(this.booking)
                     .then((res) => {
@@ -778,6 +784,7 @@
                         this.alertText = "Registration was successful!"
                 
                         const deskElement = document.querySelector(`[data-id="${wsId}"]`);
+                        console.log("deskElement: " + deskElement)
                         if (deskElement) {
                             deskElement.setAttribute('fill', 'red');
                             deskElement.style.pointerEvents = 'none';

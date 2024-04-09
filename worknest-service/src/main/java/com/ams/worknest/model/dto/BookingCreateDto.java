@@ -45,6 +45,6 @@ public class BookingCreateDto {
     /**
      * The unique identifier of the workstation associated with the booking.
      */
-    private UUID workstationId;
+    private UUID workStationId;
 
 }

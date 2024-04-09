@@ -46,7 +46,7 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(bookingDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        WorkStation workStation = workStationRepository.findById(bookingDto.getWorkstationId())
+        WorkStation workStation = workStationRepository.findById(bookingDto.getWorkStationId())
                 .orElseThrow(() -> new RuntimeException("Workstation not found"));
 
         Booking booking = Booking.builder()
