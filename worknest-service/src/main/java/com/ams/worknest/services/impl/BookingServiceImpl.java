@@ -172,6 +172,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
+    /**
+     * Edits the details of the booking with the specified ID using the provided data.
+     *
+     * @param bookingId      The UUID of the booking to be edited.
+     * @param bookingEditDto The data containing the updated details for the booking.
+     * @return The resource containing the updated details of the booking.
+     * @throws RuntimeException if the booking with the specified ID is not found, or if the corresponding workstation is not found.
+     */
     @Override
     public BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto) {
 
