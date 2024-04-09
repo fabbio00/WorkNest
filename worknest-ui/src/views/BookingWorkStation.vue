@@ -25,7 +25,7 @@
                     <v-row>
                         <v-col cols="12" md="3">
                             <Transition enter-active-class="animate__animated animate__backInUp" leave-active-class="animate__animated animate__backOutDown">
-                            <v-btn  size="x-large" icon="mdi-calendar" class="d-flex position-absolute" color="blue-grey-lighten-4" style="bottom: 2%; left: 2%;" @click="isSvgVisible = false" v-if="isSvgVisible" elevation="12">
+                            <v-btn  size="x-large" icon="mdi-calendar" class="d-flex position-fixed ml-auto" color="blue-grey-lighten-4" style="bottom: 2%; right: 2%;" @click="isSvgVisible = false" v-if="isSvgVisible" elevation="12">
                             </v-btn>
                         </Transition>
                         </v-col>
