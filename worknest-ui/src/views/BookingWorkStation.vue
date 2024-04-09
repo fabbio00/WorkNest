@@ -733,9 +733,10 @@
                     this.booking.workStationId = workStationId;
                     console.log(this.booking.workStationId)
 
-                    const userId = this.booking.userId;
-                    console.log(userId);
+                   
                                       /*
+                                       const userId = this.booking.userId;
+                    console.log(userId);
                     this.$ApiService.find_user_by_id(userId).then((u) => {
                         const emailData = {
                             to: u.data.email,
@@ -789,6 +790,32 @@
                             deskElement.setAttribute('fill', 'red');
                             deskElement.style.pointerEvents = 'none';
                         }
+
+                        const userId = this.booking.userId;
+                    console.log(userId);
+                    console.log(this.booking)
+                    const bookingDate = new Date(this.booking.startDate);
+            const formattedDate = bookingDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            console.log(formattedDate);
+                        this.$ApiService.find_desk_by_id(wsId).then((res)=>{
+                            this.$ApiService.find_user_by_id(userId).then((u) => {
+
+                        const emailData = {
+                            to: u.data.email,
+                            subject: 'Desk Booking Confirmation',
+                            text: `Your booking for the ${res.data.name} has been successfully confirmed for ${formattedDate}.`
+                        };
+
+                        this.$ApiService.send_mail(emailData).then((emailRes) => {
+                            console.log(emailRes.data);
+                        }).catch((emailError) => {
+                            console.error('Error sending email:', emailError);
+                        });
+
+                    }).catch((userError) => {
+                        console.error('Error finding user:', userError);
+                    }); 
+                        });
                         
 
                     })
@@ -796,7 +823,7 @@
                         this.alertVisible = true;
                         this.alertType = 'error';
                         this.alertText = "Something went wrong, please try again!"
-                    })
+                    });
                 
                 
             },

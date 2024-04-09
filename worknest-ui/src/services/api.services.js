@@ -22,6 +22,12 @@ class ApiService{
         });
     }
 
+    find_booking_by_id(bookingId){
+        return axios.get('http://localhost:8080/bookings/' + bookingId).then((res) => {
+            return res;
+        });
+    }
+
     find_user_by_id(userId){
         return axios.get('http://localhost:8080/users/' + userId).then((res) => {
             return res;
