@@ -12,7 +12,7 @@
         <v-alert v-if="invalidCredentials" border="top" type="warning" class="mb-2">
           Invalid email or password</v-alert>
       </Transition>
-      <div class="text-subtitle-1 text-medium-emphasis">Account</div>
+      <div class="text-subtitle-1 text-medium-emphasis text-left">Account</div>
 
       <v-text-field density="compact" placeholder="Email" prepend-inner-icon="mdi-email-outline" variant="outlined"
         v-model="email" tabindex="1" color="indigo"></v-text-field>
