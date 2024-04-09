@@ -195,6 +195,14 @@
       closeDelete () {
         this.dialogDelete = false
       },
+
+        editItem(item) {
+            if (item.status !== 'canceled') {
+                const bookingId = item.bookingId;
+                console.log(bookingId)
+                this.$router.push({ name: 'modify_booking', params: { bookingId } });
+            }
+        },
         
         /**
          * Formats the date string to display only the date part.

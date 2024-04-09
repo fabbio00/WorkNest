@@ -1,6 +1,7 @@
 package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
+import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.resources.*;
 import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -89,5 +90,21 @@ public class BookingController {
     public BookingDeleteResource bookingDelete(@PathVariable("bookingId") UUID bookingId){
         return bookingService.deleteBooking(bookingId);
     }
+
+    /**
+     * Edits the details of a booking with the specified ID using the provided data and returns the updated booking details.
+     *
+     * @param bookingId      The UUID of the booking to be edited.
+     * @param bookingEditDto The data containing the updated details for the booking.
+     * @return The resource containing the updated details of the booking.
+     * @throws RuntimeException if the booking with the specified ID is not found.
+     */
+    @PutMapping("/edit/{bookingId}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookingEditResource bookingEdit(@PathVariable("bookingId") UUID bookingId, @RequestBody BookingEditDto bookingEditDto){
+        return bookingService.editBooking(bookingId, bookingEditDto);
+    }
+
+
 
 }
