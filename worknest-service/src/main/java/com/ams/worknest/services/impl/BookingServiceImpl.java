@@ -111,6 +111,7 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream()
                 .map(booking -> BookingFindWorkStationResource.builder()
                         .workStationId(booking.getWorkStation().getId())
+                        .status(booking.getStatus())
                         .build())
                 .collect(Collectors.toList());
     }
