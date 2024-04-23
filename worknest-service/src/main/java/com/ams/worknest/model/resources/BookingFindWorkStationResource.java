@@ -19,4 +19,6 @@ public class BookingFindWorkStationResource {
      */
     private UUID workStationId;
 
+    private String status;
+
 }
