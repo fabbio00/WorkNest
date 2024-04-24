@@ -47,19 +47,21 @@ describe('LoginView', () => {
     });
 
     it('redirects to homepage on successful login', async () => {
-        // Setup the mock to simulate a successful login
+        delete window.location;
+        window.location = { href: '/login' };
+
         mockLogin.mockResolvedValue({ data: { id: 'user_id' } });
 
-        // Set user input
         wrapper.setData({ email: 'test@example.com', password: 'correctpassword' });
 
-        // Trigger login method
         await wrapper.find('v-btn').trigger('click');
-        await wrapper.vm.$nextTick(); // Wait for the promise to resolve
+        await wrapper.vm.$nextTick();
+    
+        expect(window.location.href).toBe("/");
 
-        // Assert if router push was called with the correct argument
-        expect(mockRouterPush).toHaveBeenCalledWith("/");
-        // Additionally, ensure the invalidCredentials state is false
         expect(wrapper.vm.invalidCredentials).toBe(false);
+
+        window.location = location;
     });
+    
 });
