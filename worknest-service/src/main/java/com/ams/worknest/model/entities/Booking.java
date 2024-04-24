@@ -14,7 +14,6 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
