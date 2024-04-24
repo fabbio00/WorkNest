@@ -1,6 +1,7 @@
 package com.ams.worknest.services;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.model.dto.UserLoggedDto;
 import com.ams.worknest.model.resources.UserLoggedResource;
@@ -28,6 +29,14 @@ public interface UserService {
      * @return UserResource containing the public-facing information of the retrieved user.
      */
     UserResource getUser(UUID id);
+
+    /**
+     * Retrieves the public-facing information of a user based on their email.
+     *
+     * @param userEmailDto the data transfer object containing the user's email.
+     * @return UserResource containing the public-facing information of the retrieved user.
+     */
+    UserResource getUserByEmail(UserEmailDto userEmailDto);
 
     /**
      * Authenticate a user based on the provided login credentials.

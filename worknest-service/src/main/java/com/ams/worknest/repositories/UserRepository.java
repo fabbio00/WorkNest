@@ -19,4 +19,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      */
     @Query(value = "SELECT * FROM worknest_user WHERE email = :email AND password = :password", nativeQuery = true)
     Optional<User> findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
+
+    /**
+     * Retrieves a user by their email address.
+     *
+     * This method finds a user with the specified email.
+     * It returns an optional containing the user if found, or empty if no matching user is found.
+     *
+     * @param email The email address of the user to find.
+     * @return An optional containing the user if found, otherwise empty.
+     */
+    Optional<User> findByEmail(String email);
 }

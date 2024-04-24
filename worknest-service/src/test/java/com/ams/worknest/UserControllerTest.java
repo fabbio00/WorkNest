@@ -1,6 +1,7 @@
 package com.ams.worknest;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.repositories.UserRepository;
@@ -47,6 +48,25 @@ class UserControllerTest extends BaseMvcTest {
     }
 
     @Test
+    void getUserByMail() throws Exception{
+        User savedUser = savedUserTemplate();
+        UserEmailDto userEmailDto = userEmailDtoCreation();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String emailJson = objectMapper.writeValueAsString(userEmailDto);
+
+        mvc.perform(
+                        post(USER_ENDPOINT + "/email")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(emailJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.email", is(savedUser.getEmail())))
+                .andReturn();
+    }
+
+    @Test
     void createUser() throws Exception {
         UserDto userDto = userDtoCreation();
 
@@ -66,7 +86,7 @@ class UserControllerTest extends BaseMvcTest {
     User savedUserTemplate(){
         User user = User.builder()
                 .barrierFreeFlag(true)
-                .email("prova.user@gmail.com")
+                .email("prova22.user@gmail.com")
                 .password("password")
                 .name("Mario")
                 .surname("Rossi")
@@ -92,6 +112,12 @@ class UserControllerTest extends BaseMvcTest {
                 .type("basic_user")
                 .taxCode("FDSAFDAR343")
                 .status("active")
+                .build();
+    }
+
+    UserEmailDto userEmailDtoCreation(){
+        return UserEmailDto.builder()
+                .email("prova22.user@gmail.com")
                 .build();
     }
 

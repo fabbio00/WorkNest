@@ -19,4 +19,9 @@ public class BookingFindWorkStationResource {
      */
     private UUID workStationId;
 
+    /**
+     * The status of the booking associated with the workstation.
+     */
+    private String status;
+
 }
