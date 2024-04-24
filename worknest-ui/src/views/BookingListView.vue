@@ -273,9 +273,6 @@ export default {
   cursor:unset
 }
 
-td {
-text-align: left
-}
 
 tbody tr:nth-of-type(even) {
  background-color: rgba(0, 0, 0, .05);
