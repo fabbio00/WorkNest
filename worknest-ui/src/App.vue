@@ -4,16 +4,14 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 
 <template>
   <header>
-    <v-card class="d-flex" style="z-index: 9999;" align="start">
+    <v-card class="d-flex" style="z-index: 9999;" >
       <v-layout>
-        <v-navigation-drawer v-if="showSidebar" expand-on-hover rail clipped class="bg-blue-darken-3">
+        <v-navigation-drawer v-if="showSidebar" expand-on-hover rail clipped class="bg-blue-darken-3" permanent >
           <v-list>
             <v-list-item prepend-avatar="/worknest-logo.ico" :title="user.email"
               :subtitle="user.name + ' ' + user.surname" @click="redirect('/')"></v-list-item>
           </v-list>
-
           <v-divider thickness="2"></v-divider>
-
           <v-list density="compact" nav>
             <v-list-item prepend-icon="mdi-calendar-plus-outline" title="" @click="redirect('/booking')">
               <template v-slot:title>
@@ -30,10 +28,11 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
       </v-layout>
     </v-card>
   </header>
-  <main align="center">
+  <main>
     <RouterView />
   </main>
 </template>
+
 <script>
 
 /**
@@ -68,7 +67,7 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
  * It depends on Vue Router for routing and Vuetify for UI components.
  */
 
- export default {
+export default {
   data() {
     return {
       // showSidebar: Determines whether the navigation drawer should be visible.
@@ -77,12 +76,12 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
       // current: Tracks the current route that the user navigated to.
       current: "",
       // user: Stores information about the currently authenticated user.
-      user: {},
+      user: null,
     }
   },
 
   async beforeMount() {
- // Here we check if the route requires authentication and set the sidebar visibility.
+    // Here we check if the route requires authentication and set the sidebar visibility.
     // We also make an API call to fetch user details.
     this.showSideBar = this.$route.meta.requiresAuth === true ? true : false;
     const userId = localStorage.getItem('userId');

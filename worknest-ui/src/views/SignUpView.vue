@@ -114,6 +114,11 @@ import {
 
 import UserServices from "../services/user.services";
 import { helpers } from "@vuelidate/validators";
+import axios from 'axios';
+
+const emailUsed = (value) => axios.post("http://localhost:8080/users/email", {email:value}).then(res => {
+    return !res.data.email 
+});
 
 const checkPassword = helpers.regex(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&,-.#'^"£=(){}%€;:~<>+|/])[A-Za-z\d@$!%*?&,-.#'^"£=(){}%€;:~<>+|/]{8,30}$/
@@ -179,7 +184,7 @@ export default {
          * Validates the password by checking if it matches the confirmed password.
          * Updates the `isPasswordValid` data property accordingly.
          */
-         validatePassword() {
+        validatePassword() {
             this.isPasswordValid = this.user.password && this.user.password === this.password_confirmed;
         },
 
@@ -201,11 +206,16 @@ export default {
             } else {
                 alert("Passwords do not match!");
             }
-        }
+        },
+
     },
     validations: {
         user: {
-          email: { required, email },
+          email: { 
+            required, 
+            email, 
+            isUnique: helpers.withMessage("This email is already in use", helpers.withAsync(emailUsed)),
+         }, 
           password: { required, checkPassword },
         },
         password_confirmed: { required },

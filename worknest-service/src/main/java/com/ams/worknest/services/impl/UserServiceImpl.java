@@ -1,6 +1,7 @@
 package com.ams.worknest.services.impl;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.resources.UserLoggedResource;
@@ -68,6 +69,32 @@ public class UserServiceImpl implements UserService {
     public UserResource getUser(UUID id) {
 
         Optional<User> user = userRepository.findById(id);
+        UserResource userResource = new UserResource();
+
+        user.ifPresent(u -> {
+            userResource.setId(u.getId());
+            userResource.setName(u.getName());
+            userResource.setEmail(u.getEmail());
+            userResource.setStatus(u.getStatus());
+            userResource.setSurname(u.getSurname());
+            userResource.setType(u.getType());
+            userResource.setBarrier_free_flag(u.isBarrierFreeFlag());
+            userResource.setUsername(u.getUsername());
+            userResource.setRegistration_date(u.getRegistrationDate());
+            userResource.setTax_code(u.getTaxCode());
+        });
+
+        return userResource;
+    }
+
+    /**
+     * Retrieves a user's public information from the database by their email.
+     *
+     * @param userEmailDto Data Transfer Object containing the user's email.
+     * @return UserResource containing the public-facing user information.
+     */
+    public UserResource getUserByEmail(UserEmailDto userEmailDto) {
+        Optional<User> user = userRepository.findByEmail(userEmailDto.getEmail());
         UserResource userResource = new UserResource();
 
         user.ifPresent(u -> {

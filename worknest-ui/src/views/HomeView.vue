@@ -1,5 +1,5 @@
 <template>
-    <v-card class="mx-auto pa-12 pb-8" style="margin-top: 10%;" elevation="12" max-width="800" rounded="lg">
+    <v-card class="mx-auto pa-12 pb-8" style="margin-top: 10%;" elevation="12" max-width="800" rounded="lg" align="center">
         <p class="text-h2">Hi
         <p class="font-weight-bold d-inline">{{ user.name }} {{ user.surname }}</p>!</p>
         <p class="text-h5 font-italic">Welcome to your productivity hub</p>

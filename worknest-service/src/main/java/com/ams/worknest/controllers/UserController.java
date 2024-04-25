@@ -1,6 +1,7 @@
 package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
 import com.ams.worknest.model.resources.UserLoggedResource;
 import com.ams.worknest.model.resources.UserResource;
@@ -49,6 +50,13 @@ public class UserController {
     public UserResource getUser(@PathVariable("userId") UUID id) {
         log.info("GET | /users/{}", id);
         return userService.getUser(id);
+    }
+
+    @PostMapping("/email")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResource getUserByEmail(@RequestBody UserEmailDto userEmailDto) {
+        log.info("POST | | userEmailDto = {}", userEmailDto);
+        return userService.getUserByEmail(userEmailDto);
     }
 
      /**

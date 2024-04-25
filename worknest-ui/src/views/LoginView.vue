@@ -34,7 +34,7 @@
       </v-btn>
 
       <v-card-text class="text-center">
-        <a class="text-blue text-decoration-none" href="/sign-up" rel="noopener noreferrer" target="_blank">
+        <a class="text-blue text-decoration-none" href="/sign-up" rel="noopener noreferrer">
           Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
         </a>
       </v-card-text>
@@ -99,7 +99,7 @@ export default {
           localStorage.setItem('expirationTime', expirationTime);
           localStorage.setItem('userId', res.data.id);
           this.invalidCredentials = false;
-          this.$router.push("/");
+          window.location.href="/";
         }
       });
     }
