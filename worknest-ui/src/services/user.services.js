@@ -1,4 +1,4 @@
-import CryptoJs from 'crypto-js';
+import CryptoJs from "crypto-js";
 
 class UserService {
   getPrivateKey() {
@@ -10,7 +10,7 @@ class UserService {
     var encryptedString = CryptoJs.AES.encrypt(data, this.getPrivateKey(), {
       iv: CryptoJs.enc.Base64.parse(""),
       mode: CryptoJs.mode.CBC,
-      padding: CryptoJs.pad.Pkcs7
+      padding: CryptoJs.pad.Pkcs7,
     });
     return encryptedString.toString();
   }
@@ -18,7 +18,7 @@ class UserService {
     var decrypted = CryptoJs.AES.decrypt(encrypted, this.getPrivateKey(), {
       iv: CryptoJs.enc.Base64.parse(""),
       mode: CryptoJs.mode.CBC,
-      padding: CryptoJs.pad.Pkcs7
+      padding: CryptoJs.pad.Pkcs7,
     });
     return decrypted.toString(CryptoJs.enc.Utf8);
   }

@@ -17,8 +17,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 
 
 /**
@@ -32,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final WorkStationRepository workStationRepository;
+    private static final String BOOKING_NOT_FOUND = "Booking not found!";
 
     /**
      * Creates a booking based on the provided booking data transfer object.
@@ -80,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingFindResource findBookingById(UUID bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new RuntimeException(BOOKING_NOT_FOUND));
 
         return BookingFindResource.builder()
                 .checkIn(booking.getCheckIn())
@@ -113,8 +112,11 @@ public class BookingServiceImpl implements BookingService {
                         .workStationId(booking.getWorkStation().getId())
                         .status(booking.getStatus())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
+
     }
+
+
 
     /**
      * Retrieve bookings associated with a specific user.
@@ -145,7 +147,7 @@ public class BookingServiceImpl implements BookingService {
                         .status(booking.getStatus())
                         .workStationId(booking.getWorkStation().getId())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
@@ -160,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDeleteResource deleteBooking(UUID bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new RuntimeException(BOOKING_NOT_FOUND));
 
         booking.setStatus("canceled");
 
@@ -185,7 +187,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new RuntimeException(BOOKING_NOT_FOUND));
 
         WorkStation workStation = workStationRepository.findById(bookingEditDto.getWorkStationId())
                 .orElseThrow(() -> new RuntimeException("Workstation not found"));

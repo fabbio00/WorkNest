@@ -4,7 +4,6 @@ import com.ams.worknest.model.dto.EmailDto;
 import com.ams.worknest.model.resources.EmailResource;
 import com.ams.worknest.services.EmailSenderService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 

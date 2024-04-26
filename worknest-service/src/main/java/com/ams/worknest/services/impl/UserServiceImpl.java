@@ -78,10 +78,10 @@ public class UserServiceImpl implements UserService {
             userResource.setStatus(u.getStatus());
             userResource.setSurname(u.getSurname());
             userResource.setType(u.getType());
-            userResource.setBarrier_free_flag(u.isBarrierFreeFlag());
+            userResource.setBarrierFreeFlag(u.isBarrierFreeFlag());
             userResource.setUsername(u.getUsername());
-            userResource.setRegistration_date(u.getRegistrationDate());
-            userResource.setTax_code(u.getTaxCode());
+            userResource.setRegistrationDate(u.getRegistrationDate());
+            userResource.setTaxCode(u.getTaxCode());
         });
 
         return userResource;
@@ -104,10 +104,10 @@ public class UserServiceImpl implements UserService {
             userResource.setStatus(u.getStatus());
             userResource.setSurname(u.getSurname());
             userResource.setType(u.getType());
-            userResource.setBarrier_free_flag(u.isBarrierFreeFlag());
+            userResource.setBarrierFreeFlag(u.isBarrierFreeFlag());
             userResource.setUsername(u.getUsername());
-            userResource.setRegistration_date(u.getRegistrationDate());
-            userResource.setTax_code(u.getTaxCode());
+            userResource.setRegistrationDate(u.getRegistrationDate());
+            userResource.setTaxCode(u.getTaxCode());
         });
 
         return userResource;
