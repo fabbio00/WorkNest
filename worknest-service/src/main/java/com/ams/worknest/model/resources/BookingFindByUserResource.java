@@ -1,6 +1,5 @@
 package com.ams.worknest.model.resources;
 
-import com.ams.worknest.model.entities.WorkStation;
 import lombok.Builder;
 import lombok.Data;
 

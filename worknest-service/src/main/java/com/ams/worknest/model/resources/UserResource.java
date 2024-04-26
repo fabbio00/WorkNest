@@ -29,13 +29,13 @@ public class UserResource {
 
     private String email;
 
-    private String tax_code;
+    private String taxCode;
 
     private String type;
 
-    private boolean barrier_free_flag;
+    private boolean barrierFreeFlag;
 
-    private ZonedDateTime registration_date;
+    private ZonedDateTime registrationDate;
 
     private String status;
 
