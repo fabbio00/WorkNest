@@ -1,0 +1,110 @@
+package com.ams.worknest.controllers;
+
+import com.ams.worknest.model.dto.BookingCreateDto;
+import com.ams.worknest.model.dto.BookingEditDto;
+import com.ams.worknest.model.resources.*;
+import com.ams.worknest.services.BookingService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+
+/**
+ * Controller for managing bookings.
+ * Provides endpoints for creating and retrieving booking details.
+ */
+
+@Slf4j
+@RestController
+@RequestMapping(value = "/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
+public class BookingController {
+
+    private final BookingService bookingService;
+
+    /**
+     * Create a booking with the provided booking details.
+     *
+     * @param bookingCreateDto the booking data transfer object containing booking details
+     * @return the created booking as a resource
+     */
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookingCreateResource bookingCreation(@RequestBody BookingCreateDto bookingCreateDto){
+        return bookingService.createBooking(bookingCreateDto);
+    }
+
+    /**
+     * Retrieve a booking by its unique identifier.
+     *
+     * @param bookingId the UUID of the booking to retrieve
+     * @return the requested booking as a resource
+     */
+    @GetMapping("/{bookingId}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookingFindResource bookingFindById(@PathVariable("bookingId") UUID bookingId){
+        return bookingService.findBookingById(bookingId);
+    }
+
+
+    /**
+     * Retrieve bookings for a specific date.
+     *
+     * @param date the date for which bookings are to be retrieved
+     * @return a list of bookings for the specified date
+     */
+    @GetMapping("/findDesks")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindWorkStationResource> getBookingsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return bookingService.findBookingsByDate(date);
+    }
+
+    /**
+     * Retrieves a list of bookings associated with a specific user.
+     *
+     * @param userId the UUID of the user whose bookings are to be retrieved
+     * @return a list of booking resources associated with the specified user
+     */
+    @GetMapping("/list/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindByUserResource> getBookingsByUserId(@PathVariable("userId") UUID userId){
+        return bookingService.findBookingsByUserId(userId);
+    }
+
+    /**
+     * Delete a booking with the specified ID.
+     *
+     * @param bookingId The UUID of the booking to delete
+     * @return A {@link BookingDeleteResource} representing the deleted booking
+     * @throws RuntimeException if the booking doesn't exist
+     */
+    @PutMapping("/delete/{bookingId}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookingDeleteResource bookingDelete(@PathVariable("bookingId") UUID bookingId){
+        return bookingService.deleteBooking(bookingId);
+    }
+
+    /**
+     * Edits the details of a booking with the specified ID using the provided data and returns the updated booking details.
+     *
+     * @param bookingId      The UUID of the booking to be edited.
+     * @param bookingEditDto The data containing the updated details for the booking.
+     * @return The resource containing the updated details of the booking.
+     * @throws RuntimeException if the booking with the specified ID is not found.
+     */
+    @PutMapping("/edit/{bookingId}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookingEditResource bookingEdit(@PathVariable("bookingId") UUID bookingId, @RequestBody BookingEditDto bookingEditDto){
+        return bookingService.editBooking(bookingId, bookingEditDto);
+    }
+
+
+
+}

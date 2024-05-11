@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: root
+    password: root
+    schema: worknest
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: testerdev149@gmail.com
+    password: iksh ujsb vhnp yxey
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

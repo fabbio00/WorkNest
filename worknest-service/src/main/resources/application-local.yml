@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: root
+    password: root
+  flyway:
+    locations: classpath:db/migrations
+    enabled: true
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+

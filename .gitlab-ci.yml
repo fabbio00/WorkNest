@@ -1,0 +1,114 @@
+variables:
+  MAVEN_CLI_OPTS: "--strict-checksums --threads 1C --batch-mode"
+  MAVEN_OPTS: >
+    -Dhttps.protocols=TLSv1.2
+    -Dmaven.repo.local=.m2/repository
+    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+    -Dorg.slf4j.simpleLogger.showDateTime=true
+  SPRING_PROFILES_ACTIVE: testcicd
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - worknest-ui/node_modules/
+
+stages:
+  - install_dependencies
+  - build
+  - test
+  - package
+  - release
+  - generate_documentation
+  - build_container
+
+clean:
+  stage: build
+  image: maven:3.9.6
+  script:
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS clean
+
+compile:
+  stage: build
+  needs: [clean]
+  image: maven:3.9.6
+  script:
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS compile
+
+spring_test:
+  stage: test
+  needs: [compile]
+  image: maven:3.9.6
+  services:
+    - name: postgres:14.11
+      alias: postgres
+  variables:
+    POSTGRES_DB: postgres
+    POSTGRES_USER: root
+    POSTGRES_PASSWORD: root
+  script:
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS test
+
+package_be:
+  image: maven:3.9.6
+  stage: package
+  needs: [spring_test]
+  script:
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS -DskipTests package
+  artifacts:
+    paths:
+      - worknest-service/target/*.jar
+
+docs_spring:
+  stage: generate_documentation
+  image: maven:3.9.6
+  needs: [package_be]
+  script:
+    - cd worknest-service
+    - mvn $MAVEN_CLI_OPTS $MAVEN_OPTS javadoc:javadoc
+    - mv target/site/apidocs public
+  artifacts:
+    paths:
+      - worknest-service/public
+
+install_dependencies_vue:
+  stage: install_dependencies
+  image: node:21.7.1
+  script:
+    - cd worknest-ui
+    - npm ci
+
+
+build_fe:
+  stage: build
+  image: node:21.7.1
+  needs: [install_dependencies_vue]
+  script:
+    - cd worknest-ui
+    - npm run build
+  artifacts:
+    paths:
+      - worknest-ui/dist/
+
+
+test_vue:
+  stage: test
+  needs: [build_fe]
+  image: node:21.7.1
+  script:
+    - cd worknest-ui
+    - npm run test:unit
+
+docs_vue:
+  stage: generate_documentation
+  image: node:21.7.1
+  needs: [build_fe]
+  script:
+    - cd worknest-ui
+    - npm run docs
+  artifacts:
+    paths:
+      - worknest-ui/docs/
