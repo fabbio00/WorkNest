@@ -1,4 +1,4 @@
-﻿# Project Setup Documentation
+# Project Setup Documentation
 
 ## IDE Configuration - IntelliJ IDEA
 
