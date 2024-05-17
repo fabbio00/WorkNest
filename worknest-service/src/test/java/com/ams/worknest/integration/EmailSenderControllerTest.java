@@ -1,6 +1,6 @@
-package com.ams.worknest;
+package com.ams.worknest.integration;
 
-import com.ams.worknest.model.dto.EmailDto;
+import com.ams.worknest.BaseMvcTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @Slf4j
-@ContextConfiguration(classes = com.ams.worknest.EmailSenderControllerTest.class)
+@ContextConfiguration(classes = EmailSenderControllerTest.class)
 class EmailSenderControllerTest extends BaseMvcTest {
 
     @Autowired

@@ -1,5 +1,6 @@
-package com.ams.worknest;
+package com.ams.worknest.integration;
 
+import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.repositories.WorkStationRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
-@ContextConfiguration(classes = com.ams.worknest.BookingControllerTest.class)
+@ContextConfiguration(classes = BookingControllerTest.class)
 class WorkStationControllerTest extends BaseMvcTest {
 
     @Autowired
