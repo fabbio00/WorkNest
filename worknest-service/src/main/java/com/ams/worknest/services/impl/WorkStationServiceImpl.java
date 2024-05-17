@@ -43,7 +43,6 @@ public class WorkStationServiceImpl implements WorkStationService {
                 .pricePerH(workStation.getPricePerH())
                 .equipment(workStation.getEquipment())
                 .type(workStation.getType())
-                .floor(workStation.getFloor())
                 .name(workStation.getName())
                 .build();
     }
