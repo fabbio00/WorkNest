@@ -1,5 +1,6 @@
-package com.ams.worknest;
+package com.ams.worknest.integration;
 
+import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.dto.UserDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @Transactional
-@ContextConfiguration(classes = com.ams.worknest.UserControllerTest.class)
+@ContextConfiguration(classes = UserControllerTest.class)
 class UserControllerTest extends BaseMvcTest {
     @Autowired
     private MockMvc mvc;

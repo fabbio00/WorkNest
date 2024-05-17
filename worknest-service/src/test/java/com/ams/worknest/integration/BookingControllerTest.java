@@ -1,5 +1,6 @@
-package com.ams.worknest;
+package com.ams.worknest.integration;
 
+import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @Slf4j
-@ContextConfiguration(classes = com.ams.worknest.BookingControllerTest.class)
+@ContextConfiguration(classes = BookingControllerTest.class)
 class BookingControllerTest extends BaseMvcTest {
 
     @Autowired
