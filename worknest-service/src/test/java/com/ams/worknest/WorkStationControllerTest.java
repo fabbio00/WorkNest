@@ -45,7 +45,6 @@ class WorkStationControllerTest extends BaseMvcTest {
                 .pricePerH(3)
                 .equipment("monitor")
                 .type("desk")
-                .floor(1)
                 .build();
 
         return workStationRepository.save(workStation);

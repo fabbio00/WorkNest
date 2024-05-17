@@ -46,9 +46,4 @@ public class WorkStation {
      */
     private String type;
 
-    /**
-     * The floor where the workstation is located.
-     */
-    private int floor;
-
 }
