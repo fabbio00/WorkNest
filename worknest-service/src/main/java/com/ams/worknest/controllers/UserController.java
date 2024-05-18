@@ -1,8 +1,10 @@
 package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEditTypeDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.resources.UserFindByCompanyResource;
 import com.ams.worknest.model.resources.UserLoggedResource;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.services.UserService;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -69,6 +72,28 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserLoggedResource getLoggedUser(@RequestBody UserLoggedDto userLoggedDto){
         return userService.userLogin(userLoggedDto);
+    }
+
+    // find users associeted with a specific company code
+    @GetMapping("/company/{companyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserFindByCompanyResource> getUsersByCompany(@PathVariable("companyId") UUID companyId) {
+        log.info("GET | /users/company/{}", companyId);
+        return userService.getUsersByCompany(companyId);
+    }
+
+    // change user type
+    @PutMapping("/type")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResource changeUserStatus(@RequestBody UserEditTypeDto userEditTypeDto) {
+        return userService.changeUserType(userEditTypeDto);
+    }
+
+    // change user status to active
+    @PutMapping("/status/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResource activateUser(@PathVariable("userId") UUID userId) {
+        return userService.changeUserStatus(userId);
     }
 
 }

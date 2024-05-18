@@ -1,9 +1,11 @@
 package com.ams.worknest.services.impl;
 
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEditTypeDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
 import com.ams.worknest.model.entities.User;
+import com.ams.worknest.model.resources.UserFindByCompanyResource;
 import com.ams.worknest.model.resources.UserLoggedResource;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.repositories.UserRepository;
@@ -14,8 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Service implementation for managing user-related operations.
@@ -133,4 +134,74 @@ public class UserServiceImpl implements UserService {
                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found or credentials are incorrect"));
          return new UserLoggedResource(user.getId());
      }
+
+    @Override
+    public List<UserFindByCompanyResource> getUsersByCompany(UUID companyId) {
+
+         List<User> users = userRepository.findByCompany(companyId);
+
+         if(users.isEmpty()){
+             return Collections.emptyList();
+         }
+
+         return users.stream()
+                 .map(u -> UserFindByCompanyResource.builder()
+                         .id(u.getId())
+                         .name(u.getName())
+                         .email(u.getEmail())
+                         .status(u.getStatus())
+                         .surname(u.getSurname())
+                         .type(u.getType())
+                         .build())
+                 .toList();
+
+    }
+
+    @Override
+    public UserResource changeUserType(UserEditTypeDto userTypeEditDto) {
+         Optional<User> user = userRepository.findById(userTypeEditDto.getUserId());
+         UserResource userResource = new UserResource();
+
+         user.ifPresent(u -> {
+             u.setType(userTypeEditDto.getType());
+             userRepository.save(u);
+
+             userResource.setId(u.getId());
+             userResource.setName(u.getName());
+             userResource.setEmail(u.getEmail());
+             userResource.setStatus(u.getStatus());
+             userResource.setSurname(u.getSurname());
+             userResource.setType(u.getType());
+             userResource.setBarrierFreeFlag(u.isBarrierFreeFlag());
+             userResource.setUsername(u.getUsername());
+             userResource.setRegistrationDate(u.getRegistrationDate());
+             userResource.setTaxCode(u.getTaxCode());
+         });
+
+         return userResource;
+    }
+
+    @Override
+    public UserResource changeUserStatus(UUID userId) {
+        Optional<User> user = userRepository.findById(userId);
+        UserResource userResource = new UserResource();
+
+        user.ifPresent(u -> {
+            u.setStatus("inactive");
+            userRepository.save(u);
+
+            userResource.setId(u.getId());
+            userResource.setName(u.getName());
+            userResource.setEmail(u.getEmail());
+            userResource.setStatus(u.getStatus());
+            userResource.setSurname(u.getSurname());
+            userResource.setType(u.getType());
+            userResource.setBarrierFreeFlag(u.isBarrierFreeFlag());
+            userResource.setUsername(u.getUsername());
+            userResource.setRegistrationDate(u.getRegistrationDate());
+            userResource.setTaxCode(u.getTaxCode());
+        });
+
+        return userResource;
+    }
 }

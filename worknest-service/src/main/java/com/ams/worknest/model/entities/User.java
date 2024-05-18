@@ -1,5 +1,6 @@
 package com.ams.worknest.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -82,5 +83,10 @@ public class User {
      * Can be 'active' or 'inactive'.
      */
     private String status;
+
+    @JsonManagedReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id")
+    private Company company;
 
 }
