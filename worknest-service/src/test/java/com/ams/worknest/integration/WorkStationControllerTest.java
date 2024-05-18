@@ -4,6 +4,7 @@ import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.repositories.WorkStationRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,6 +38,11 @@ class WorkStationControllerTest extends BaseMvcTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name", is(savedWorkStation.getName())))
                 .andReturn();
+    }
+
+    @AfterEach
+    void cleanUp() throws Exception {
+        workStationRepository.deleteAll();
     }
 
     WorkStation savedWorkStationTemplate(){

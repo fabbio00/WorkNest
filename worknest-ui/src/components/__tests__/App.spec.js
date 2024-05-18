@@ -3,12 +3,15 @@ import { shallowMount } from "@vue/test-utils";
 import App from "../../App.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
+
 // Create a mock for the router with necessary test routes
 const routes = [{ path: "/", meta: { requiresAuth: true } }];
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+
 
 describe("App", () => {
   let wrapper;
@@ -59,4 +62,6 @@ describe("App", () => {
 
     expect(mockApiService.find_user_by_id).not.toHaveBeenCalled();
   });
+
+
 });
