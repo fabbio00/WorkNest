@@ -31,7 +31,7 @@ describe("CompanyRegistrationView", () => {
 
   it("should validate that passwords match and set isPasswordValid to true", async () => {
     await wrapper.setData({
-      business_user: {
+      businessUser: {
         password: "TestPassword123!",
       },
       password_confirmed: "TestPassword123!",
@@ -61,7 +61,7 @@ describe("CompanyRegistrationView", () => {
 
   it("should validate that passwords match", async () => {
     await wrapper.setData({
-      business_user: {
+      businessUser: {
         password: "Password1!",
         surname: "Smith",
       },

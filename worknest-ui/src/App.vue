@@ -25,6 +25,7 @@ import { RouterView } from "vue-router";
           <v-divider thickness="2"></v-divider>
           <v-list density="compact" nav>
             <v-list-item
+              v-if="user.type !== 'ADMINISTRATOR'"
               prepend-icon="mdi-calendar-plus-outline"
               title=""
               @click="redirect('/booking')"
@@ -34,12 +35,57 @@ import { RouterView } from "vue-router";
               </template>
             </v-list-item>
             <v-list-item
+              v-if="user.type !== 'ADMINISTRATOR'"
               prepend-icon="mdi-calendar-month-outline"
               title=""
               @click="redirect('/bookingList')"
             >
               <template v-slot:title>
                 <p class="font-weight-black">View your bookings</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'ADMINISTRATOR'"
+              prepend-icon="mdi-office-building-plus"
+              title=""
+              @click="redirect('/company-registration')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">Add new company</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'ADMINISTRATOR'"
+              prepend-icon="mdi-calendar-multiple"
+              title=""
+              @click="redirect('/')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all bookings</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'ADMINISTRATOR'"
+              prepend-icon="mdi-domain"
+              title=""
+              @click="redirect('/')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all company</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'ADMINISTRATOR'"
+              prepend-icon="mdi-account-multiple"
+              title=""
+              @click="redirect('/')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all users</p>
               </template>
             </v-list-item>
           </v-list>

@@ -32,6 +32,9 @@ import { required, email, minLength, maxLength } from "@vuelidate/validators";
             label="First name"
             variant="outlined"
             color="indigo"
+            :error-messages="v$.user.name.$errors.map((e) => e.$message)"
+            @blur="v$.user.name.$touch"
+            @input="v$.user.name.$touch"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="6">
@@ -41,6 +44,9 @@ import { required, email, minLength, maxLength } from "@vuelidate/validators";
             label="Last name"
             variant="outlined"
             color="indigo"
+            :error-messages="v$.user.surname.$errors.map((e) => e.$message)"
+            @blur="v$.user.surname.$touch"
+            @input="v$.user.surname.$touch"
           ></v-text-field>
         </v-col>
       </v-row>

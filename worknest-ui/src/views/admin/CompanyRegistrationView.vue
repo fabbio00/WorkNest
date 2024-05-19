@@ -90,19 +90,29 @@ import { required, email, numeric, minLength } from "@vuelidate/validators";
         <v-col cols="12" md="6">
           <div class="text-overline text-large-emphasis">Name</div>
           <v-text-field
-            v-model="business_user.name"
+            v-model="businessUser.name"
             label="Name"
             variant="outlined"
             color="indigo"
+            :error-messages="
+              v$.businessUser.name.$errors.map((e) => e.$message)
+            "
+            @blur="v$.businessUser.name.$touch"
+            @input="v$.businessUser.name.$touch"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="6">
           <div class="text-overline text-large-emphasis">Surname</div>
           <v-text-field
-            v-model="business_user.surname"
+            v-model="businessUser.surname"
             label="Surname"
             variant="outlined"
             color="indigo"
+            :error-messages="
+              v$.businessUser.surname.$errors.map((e) => e.$message)
+            "
+            @blur="v$.businessUser.surname.$touch"
+            @input="v$.businessUser.surname.$touch"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -110,21 +120,21 @@ import { required, email, numeric, minLength } from "@vuelidate/validators";
         <v-col cols="12" md="6">
           <div class="text-overline text-large-emphasis">E-mail</div>
           <v-text-field
-            v-model="business_user.email"
+            v-model="businessUser.email"
             label="E-mail"
             variant="outlined"
             color="indigo"
             :error-messages="
-              v$.business_user.email.$errors.map((e) => e.$message)
+              v$.businessUser.email.$errors.map((e) => e.$message)
             "
-            @blur="v$.business_user.email.$touch"
-            @input="v$.business_user.email.$touch"
+            @blur="v$.businessUser.email.$touch"
+            @input="v$.businessUser.email.$touch"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="6">
           <div class="text-overline text-large-emphasis">Username</div>
           <v-text-field
-            v-model="business_user.username"
+            v-model="businessUser.username"
             label="Username"
             variant="outlined"
             color="indigo"
@@ -135,7 +145,7 @@ import { required, email, numeric, minLength } from "@vuelidate/validators";
         <v-col cols="12" md="6">
           <div class="text-overline text-large-emphasis">Password</div>
           <v-text-field
-            v-model="business_user.password"
+            v-model="businessUser.password"
             label="Password"
             variant="outlined"
             color="indigo"
@@ -143,12 +153,12 @@ import { required, email, numeric, minLength } from "@vuelidate/validators";
             :append-inner-icon="passwordVisible ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append-inner="passwordVisible = !passwordVisible"
             :error-messages="
-              v$.business_user.password.$invalid
+              v$.businessUser.password.$invalid
                 ? 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and be at least 8 characters long'
                 : []
             "
-            @blur="v$.business_user.password.$touch"
-            @input="v$.business_user.password.$touch"
+            @blur="v$.businessUser.password.$touch"
+            @input="v$.businessUser.password.$touch"
           >
           </v-text-field>
         </v-col>
@@ -181,7 +191,7 @@ import { required, email, numeric, minLength } from "@vuelidate/validators";
           <v-btn
             :disabled="
               !isPasswordValid ||
-              v$.business_user.$invalid ||
+              v$.businessUser.$invalid ||
               v$.company.$invalid
             "
             prepend-icon="mdi-check"
@@ -300,7 +310,7 @@ const checkPassword = helpers.regex(
  *
  * Data properties:
  * @vue-data {Object} company - Contains company input fields including name, email, vatCode, phone, and companyCode.
- * @vue-data {Object} business_user - Contains business user input fields including name, surname, email, username, password, taxCode, and companyCode.
+ * @vue-data {Object} businessUser - Contains business user input fields including name, surname, email, username, password, taxCode, and companyCode.
  * @vue-data {Boolean} isPasswordValid - Indicates whether the password matches the confirmation password.
  * @vue-data {String} password_confirmed - Stores the user's input for password confirmation.
  * @vue-data {Boolean} passwordVisible - Controls the visibility of the password field.
@@ -331,7 +341,7 @@ export default {
         phone: "",
         companyCode: "",
       },
-      business_user: {
+      businessUser: {
         name: "",
         surname: "",
         email: "",
@@ -343,7 +353,7 @@ export default {
         barrerFreeFlag: false,
       },
       companyInitialState: { ...this.company },
-      business_userInitialState: { ...this.business_user },
+      businessUserInitialState: { ...this.businessUser },
       isPasswordValid: false,
       password_confirmed: "",
       passwordVisible: false,
@@ -362,8 +372,8 @@ export default {
      */
     validatePassword() {
       this.isPasswordValid =
-        this.business_user &&
-        this.business_user.password === this.password_confirmed;
+        this.businessUser &&
+        this.businessUser.password === this.password_confirmed;
     },
 
     /**
@@ -417,18 +427,18 @@ export default {
      */
     createBusinessUser(companyId) {
       if (this.isPasswordValid) {
-        this.business_user.companyId = companyId;
+        this.businessUser.companyId = companyId;
         let encryptedPassword = UserServices.encryptPassword(
-          this.business_user.password,
+          this.businessUser.password,
         );
         let userWithEncryptedPassword = {
-          ...this.business_user,
+          ...this.businessUser,
           password: encryptedPassword,
         };
         const emailData = {
-          to: this.business_user.email,
+          to: this.businessUser.email,
           subject: "Registration to WorkNest",
-          text: `Welcome ${this.business_user.name}, you've been registered as a business user for the company ${this.company.name}. \nUse the following code to login as a company: ${this.company.companyCode}. \nThen use the following password: ${this.business_user.password}`,
+          text: `Welcome ${this.businessUser.name}, you've been registered as a business user for the company ${this.company.name}. \nUse the following code to login as a company: ${this.company.companyCode}. \nThen use the following password: ${this.businessUser.password}`,
         };
         this.$ApiService
           .create_user(userWithEncryptedPassword)
@@ -461,7 +471,7 @@ export default {
     clear() {
       this.alertVisible = false;
       this.company = { ...this.companyInitialState };
-      this.business_user = { ...this.business_userInitialState };
+      this.businessUser = { ...this.businessUserInitialState };
       this.password_confirmed = "";
       this.isPasswordValid = false;
       this.v$.$reset();
@@ -469,7 +479,7 @@ export default {
   },
 
   validations: {
-    business_user: {
+    businessUser: {
       email: {
         required,
         email,
@@ -478,6 +488,8 @@ export default {
           helpers.withAsync(emailUsed),
         ),
       },
+      name: { required },
+      surname: { required },
       password: { required, checkPassword },
     },
     password_confirmed: { required },
