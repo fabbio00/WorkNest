@@ -12,6 +12,7 @@ import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Component;
 
