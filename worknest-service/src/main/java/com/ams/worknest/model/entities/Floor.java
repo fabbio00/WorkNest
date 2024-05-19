@@ -42,7 +42,7 @@ public class Floor {
      * The building that this floor belongs to.
      */
     @JsonManagedReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "building_id")
     private Building building;
 

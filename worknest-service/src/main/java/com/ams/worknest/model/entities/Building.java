@@ -50,12 +50,12 @@ public class Building {
      * The street number of the building.
      */
     @Column(name = "street_number")
-    private String streetNumber;
+    private Integer streetNumber;
 
     /**
      * The list of floors in the building.
      */
-    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "building", fetch = FetchType.LAZY)
     private List<Floor> floors;
 
 }
