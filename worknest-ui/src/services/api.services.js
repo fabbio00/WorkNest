@@ -87,6 +87,28 @@ class ApiService {
         return res;
       });
   }
+
+  get_list_employee(companyId) {
+    return axios.get("http://localhost:8080/users/company/" + companyId)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  delete_user(userId) {
+    return axios.put("http://localhost:8080/users/status/" + userId)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  edit_user_type(userId, userType) {
+    return axios.put("http://localhost:8080/users/type/" + userId, userType)
+      .then((res) => {
+        return res;
+      });
+  }
+
 }
 
 export default new ApiService();

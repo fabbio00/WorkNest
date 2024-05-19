@@ -83,13 +83,13 @@ public class UserController {
     }
 
     // change user type
-    @PutMapping("/type")
+    @PutMapping("/type/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserResource changeUserStatus(@RequestBody UserEditTypeDto userEditTypeDto) {
-        return userService.changeUserType(userEditTypeDto);
+    public UserResource changeUserStatus(@PathVariable("userId") UUID userId, @RequestBody UserEditTypeDto userEditTypeDto) {
+        return userService.changeUserType(userId, userEditTypeDto);
     }
 
-    // change user status to active
+    // change user status to inactive
     @PutMapping("/status/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserResource activateUser(@PathVariable("userId") UUID userId) {

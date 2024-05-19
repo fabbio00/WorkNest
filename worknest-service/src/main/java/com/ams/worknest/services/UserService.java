@@ -51,7 +51,7 @@ public interface UserService {
 
     List<UserFindByCompanyResource> getUsersByCompany(UUID companyId);
 
-    UserResource changeUserType(UserEditTypeDto userEditTypeDto);
+    UserResource changeUserType(UUID userId, UserEditTypeDto userEditTypeDto);
 
     UserResource changeUserStatus(UUID userId);
 }

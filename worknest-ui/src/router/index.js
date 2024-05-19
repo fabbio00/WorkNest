@@ -46,6 +46,12 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: "/company/employeesList",
+      name: "employeesList",
+      component: () => import("../views/company/EmployeesListView.vue"),
+    },
+
   ],
 });
 

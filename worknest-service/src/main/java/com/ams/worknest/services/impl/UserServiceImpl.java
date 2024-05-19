@@ -158,8 +158,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResource changeUserType(UserEditTypeDto userTypeEditDto) {
-         Optional<User> user = userRepository.findById(userTypeEditDto.getUserId());
+    public UserResource changeUserType(UUID userId, UserEditTypeDto userTypeEditDto) {
+         Optional<User> user = userRepository.findById(userId);
          UserResource userResource = new UserResource();
 
          user.ifPresent(u -> {
