@@ -34,7 +34,7 @@
               </v-card>
             </v-dialog>
 
-            <v-dialog v-model="dialogEdit" max-width="500px">
+            <v-dialog v-model="dialogEdit" max-width="600px">
                 <v-card>
                     <v-card-title class="text-h5 text-center"
                     >Are you sure you want to change <br> {{ editedItem.name }} {{ editedItem.surname }}'s permissions to business?</v-card-title
@@ -143,6 +143,7 @@
 export default {
   data: () => ({
     companyId: "356869f3-8402-4b65-b0e3-d8eb1f0de532",
+    userId: "c0cae2ca-8085-4772-9237-e09e9c22cd6b",
     dialog: false,
     dialogDelete: false,
     dialogEdit: false,
@@ -187,6 +188,58 @@ export default {
 
     deleteItemConfirm() {
         this.$ApiService.delete_user(this.editedItem.userId).then(() => {
+
+            this.$ApiService
+                .find_user_by_id(this.editedItem.userId)
+                .then((u) => {
+                    const emailData = {
+                    to: u.data.email,
+                    subject: "Delete User Confirmed",
+                    text: `${this.editedItem.name} ${this.editedItem.surname} has been successfully deleted yuor account.`,
+                    };
+
+                    this.$ApiService
+                    .send_mail(emailData)
+                    .then((emailRes) => {
+                        console.log(emailRes.data);
+                    })
+                    .catch((emailError) => {
+                        console.error("Error sending email:", emailError);
+                    });
+
+                    this.dialogDelete = false;
+                    location.reload();
+                })
+                .catch((userError) => {
+                    console.error("Error finding user:", userError);
+                });
+
+            this.$ApiService
+                .find_user_by_id(this.userId)
+                .then((u) => {
+                    const emailData = {
+                    to: u.data.email,
+                    subject: "Delete User Confirmed",
+                    text: `${u.data.name} ${u.data.surname} has been successfully deleted.`,
+                    };
+
+                    this.$ApiService
+                    .send_mail(emailData)
+                    .then((emailRes) => {
+                        console.log(emailRes.data);
+                    })
+                    .catch((emailError) => {
+                        console.error("Error sending email:", emailError);
+                    });
+
+                    this.dialogDelete = false;
+                    location.reload();
+                })
+                .catch((userError) => {
+                    console.error("Error finding user:", userError);
+                });
+            
+
             this.dialogDelete = false;
             location.reload();
         });
@@ -207,7 +260,32 @@ export default {
     editItemConfirm() {
         this.editType.type = "Business";
         this.$ApiService.edit_user_type(this.editedItem.userId, this.editType).then((response) => {
-            console.log(response);
+
+            this.$ApiService
+                .find_user_by_id(this.editedItem.userId)
+                .then((u) => {
+                    const emailData = {
+                    to: u.data.email,
+                    subject: "User Type Changed",
+                    text: `Your account is now business.`,
+                    };
+
+                    this.$ApiService
+                    .send_mail(emailData)
+                    .then((emailRes) => {
+                        console.log(emailRes.data);
+                    })
+                    .catch((emailError) => {
+                        console.error("Error sending email:", emailError);
+                    });
+
+                    this.dialogDelete = false;
+                    location.reload();
+                })
+                .catch((userError) => {
+                    console.error("Error finding user:", userError);
+                });
+
             this.dialogDelete = false;
             location.reload();
         });

@@ -23,7 +23,7 @@
           type="warning"
           class="mb-2"
         >
-          Invalid email or password</v-alert
+          Invalid email or password </v-alert
         >
       </Transition>
       <div class="text-subtitle-1 text-medium-emphasis text-left">Account</div>
@@ -134,15 +134,18 @@ export default {
       this.$ApiService
         .login(this.email, UserServices.encryptPassword(this.password))
         .then((res) => {
-          if (res == "unauthorized") {
-            this.invalidCredentials = true;
-          } else if (res.data && res.data.id) {
-            const expirationTime = Date.now() + 3 * 3600 * 1000;
-            localStorage.setItem("expirationTime", expirationTime);
-            localStorage.setItem("userId", res.data.id);
-            this.invalidCredentials = false;
-            window.location.href = "/";
-          }
+          this.$ApiService.find_user_by_id(res.data.id).then((u) => {
+            console.log(u.data);
+            if (res == "unauthorized" || u.data.status == "inactive") {
+              this.invalidCredentials = true;
+            } else if (res.data && res.data.id) {
+              const expirationTime = Date.now() + 3 * 3600 * 1000;
+              localStorage.setItem("expirationTime", expirationTime);
+              localStorage.setItem("userId", res.data.id);
+              this.invalidCredentials = false;
+              window.location.href = "/";
+            }
+          });
         });
     },
   },
