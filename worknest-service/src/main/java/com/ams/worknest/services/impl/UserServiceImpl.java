@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Service implementation for managing user-related operations.
- * This class provides methods to create and retrieve user information.
+ * Implementation of the {@link UserService} interface.
+ * Provides methods for finding user details.
  */
 @Component
 @RequiredArgsConstructor
@@ -115,7 +115,6 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Authenticate a user based on the provided login credentials.
-     *
      * This method attempts to authenticate a user using their email and password.
      * If authentication is successful, it returns the logged-in user information as a resource.
      * If the user cannot be found or if the credentials are incorrect, it throws a ResponseStatusException

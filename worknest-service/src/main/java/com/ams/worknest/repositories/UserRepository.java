@@ -8,6 +8,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * UserRepository interface.
+ * This interface handles the data access layer for the User entity.
+ */
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**

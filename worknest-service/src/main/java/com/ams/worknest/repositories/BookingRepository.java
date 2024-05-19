@@ -9,11 +9,27 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * BookingRepository interface.
+ * This interface handles the data access layer for the Booking entity.
+ */
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
+    /**
+     * Custom query to find bookings by start date only.
+     *
+     * @param date The start date to search bookings.
+     * @return A list of bookings that start on the given date.
+     */
     @Query(value = "SELECT * FROM booking WHERE DATE(start_date) = :date", nativeQuery = true)
     List<Booking> findByStartDateOnly(LocalDate date);
 
+    /**
+     * Finds bookings by user.
+     *
+     * @param user The user to search bookings.
+     * @return A list of bookings associated with the given user.
+     */
     List<Booking> findByUser(User user);
 
 }
