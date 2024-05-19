@@ -7,15 +7,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation of the EmailSenderService.
- * Provides functionality to send simple text emails.
+ * Implementation of the {@link EmailSenderService} interface.
+ * Provides methods for sending email messages.
  */
 @Component
 public class EmailSenderServiceImpl implements EmailSenderService {
 
     private final JavaMailSender emailSender;
 
-    // Email address from which the email will be sent
     private static final String SENDER_EMAIL_ADDRESS = "testerdev149@gmail.com";
 
     /**

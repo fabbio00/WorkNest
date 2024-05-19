@@ -1,7 +1,6 @@
 package com.ams.worknest.model.resources;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -10,7 +9,10 @@ import java.util.UUID;
  * Resource class representing a workstation found during a booking search.
  * Contains the ID of a workstation associated with a booking.
  */
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder(toBuilder = true)
 public class BookingFindWorkStationResource {
 

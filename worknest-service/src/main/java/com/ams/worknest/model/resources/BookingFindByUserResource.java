@@ -1,7 +1,6 @@
 package com.ams.worknest.model.resources;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -10,7 +9,10 @@ import java.util.UUID;
  * Resource class representing booking details associated with a specific user.
  * Contains information about bookings made by a user.
  */
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder(toBuilder = true)
 public class BookingFindByUserResource {
 
