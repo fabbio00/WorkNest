@@ -9,7 +9,6 @@ import java.util.UUID;
 /**
  * Building entity class.
  * Represents a building in the system.
- *
  */
 @Entity
 @Getter

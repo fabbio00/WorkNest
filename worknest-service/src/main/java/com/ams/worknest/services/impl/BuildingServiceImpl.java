@@ -5,11 +5,11 @@ import com.ams.worknest.model.resources.BuildingFindResource;
 import com.ams.worknest.model.resources.FloorFindResource;
 import com.ams.worknest.repositories.BuildingRepository;
 import com.ams.worknest.services.BuildingService;
-import com.ams.worknest.services.FloorService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,14 +37,17 @@ public class BuildingServiceImpl implements BuildingService {
         Building building = buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new EntityNotFoundException(BUILDING_NOT_FOUND));
 
-        List<FloorFindResource> floorResources = building.getFloors().stream()
-                .map(floor -> FloorFindResource.builder()
-                        .floorId(floor.getId())
-                        .buildingId(building.getId())
-                        .numberOfFloor(floor.getNumberOfFloor())
-                        .numBathrooms(floor.getNumBathrooms())
-                        .build())
-                .toList();
+        List<FloorFindResource> floorResources = new ArrayList<>();
+        if (building.getFloors() != null) {
+            floorResources = building.getFloors().stream()
+                    .map(floor -> FloorFindResource.builder()
+                            .floorId(floor.getId())
+                            .buildingId(building.getId())
+                            .numberOfFloor(floor.getNumberOfFloor())
+                            .numBathrooms(floor.getNumBathrooms())
+                            .build())
+                    .toList();
+        }
 
         return BuildingFindResource.builder()
                 .id(building.getId())
@@ -68,14 +71,18 @@ public class BuildingServiceImpl implements BuildingService {
         List<Building> buildingsList = buildingRepository.findAll();
 
         return buildingsList.stream().map(building -> {
-            List<FloorFindResource> floorResources = building.getFloors().stream()
-                    .map(floor -> FloorFindResource.builder()
-                            .floorId(floor.getId())
-                            .buildingId(building.getId())
-                            .numberOfFloor(floor.getNumberOfFloor())
-                            .numBathrooms(floor.getNumBathrooms())
-                            .build())
-                    .toList();
+            List<FloorFindResource> floorResources = new ArrayList<>();
+            if (building.getFloors() != null) {
+                floorResources = building.getFloors().stream()
+                        .map(floor -> FloorFindResource.builder()
+                                .floorId(floor.getId())
+                                .buildingId(building.getId())
+                                .numberOfFloor(floor.getNumberOfFloor())
+                                .numBathrooms(floor.getNumBathrooms())
+                                .build())
+                        .toList();
+            }
+
 
             return BuildingFindResource.builder()
                     .id(building.getId())

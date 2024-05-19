@@ -9,7 +9,6 @@ import java.util.UUID;
 /**
  * WorkStation entity class.
  * Represents a workstation on a floor in a building in the system.
- *
  */
 @Entity
 @Getter

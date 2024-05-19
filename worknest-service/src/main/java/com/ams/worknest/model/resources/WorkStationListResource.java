@@ -8,7 +8,6 @@ import java.util.UUID;
 /**
  * WorkStationListResource class.
  * Represents a list of workstations in a specific building and floor.
- *
  */
 @Getter
 @Setter

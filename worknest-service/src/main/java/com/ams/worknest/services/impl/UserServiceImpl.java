@@ -8,8 +8,8 @@ import com.ams.worknest.model.resources.UserLoggedResource;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +26,8 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private static final String USER_NOT_FOUND = "User not found or credentials are incorrect";
 
     /**
      * Creates a new user in the database using the information provided in the UserDto.
@@ -129,7 +131,7 @@ public class UserServiceImpl implements UserService {
      public UserLoggedResource userLogin(UserLoggedDto userLoggedDto) {
 
          User user = userRepository.findByEmailAndPassword(userLoggedDto.getEmail(), userLoggedDto.getPassword())
-                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found or credentials are incorrect"));
+                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
          return new UserLoggedResource(user.getId());
      }
 }

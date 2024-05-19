@@ -33,7 +33,7 @@ public class FloorServiceImpl implements FloorService {
     public FloorFindResource findFloorById(UUID floorId) {
 
         Floor floor = floorRepository.findById(floorId)
-                .orElseThrow(() -> new RuntimeException(FLOOR_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(FLOOR_NOT_FOUND));
 
         return FloorFindResource.builder()
                 .floorId(floorId)

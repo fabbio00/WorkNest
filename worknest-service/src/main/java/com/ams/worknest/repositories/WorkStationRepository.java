@@ -10,7 +10,6 @@ import java.util.UUID;
 /**
  * WorkStationRepository interface.
  * This interface handles the data access layer for the WorkStation entity.
- *
  */
 public interface WorkStationRepository extends JpaRepository<WorkStation, UUID> {
 

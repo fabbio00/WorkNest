@@ -14,7 +14,6 @@ import java.util.UUID;
 /**
  * FloorController class.
  * Provides endpoints for managing floors of a building.
- *
  */
 @Slf4j
 @RestController

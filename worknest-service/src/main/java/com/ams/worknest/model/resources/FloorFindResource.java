@@ -7,7 +7,6 @@ import java.util.UUID;
 /**
  * FloorFindResource class.
  * Represents a floor resource that is returned to UI when retrieving floor information.
- *
  */
 @Getter
 @Setter

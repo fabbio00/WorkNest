@@ -9,8 +9,6 @@ import java.util.UUID;
 /**
  * FloorRepository interface.
  * This interface handles the data access layer for the Floor entity.
- *
- * @author OCR1D
  */
 public interface FloorRepository extends JpaRepository<Floor, UUID> {
 

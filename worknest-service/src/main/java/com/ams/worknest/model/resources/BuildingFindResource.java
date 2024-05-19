@@ -45,7 +45,7 @@ public class BuildingFindResource {
     /**
      * The street number of the building.
      */
-    private String streetNumber;
+    private Integer streetNumber;
 
     /**
      * The list of floors in the building.
