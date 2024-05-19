@@ -135,6 +135,14 @@ public class UserServiceImpl implements UserService {
          return new UserLoggedResource(user.getId());
      }
 
+    /**
+     * This method is used to retrieve all users associated with a specific company.
+     * It first retrieves all User entities associated with the provided company id from the database. If no users are found, it returns an empty list.
+     * If users are found, it creates a list of UserFindByCompanyResource objects, each containing the public-facing information of a user, and returns this list.
+     *
+     * @param companyId The unique identifier of the company.
+     * @return List of UserFindByCompanyResource containing the public-facing user information.
+     */
     @Override
     public List<UserFindByCompanyResource> getUsersByCompany(UUID companyId) {
 
@@ -157,6 +165,16 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     * This method is used to change the type of a user.
+     * It first tries to find the user in the database using the provided UUID. If the user is found, it changes the user's type to the type provided in the
+     * UserEditTypeDto object, saves the updated User entity in the database, and then creates a UserResource object and sets its properties to the corresponding
+     * properties of the updated User entity. If the user is not found, it returns an empty UserResource object.
+     *
+     * @param userId The unique identifier of the user.
+     * @param userTypeEditDto Data Transfer Object containing the new user type.
+     * @return UserResource containing the updated user information.
+     */
     @Override
     public UserResource changeUserType(UUID userId, UserEditTypeDto userTypeEditDto) {
          Optional<User> user = userRepository.findById(userId);
@@ -181,6 +199,15 @@ public class UserServiceImpl implements UserService {
          return userResource;
     }
 
+    /**
+     * This method is used to change the status of a user to inactive.
+     * It first tries to find the user in the database using the provided UUID. If the user is found, it changes the user's status to "inactive",
+     * saves the updated User entity in the database, and then creates a UserResource object and sets its properties to the corresponding properties
+     * of the updated User entity. If the user is not found, it returns an empty UserResource object.
+     *
+     * @param userId The unique identifier of the user.
+     * @return UserResource containing the updated user information.
+     */
     @Override
     public UserResource changeUserStatus(UUID userId) {
         Optional<User> user = userRepository.findById(userId);

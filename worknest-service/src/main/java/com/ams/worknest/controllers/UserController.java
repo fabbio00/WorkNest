@@ -74,7 +74,12 @@ public class UserController {
         return userService.userLogin(userLoggedDto);
     }
 
-    // find users associeted with a specific company code
+    /**
+     * Retrieve all users associated with a company.
+     *
+     * @param companyId the UUID of the company to retrieve users for
+     * @return a list of users associated with the company
+     */
     @GetMapping("/company/{companyId}")
     @ResponseStatus(HttpStatus.OK)
     public List<UserFindByCompanyResource> getUsersByCompany(@PathVariable("companyId") UUID companyId) {
@@ -82,14 +87,25 @@ public class UserController {
         return userService.getUsersByCompany(companyId);
     }
 
-    // change user type
+    /**
+     * Change the type of a user.
+     *
+     * @param userId the UUID of the user to change the type for
+     * @param userEditTypeDto the data transfer object containing the new user type
+     * @return the updated user information as a resource
+     */
     @PutMapping("/type/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserResource changeUserStatus(@PathVariable("userId") UUID userId, @RequestBody UserEditTypeDto userEditTypeDto) {
         return userService.changeUserType(userId, userEditTypeDto);
     }
 
-    // change user status to inactive
+    /**
+     * Change the status of a user to inactive.
+     *
+     * @param userId the UUID of the user to change the status for
+     * @return the updated user information as a resource
+     */
     @PutMapping("/status/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserResource activateUser(@PathVariable("userId") UUID userId) {

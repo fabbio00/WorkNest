@@ -2,6 +2,7 @@ package com.ams.worknest.integration;
 
 import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.dto.UserDto;
+import com.ams.worknest.model.dto.UserEditTypeDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
 import com.ams.worknest.model.entities.User;
@@ -17,8 +18,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -152,11 +155,6 @@ class UserControllerTest extends BaseMvcTest {
                 .andExpect(status().isUnauthorized()).andReturn();
     }
 
-    @AfterEach
-    void cleanUp() throws Exception {
-        userRepository.deleteAll();
-    }
-
     UserLoggedDto userLoggedDtoCreation(){
 
         User user = User.builder()
@@ -179,4 +177,51 @@ class UserControllerTest extends BaseMvcTest {
                 .password("prova24!")
                 .build();
     }
+
+
+    @Test
+    void getUsersByCompany() throws Exception {
+        User savedUser = savedUserTemplate();
+        mvc.perform(
+                        get(USER_ENDPOINT + "/company/{companyId}", savedUser.getId())
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void changeUserStatus() throws Exception {
+        User savedUser = savedUserTemplate();
+        UserEditTypeDto userEditTypeDto = new UserEditTypeDto();
+        userEditTypeDto.setType("Business");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(userEditTypeDto);
+
+        mvc.perform(
+                        put(USER_ENDPOINT + "/type/{userId}", savedUser.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(userJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void activateUser() throws Exception {
+        User savedUser = savedUserTemplate();
+
+        mvc.perform(
+                        put(USER_ENDPOINT + "/status/{userId}", savedUser.getId())
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @AfterEach
+    void cleanUp() throws Exception {
+        userRepository.deleteAll();
+    }
+
+
 }
