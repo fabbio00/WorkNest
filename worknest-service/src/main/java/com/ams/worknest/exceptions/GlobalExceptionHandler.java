@@ -1,6 +1,7 @@
 package com.ams.worknest.exceptions;
 
 import com.ams.worknest.model.resources.CustomErrorResource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,6 +15,8 @@ import java.time.LocalDateTime;
  * Handles all exceptions thrown within the application.
  * Returns a ResponseEntity containing a CustomErrorResource in the body.
  */
+
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -42,6 +45,9 @@ public class GlobalExceptionHandler {
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
+
+        log.info("Exception handled: ", ex);
+
         CustomErrorResource errorResource = CustomErrorResource.builder()
                 .message(ex.getMessage())
                 .status(status)
