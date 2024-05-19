@@ -7,6 +7,7 @@ import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.services.impl.UserServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -168,7 +169,7 @@ class UserServiceTest {
         userLoggedDto.setEmail(email);
         userLoggedDto.setPassword(password);
 
-        assertThrows(ResponseStatusException.class, () -> userService.userLogin(userLoggedDto));
+        assertThrows(EntityNotFoundException.class, () -> userService.userLogin(userLoggedDto));
     }
 
     @DisplayName("User login with non-existing email")
@@ -183,7 +184,7 @@ class UserServiceTest {
         userLoggedDto.setEmail(email);
         userLoggedDto.setPassword(password);
 
-        assertThrows(ResponseStatusException.class, () -> userService.userLogin(userLoggedDto));
+        assertThrows(EntityNotFoundException.class, () -> userService.userLogin(userLoggedDto));
     }
 
     @DisplayName("User login with incorrect password")
@@ -212,6 +213,6 @@ class UserServiceTest {
         userLoggedDto.setEmail(email);
         userLoggedDto.setPassword(incorrectPassword);
 
-        assertThrows(ResponseStatusException.class, () -> userService.userLogin(userLoggedDto));
+        assertThrows(EntityNotFoundException.class, () -> userService.userLogin(userLoggedDto));
     }
 }
