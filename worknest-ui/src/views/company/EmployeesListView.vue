@@ -139,6 +139,44 @@
 
 <script>
 
+/**
+ * Vue component for managing employees.
+ * This component allows users to view and manage employees, including displaying employee details in a table format.
+ *
+ * Features:
+ * - Displays a table of employees with columns for surname, name, user type, status, and actions.
+ * - Allows users to perform actions such as editing or deleting employees.
+ *
+ * Data properties:
+ * @vue-data {string} companyId - The ID of the company.
+ * @vue-data {string} userId - The ID of the current user.
+ * @vue-data {boolean} dialog - Flag to control the visibility of a dialog.
+ * @vue-data {boolean} dialogDelete - Flag to control the visibility of the delete confirmation dialog.
+ * @vue-data {boolean} dialogEdit - Flag to control the visibility of the edit confirmation dialog.
+ * @vue-data {boolean} showField - Flag to control the visibility of a field.
+ * @vue-data {Array} headers - Array of objects representing table headers.
+ * @vue-data {Object} headerProps - Object containing properties for table header styling.
+ * @vue-data {Object} itemProps - Object containing properties for table item styling.
+ * @vue-data {Array} employees - Array containing employee data to be displayed in the table.
+ * @vue-data {number} editedIndex - Index of the currently edited employee.
+ * @vue-data {Object} editedItem - Object representing the currently edited employee.
+ * @vue-data {Object} editType - Object representing the edit type of the employee.
+ *
+ * Methods:
+ * @vue-method {Function} deleteItem - Opens the delete confirmation dialog for the specified employee.
+ * @vue-method {Function} deleteItemConfirm - Confirms the deletion of an employee.
+ * @vue-method {Function} closeDelete - Closes the delete confirmation dialog.
+ * @vue-method {Function} editItem - Opens the edit confirmation dialog for the specified employee.
+ * @vue-method {Function} editItemConfirm - Confirms the editing of an employee.
+ * @vue-method {Function} closeEdit - Closes the edit confirmation dialog.
+ * @vue-method {Function} initialize_table - Initializes the table by fetching employee data and populating the employees array.
+ *
+ * Usage:
+ * This component is used within a Vue application to manage employee data and display it in a table format.
+ * It integrates with backend APIs to fetch employee information and allows users to perform various actions on employees.
+ * @subcategory views/company
+ */
+
 
 export default {
   data: () => ({
@@ -177,6 +215,10 @@ export default {
 
   methods: {
 
+     /**
+     * Opens the delete confirmation dialog for the specified employee.
+     * @param {Object} item - The employee item to be deleted.
+     */
     deleteItem(item) {
       if (item.status !== "inactive") {
         this.editedIndex = this.employees.indexOf(item);
@@ -185,7 +227,10 @@ export default {
       }
     },
 
-
+    /**
+     * Confirms the deletion of an employee.
+     * Deletes the employee item from the database and sends a confirmation email.
+     */
     deleteItemConfirm() {
         this.$ApiService.delete_user(this.editedItem.userId).then(() => {
 
@@ -245,10 +290,17 @@ export default {
         });
     },
 
+    /**
+     * Closes the delete confirmation dialog.
+     */
     closeDelete() {
       this.dialogDelete = false;
     },
 
+    /**
+     * Opens the edit confirmation dialog for the specified employee.
+     * @param {Object} item - The employee item to be edited.
+     */
     editItem(item) {
       if (item.status !== "inactive") {
         this.editedIndex = this.employees.indexOf(item);
@@ -257,6 +309,10 @@ export default {
       }
     },
 
+    /**
+     * Confirms the editing of an employee.
+     * Edits the employee type in the database and sends a confirmation email.
+     */
     editItemConfirm() {
         this.editType.type = "Business";
         this.$ApiService.edit_user_type(this.editedItem.userId, this.editType).then((response) => {
@@ -291,11 +347,16 @@ export default {
         });
     },
 
+    /**
+     * Closes the edit confirmation dialog.
+     */
     closeEdit() {
       this.dialogEdit = false;
     },
 
-
+    /**
+     * Initializes the table by fetching employee data and populating the employees array.
+     */
     initialize_table() {
       this.$ApiService
         .get_list_employee(this.companyId)
