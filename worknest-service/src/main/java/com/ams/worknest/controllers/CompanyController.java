@@ -46,10 +46,6 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     public CompanyResource getCompanyByCompanyCode(@RequestBody CompanyCodeDto companyCodeDto) {
         log.info("POST | /companies/companyCode | companyCodeDto = {}", companyCodeDto);
-        CompanyResource companyResource = companyService.getCompanyByCompanyCode(companyCodeDto);
-        if (companyResource == null || companyResource.getCompanyCode() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company code not found");
-        }
-        return companyResource;
+        return companyService.getCompanyByCompanyCode(companyCodeDto);
     }
 }

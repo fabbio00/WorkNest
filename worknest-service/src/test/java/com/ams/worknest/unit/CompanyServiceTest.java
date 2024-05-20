@@ -6,6 +6,7 @@ import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.resources.CompanyResource;
 import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.services.impl.CompanyServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,12 +95,9 @@ class CompanyServiceTest {
         CompanyCodeDto companyCodeDto = new CompanyCodeDto();
         companyCodeDto.setCompanyCode(companyCode);
 
-        CompanyResource companyResource = companyService.getCompanyByCompanyCode(companyCodeDto);
-
-        assertNull(companyResource.getId());
-        assertNull(companyResource.getName());
-        assertNull(companyResource.getEmail());
-        assertNull(companyResource.getCompanyCode());
+        assertThrows(EntityNotFoundException.class, () -> {
+            companyService.getCompanyByCompanyCode(companyCodeDto);
+        });
     }
 
     CompanyDto companyDtoCreation() {

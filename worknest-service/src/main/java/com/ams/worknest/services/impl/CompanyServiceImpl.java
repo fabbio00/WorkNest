@@ -6,10 +6,10 @@ import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.resources.CompanyResource;
 import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.services.CompanyService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 /**
  * Service implementation for managing company-related operations.
  * This class provides methods to create and retrieve company information.
@@ -18,6 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
+
+    private static final String COMPANY_CODE_NOT_FOUND = "Company code not found!";
 
     /**
      * Creates a new company in the database using the information provided in the CompanyDto.
@@ -51,17 +53,18 @@ public class CompanyServiceImpl implements CompanyService {
      * @return CompanyResource containing the public-facing company information.
      */
     public CompanyResource getCompanyByCompanyCode(CompanyCodeDto companyCodeDto){
-        Optional<Company> company = companyRepository.findByCompanyCode(companyCodeDto.getCompanyCode());
-        CompanyResource companyResource = new CompanyResource();
 
-        company.ifPresent(c -> {
-            companyResource.setId(c.getId());
-            companyResource.setName(c.getName());
-            companyResource.setEmail(c.getEmail());
-            companyResource.setVatCode(c.getVatCode());
-            companyResource.setPhone(c.getPhone());
-            companyResource.setCompanyCode(c.getCompanyCode());
-        });
-        return companyResource;
+        Company company = companyRepository.findByCompanyCode(companyCodeDto.getCompanyCode())
+                .orElseThrow(() -> new EntityNotFoundException(COMPANY_CODE_NOT_FOUND));
+
+        return CompanyResource.builder()
+                .id(company.getId())
+                .name(company.getName())
+                .email(company.getEmail())
+                .vatCode(company.getVatCode())
+                .phone(company.getPhone())
+                .companyCode(company.getCompanyCode())
+                .build();
+
     }
 }

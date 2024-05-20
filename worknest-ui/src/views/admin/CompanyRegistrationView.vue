@@ -443,13 +443,12 @@ export default {
         this.$ApiService
           .create_user(userWithEncryptedPassword)
           .then(() => {
+            this.alertVisible = true;
+            this.alertType = "success";
+            this.alertText = "Registration was successful!";
             this.$ApiService
               .send_mail(emailData)
-              .then(() => {
-                this.alertVisible = true;
-                this.alertType = "success";
-                this.alertText = "Registration was successful!";
-              })
+              .then(() => {})
               .catch((emailError) => {
                 console.error("Error sending email:", emailError);
               });
