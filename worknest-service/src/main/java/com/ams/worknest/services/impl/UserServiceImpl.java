@@ -3,13 +3,16 @@ package com.ams.worknest.services.impl;
 import com.ams.worknest.model.dto.UserDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.resources.UserLoggedResource;
 import com.ams.worknest.model.resources.UserResource;
+import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private static final String USER_NOT_FOUND = "User not found or credentials are incorrect";
-
+    private final CompanyRepository companyRepository;
     /**
      * Creates a new user in the database using the information provided in the UserDto.
      *
@@ -51,6 +54,11 @@ public class UserServiceImpl implements UserService {
                 .registrationDate(zonedDateTime)
                 .build();
 
+        if (userDTO.getCompanyId() != null) {
+            Company company = companyRepository.findById(userDTO.getCompanyId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
+            user.setCompany(company);
+        }
         // Save the User entity to the database
         User savedUser = userRepository.save(user);
 

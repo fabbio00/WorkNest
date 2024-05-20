@@ -49,7 +49,7 @@ import { RouterView } from "vue-router";
               v-if="user.type === 'ADMINISTRATOR'"
               prepend-icon="mdi-office-building-plus"
               title=""
-              @click="redirect('/')"
+              @click="redirect('/company-registration')"
             >
               <template v-slot:title>
                 <p class="font-weight-black">Add new company</p>
@@ -88,7 +88,6 @@ import { RouterView } from "vue-router";
                 <p class="font-weight-black">View all users</p>
               </template>
             </v-list-item>
-
           </v-list>
         </v-navigation-drawer>
       </v-layout>

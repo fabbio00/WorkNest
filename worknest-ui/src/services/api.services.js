@@ -87,6 +87,14 @@ class ApiService {
         return res;
       });
   }
+
+  create_company(company) {
+    return axios
+      .post("http://localhost:8080/companies", company)
+      .then((res) => {
+        return res;
+      });
+  }
 }
 
 export default new ApiService();

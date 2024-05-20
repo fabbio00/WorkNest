@@ -16,32 +16,34 @@
  * It displays a personalized greeting with the user's name and surname, and a motivational message.
  * The component fetches the user's data from a backend API upon mounting.
  *
- * 
+ *
  * Data properties:
  * @vue-data {Object} user - An object to store the currently authenticated user's data.
  *
  * Lifecycle hooks:
  * @vue-lifecycle-hook {Function} beforeMount - Called before the component is mounted.
  *      It makes an API call to retrieve the user's data based on the userId stored in local storage.
- * 
+ *
  * @subcategory views
  */
 export default {
-    data() {
-        return {
-            // Data property to store the current user's information.
-            user: {}
-        }
-    },
-    beforeMount() {
-        /**
-         * Lifecycle hook to fetch the user's data before the component mounts.
-         * It sends a request to the backend API using the userId from local storage.
-         * The response data is then assigned to the 'user' data property.
-         */
-        this.$ApiService.find_user_by_id(localStorage.getItem('userId')).then((res) => {
-            this.user = res.data;
-        });
-    },
-}
+  data() {
+    return {
+      // Data property to store the current user's information.
+      user: {},
+    };
+  },
+  beforeMount() {
+    /**
+     * Lifecycle hook to fetch the user's data before the component mounts.
+     * It sends a request to the backend API using the userId from local storage.
+     * The response data is then assigned to the 'user' data property.
+     */
+    this.$ApiService
+      .find_user_by_id(localStorage.getItem("userId"))
+      .then((res) => {
+        this.user = res.data;
+      });
+  },
+};
 </script>
