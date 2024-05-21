@@ -93,19 +93,18 @@ import { RouterView } from "vue-router";
               v-if="user.type === 'BUSINESS'"
               prepend-icon="mdi-calendar-multiple"
               title=""
-              @click="redirect('/businessBookingsList')"
+              @click="redirect('/')"
             >
               <template v-slot:title>
                 <p class="font-weight-black">View all bookings</p>
               </template>
             </v-list-item>
 
-
             <v-list-item
               v-if="user.type === 'BUSINESS'"
               prepend-icon="mdi-account-multiple"
               title=""
-              @click="redirect('/businessEmployeesList')"
+              @click="redirect('/')"
             >
               <template v-slot:title>
                 <p class="font-weight-black">View all employees</p>
