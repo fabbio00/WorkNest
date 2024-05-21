@@ -93,6 +93,7 @@ public class UserServiceImpl implements UserService {
             userResource.setUsername(u.getUsername());
             userResource.setRegistrationDate(u.getRegistrationDate());
             userResource.setTaxCode(u.getTaxCode());
+            userResource.setCompanyId(u.getCompany().getId());
         });
 
         return userResource;

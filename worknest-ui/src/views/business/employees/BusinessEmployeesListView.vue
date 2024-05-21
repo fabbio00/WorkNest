@@ -180,8 +180,8 @@
 
 export default {
   data: () => ({
-    companyId: "356869f3-8402-4b65-b0e3-d8eb1f0de532",
-    userId: "c0cae2ca-8085-4772-9237-e09e9c22cd6b",
+    companyId: "",
+    userId: "",
     dialog: false,
     dialogDelete: false,
     dialogEdit: false,
@@ -210,7 +210,13 @@ export default {
   }),
 
   mounted() {
-    this.initialize_table();
+    this.userId = localStorage.getItem("userId");
+    this.$ApiService.find_user_by_id(this.userId).then((res) => {
+      console.log(res.data.companyId);
+      this.companyId = res.data.companyId;
+      this.initialize_table();
+    });
+    console.log(this.companyId);
   },
 
   methods: {
@@ -358,6 +364,7 @@ export default {
      * Initializes the table by fetching employee data and populating the employees array.
      */
     initialize_table() {
+      console.log(this.companyId);
       this.$ApiService
         .get_list_employee(this.companyId)
         .then((response) => {
@@ -365,6 +372,7 @@ export default {
             console.log(employees);
 
             employees.forEach((employee) => {
+              if(employee.id !== this.userId) {
                 this.employees.push({
                     name: employee.name,
                     surname: employee.surname,
@@ -372,6 +380,7 @@ export default {
                     status: employee.status,
                     userId: employee.id,
                 });
+              }
             });
 
         })

@@ -104,7 +104,7 @@ import { RouterView } from "vue-router";
               v-if="user.type === 'BUSINESS'"
               prepend-icon="mdi-account-multiple"
               title=""
-              @click="redirect('/')"
+              @click="redirect('/businessEmployeesList')"
             >
               <template v-slot:title>
                 <p class="font-weight-black">View all employees</p>
