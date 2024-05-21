@@ -68,7 +68,7 @@
             :class="{
               disabled:
                 item.status !== 'inactive' &&
-                item.type !== 'Business'
+                item.type !== 'BUSINESS'
                   ? false
                   : true,
             }"
@@ -314,7 +314,7 @@ export default {
      * Edits the employee type in the database and sends a confirmation email.
      */
     editItemConfirm() {
-        this.editType.type = "Business";
+        this.editType.type = "BUSINESS";
         this.$ApiService.edit_user_type(this.editedItem.userId, this.editType).then((response) => {
 
             this.$ApiService

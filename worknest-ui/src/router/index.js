@@ -47,9 +47,12 @@ const router = createRouter({
       },
     },
     {
-      path: "/company/employeesList",
-      name: "employeesList",
-      component: () => import("../views/company/EmployeesListView.vue"),
+      path: "/businessEmployeesList",
+      name: "businessEmployeesList",
+      component: () => import("../views/business/employees/BusinessEmployeesListView.vue"),
+      meta: {
+        requiresAuth: true,
+      },
     },
 
   ],

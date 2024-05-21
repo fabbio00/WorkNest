@@ -11,6 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -27,6 +31,8 @@ class WorkStationControllerTest extends BaseMvcTest {
 
     private static final String WORKSTATION_ENDPOINT = "/workstations";
 
+    private final List<UUID> createdWorkstationIds = new ArrayList<>();
+
     @Test
     void getWorkStationById() throws Exception{
         WorkStation savedWorkStation = savedWorkStationTemplate();
@@ -42,7 +48,8 @@ class WorkStationControllerTest extends BaseMvcTest {
 
     @AfterEach
     void cleanUp() throws Exception {
-        workStationRepository.deleteAll();
+        createdWorkstationIds.forEach(id -> workStationRepository.deleteById(id));
+        createdWorkstationIds.clear();
     }
 
     WorkStation savedWorkStationTemplate(){
@@ -54,7 +61,10 @@ class WorkStationControllerTest extends BaseMvcTest {
                 .type("desk")
                 .build();
 
-        return workStationRepository.save(workStation);
+        WorkStation savedWorkStation = workStationRepository.save(workStation);
+
+        createdWorkstationIds.add(savedWorkStation.getId());
+        return savedWorkStation;
 
     }
 
