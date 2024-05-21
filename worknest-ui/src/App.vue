@@ -49,7 +49,7 @@ import { RouterView } from "vue-router";
               v-if="user.type === 'ADMINISTRATOR'"
               prepend-icon="mdi-office-building-plus"
               title=""
-              @click="redirect('/')"
+              @click="redirect('/company-registration')"
             >
               <template v-slot:title>
                 <p class="font-weight-black">Add new company</p>
@@ -89,6 +89,27 @@ import { RouterView } from "vue-router";
               </template>
             </v-list-item>
 
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-calendar-multiple"
+              title=""
+              @click="redirect('/')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all bookings</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-account-multiple"
+              title=""
+              @click="redirect('/')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all employees</p>
+              </template>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
       </v-layout>

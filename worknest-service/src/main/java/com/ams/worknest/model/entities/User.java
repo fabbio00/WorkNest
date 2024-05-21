@@ -60,10 +60,10 @@ public class User {
 
     /**
      * Type of the user, indicating their role within the system.
-     * - Private: An individual user with personal access.
-     * - Employee: A standard business or company user.
-     * - Business: A business user with additional privileges, like managing or booking for others.
-     * - Administrator: A user with full administrative access to the entire Worknest system.
+     * - PRIVATE: An individual user with personal access.
+     * - EMPLOYEE: A standard business or company user.
+     * - BUSINESS: A business user with additional privileges, like managing or booking for others.
+     * - ADMINISTRATOR: A user with full administrative access to the entire Worknest system.
      */
     private String type;
 

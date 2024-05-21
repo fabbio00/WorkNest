@@ -88,6 +88,14 @@ class ApiService {
       });
   }
 
+  create_company(company) {
+    return axios
+      .post("http://localhost:8080/companies", company)
+      .then((res) => {
+        return res;
+      });
+  }
+
   get_list_employee(companyId) {
     return axios.get("http://localhost:8080/users/company/" + companyId)
       .then((res) => {

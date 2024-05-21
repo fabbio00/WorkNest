@@ -1,26 +1,23 @@
-package com.ams.worknest.model.entities;
+package com.ams.worknest.model.resources;
 
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
 
 /**
- * Entity representing a company in the Worknest system.
+ * Resource class representing the public-facing information of a company.
+ * This class is used to encapsulate company data that is safe to expose through the API.
  */
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@Table(name = "company")
-public class Company {
+public class CompanyResource {
+
     /**
      * Unique identifier for the company.
      */
-    @Id
-    @GeneratedValue(generator = "uuid")
     private UUID id;
 
     /**
@@ -29,15 +26,14 @@ public class Company {
     private String name;
 
     /**
-     * VAT code of the company.
-     */
-    @Column(name = "vat_code")
-    private String vatCode;
-
-    /**
      * Email address of the company.
      */
     private String email;
+
+    /**
+     * VAT code of the company.
+     */
+    private String vatCode;
 
     /**
      * Phone number of the company.
@@ -47,6 +43,5 @@ public class Company {
     /**
      * Unique code of the company.
      */
-    @Column(name = "company_code")
     private String companyCode;
 }

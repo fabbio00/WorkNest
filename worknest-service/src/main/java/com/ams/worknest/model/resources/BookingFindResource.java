@@ -1,8 +1,7 @@
 package com.ams.worknest.model.resources;
 
 import com.ams.worknest.model.entities.WorkStation;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 
@@ -10,7 +9,10 @@ import java.time.ZonedDateTime;
  * Resource class representing the details of a booking found.
  * Contains information about an existing booking.
  */
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder(toBuilder = true)
 public class BookingFindResource {
 
