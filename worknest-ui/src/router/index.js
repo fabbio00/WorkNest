@@ -55,6 +55,15 @@ const router = createRouter({
         role: "ADMINISTRATOR",
       },
     },
+    {
+      path: "/businessEmployeesList",
+      name: "businessEmployeesList",
+      component: () => import("../views/business/employees/BusinessEmployeesListView.vue"),
+      meta: {
+        requiresAuth: true,
+      },
+    },
+
   ],
 });
 

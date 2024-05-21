@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,4 +35,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * @return An optional containing the user if found, otherwise empty.
      */
     Optional<User> findByEmail(String email);
+
+
+    @Query("SELECT u FROM User u WHERE u.company.id = :companyId")
+    List<User> findByCompany(@Param("companyId") UUID companyId);
 }

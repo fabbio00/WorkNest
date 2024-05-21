@@ -23,7 +23,7 @@
           type="warning"
           class="mb-2"
         >
-          Invalid email or password</v-alert
+          Invalid email or password </v-alert
         >
       </Transition>
       <div class="text-subtitle-1 text-medium-emphasis text-left">Account</div>
@@ -120,6 +120,7 @@ export default {
       email: "",
       password: "",
       invalidCredentials: false,
+      prova: "ciao",
     };
   },
   methods: {
@@ -127,23 +128,33 @@ export default {
      * login
      * Called when the user attempts to log in via the login form. It encrypts the provided password and sends the
      * email and encrypted password to the API for validation. If the response indicates failure (e.g., 'unauthorized'),
-     * it sets the invalidCredentials flag to true, which triggers the display of an error alert.
+     * or the user's status is 'inactive' it sets the invalidCredentials flag to true, which triggers the display of an error alert.
      * On successful authentication, the method stores the user's session information and redirects to the homepage.
      */
     login() {
       this.$ApiService
         .login(this.email, UserServices.encryptPassword(this.password))
         .then((res) => {
-          if (res == "unauthorized") {
+          if(res == "unauthorized"){
             this.invalidCredentials = true;
-          } else if (res.data && res.data.id) {
-            const expirationTime = Date.now() + 3 * 3600 * 1000;
-            localStorage.setItem("expirationTime", expirationTime);
-            localStorage.setItem("userId", res.data.id);
-            this.invalidCredentials = false;
-            window.location.href = "/";
-          }
+            return true;
+          } else {
+            this.prova = res.data.id;
+          this.$ApiService.find_user_by_id(res.data.id).then((u) => {
+            console.log(u.data);
+            if (u.data.status == "inactive") {
+              this.invalidCredentials = true;
+            } else if (res.data && res.data.id) {
+              const expirationTime = Date.now() + 3 * 3600 * 1000;
+              localStorage.setItem("expirationTime", expirationTime);
+              localStorage.setItem("userId", res.data.id);
+              this.invalidCredentials = false;
+              window.location.href = "/";
+            }
+          });
+        }
         });
+      
     },
   },
 };
