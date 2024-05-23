@@ -120,7 +120,6 @@ export default {
       email: "",
       password: "",
       invalidCredentials: false,
-      prova: "ciao",
     };
   },
   methods: {

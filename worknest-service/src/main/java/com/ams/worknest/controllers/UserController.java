@@ -88,7 +88,7 @@ public class UserController {
     }
 
     /**
-     * Change the type of a user.
+     * Change the type of user.
      *
      * @param userId the UUID of the user to change the type for
      * @param userEditTypeDto the data transfer object containing the new user type

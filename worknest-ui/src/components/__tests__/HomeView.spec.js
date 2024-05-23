@@ -47,7 +47,7 @@ describe("HomeView", () => {
     );
   });
 
-  // ------- adimin buttons tests -------
+  // ------- admin buttons tests -------
 
   it("does not show admin buttons for non ADMINISTRATOR user", async () => {
     const user = {
@@ -63,6 +63,8 @@ describe("HomeView", () => {
     mockApiService.find_user_by_id.mockResolvedValueOnce({ data: user });
 
     await wrapper.vm.$nextTick();
+    await wrapper.setData({ user });
+    await wrapper.vm.$nextTick(); // Ensure reactivity is processed
 
     expect(
       wrapper.find('[prepend-icon="mdi-office-building-plus"]').exists(),
@@ -76,7 +78,42 @@ describe("HomeView", () => {
     );
   });
 
-  it("does not show admin buttons for ADMINISTRATOR user", async () => {
+  // ------- business user tests -------
+
+  it("does not show business buttons for non BUSINESS user", async () => {
+    const user = {
+      name: "John",
+      surname: "Doe",
+      email: "john@example.com",
+      password: "test123",
+      taxCode: "taxcode",
+      companyCode: "companyCode",
+      type: "USER",
+      barrerFreeFlag: false,
+    };
+    mockApiService.find_user_by_id.mockResolvedValueOnce({ data: user });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.setData({ user });
+    await wrapper.vm.$nextTick(); // Ensure reactivity is processed
+
+    // Check if user is correctly set
+    expect(wrapper.vm.user.type).toBe("USER");
+
+    // Ensure the correct buttons are not rendered
+    await wrapper.vm.$nextTick(); // Ensure the DOM is updated
+
+    expect(
+      wrapper.find('[prepend-icon="mdi-calendar-multiple"]').exists(),
+    ).toBe(false);
+    expect(wrapper.find('[prepend-icon="mdi-account-multiple"]').exists()).toBe(
+      false,
+    );
+  });
+
+  // ------- welcome message tests -------
+
+  it("displays welcome message for ADMINISTRATOR user", async () => {
     const user = {
       name: "John",
       surname: "Doe",
@@ -90,12 +127,52 @@ describe("HomeView", () => {
     mockApiService.find_user_by_id.mockResolvedValueOnce({ data: user });
 
     await wrapper.vm.$nextTick();
+    await wrapper.setData({ user });
+    await wrapper.vm.$nextTick(); // Ensure reactivity is processed
 
-    expect(
-      wrapper.find('[prepend-icon="mdi-calendar-month-outline"]').exists(),
-    ).toBe(false);
-    expect(
-      wrapper.find('[prepend-icon="mdi-calendar-plus-outline"]').exists(),
-    ).toBe(false);
+    const welcomeMessage = wrapper.find(".text-h5").text();
+    expect(welcomeMessage).toBe("Welcome admin");
+  });
+
+  it("displays welcome message for BUSINESS user", async () => {
+    const user = {
+      name: "John",
+      surname: "Doe",
+      email: "john@example.com",
+      password: "test123",
+      taxCode: "taxcode",
+      companyCode: "companyCode",
+      type: "BUSINESS",
+      barrerFreeFlag: false,
+    };
+    mockApiService.find_user_by_id.mockResolvedValueOnce({ data: user });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.setData({ user });
+    await wrapper.vm.$nextTick(); // Ensure reactivity is processed
+
+    const welcomeMessage = wrapper.find(".text-h5").text();
+    expect(welcomeMessage).toBe("Welcome business user");
+  });
+
+  it("displays generic welcome message for USER", async () => {
+    const user = {
+      name: "John",
+      surname: "Doe",
+      email: "john@example.com",
+      password: "test123",
+      taxCode: "taxcode",
+      companyCode: "companyCode",
+      type: "USER",
+      barrerFreeFlag: false,
+    };
+    mockApiService.find_user_by_id.mockResolvedValueOnce({ data: user });
+
+    await wrapper.vm.$nextTick();
+    await wrapper.setData({ user });
+    await wrapper.vm.$nextTick(); // Ensure reactivity is processed
+
+    const welcomeMessage = wrapper.find(".text-h5").text();
+    expect(welcomeMessage).toBe("Welcome to your productivity hub");
   });
 });
