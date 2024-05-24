@@ -117,6 +117,17 @@ class ApiService {
       });
   }
 
+  get_list_by_company_booking(companyId, employeeName = '', employeeSurname = '') {
+    const params = new URLSearchParams();
+    if (employeeName) params.append('employeeName', employeeName);
+    if (employeeSurname) params.append('employeeSurname', employeeSurname);
+    return axios
+      .get("http://localhost:8080/bookings/list_by_company/" + companyId + "?" + params.toString())
+      .then((res) => {
+        return res;
+      });
+  }
+
 }
 
 export default new ApiService();
