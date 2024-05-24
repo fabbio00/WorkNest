@@ -47,7 +47,7 @@
                     <v-btn
                         color="blue-darken-1"
                         variant="text"
-                        @click="editItemConfirm"
+                        @click="editTypeItemConfirm"
                         >OK</v-btn
                     >
                     <v-spacer></v-spacer>
@@ -64,7 +64,7 @@
           <v-icon
             class="me-2"
             size="small"
-            @click="editItem(item)"
+            @click="editTypeItem(item)"
             :class="{
               disabled:
                 item.status !== 'inactive' &&
@@ -166,8 +166,8 @@
  * @vue-method {Function} deleteItem - Opens the delete confirmation dialog for the specified employee.
  * @vue-method {Function} deleteItemConfirm - Confirms the deletion of an employee.
  * @vue-method {Function} closeDelete - Closes the delete confirmation dialog.
- * @vue-method {Function} editItem - Opens the edit confirmation dialog for the specified employee.
- * @vue-method {Function} editItemConfirm - Confirms the editing of an employee.
+ * @vue-method {Function} editTypeItem - Opens the edit confirmation dialog for the specified employee.
+ * @vue-method {Function} editTypeItemConfirm - Confirms the editing of an employee.
  * @vue-method {Function} closeEdit - Closes the edit confirmation dialog.
  * @vue-method {Function} initialize_table - Initializes the table by fetching employee data and populating the employees array.
  *
@@ -212,11 +212,9 @@ export default {
   mounted() {
     this.userId = localStorage.getItem("userId");
     this.$ApiService.find_user_by_id(this.userId).then((res) => {
-      console.log(res.data.companyId);
       this.companyId = res.data.companyId;
       this.initialize_table();
     });
-    console.log(this.companyId);
   },
 
   methods: {
@@ -307,7 +305,7 @@ export default {
      * Opens the edit confirmation dialog for the specified employee.
      * @param {Object} item - The employee item to be edited.
      */
-    editItem(item) {
+    editTypeItem(item) {
       if (item.status !== "inactive") {
         this.editedIndex = this.employees.indexOf(item);
         this.editedItem = Object.assign({}, item);
@@ -319,7 +317,7 @@ export default {
      * Confirms the editing of an employee.
      * Edits the employee type in the database and sends a confirmation email.
      */
-    editItemConfirm() {
+    editTypeItemConfirm() {
         this.editType.type = "BUSINESS";
         this.$ApiService.edit_user_type(this.editedItem.userId, this.editType).then((response) => {
 

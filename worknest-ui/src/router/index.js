@@ -63,6 +63,14 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: "/businessBookingDesks",
+      name: "businessBookingDesks",
+      component: () => import("../views/business/bookings/BusinessBookingWorkStations.vue"),
+      meta: {
+        requiresAuth: true,
+      },
+    },
 
   ],
 });

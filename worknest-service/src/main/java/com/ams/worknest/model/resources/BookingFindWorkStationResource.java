@@ -1,5 +1,6 @@
 package com.ams.worknest.model.resources;
 
+import com.ams.worknest.model.entities.User;
 import lombok.*;
 
 import java.util.UUID;
@@ -26,4 +27,5 @@ public class BookingFindWorkStationResource {
      */
     private String status;
 
+    private User user;
 }
