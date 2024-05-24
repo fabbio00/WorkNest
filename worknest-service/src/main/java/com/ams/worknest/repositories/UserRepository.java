@@ -1,5 +1,6 @@
 package com.ams.worknest.repositories;
 
+import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,5 +39,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 
     @Query("SELECT u FROM User u WHERE u.company.id = :companyId")
-    List<User> findByCompany(@Param("companyId") UUID companyId);
+    List<User> findByCompanyId(@Param("companyId") UUID companyId);
+
 }

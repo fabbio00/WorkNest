@@ -41,4 +41,6 @@ public class UserResource {
 
     private String username;
 
+    private UUID companyId;
+
 }

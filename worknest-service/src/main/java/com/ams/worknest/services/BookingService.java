@@ -63,4 +63,9 @@ public interface BookingService {
      */
     BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto);
 
+    List<BookingFindByCompanyResource> findBookingsByCompanyId(
+            UUID companyId,
+            String employeeName,
+            String employeeSurname
+    );
 }

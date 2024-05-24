@@ -105,6 +105,13 @@ public class BookingController {
         return bookingService.editBooking(bookingId, bookingEditDto);
     }
 
-
+    @GetMapping("/list_by_company/{companyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindByCompanyResource> getBookingsByCompanyId(
+            @PathVariable("companyId") UUID companyId,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "employeeSurname", required = false) String employeeSurname) {
+        return bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname);
+    }
 
 }

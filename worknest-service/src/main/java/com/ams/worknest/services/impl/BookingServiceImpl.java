@@ -7,13 +7,16 @@ import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.model.resources.*;
 import com.ams.worknest.repositories.BookingRepository;
+import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
 import com.ams.worknest.services.BookingService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final WorkStationRepository workStationRepository;
+    private final CompanyRepository companyRepository;
     private static final String BOOKING_NOT_FOUND = "Booking not found!";
 
     /**
@@ -85,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
                 .checkIn(booking.getCheckIn())
                 .checkOut(booking.getCheckOut())
                 .endDate(booking.getEndDate())
-                .hasPenalty(booking.isHasPenalty())
+                .hasPenalty(booking.getHasPenalty())
                 .startDate(booking.getStartDate())
                 .workStation(booking.getWorkStation())
                 .status(booking.getStatus())
@@ -115,8 +119,6 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
 
     }
-
-
 
     /**
      * Retrieve bookings associated with a specific user.
@@ -174,7 +176,6 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
-
     /**
      * Edits the details of the booking with the specified ID using the provided data.
      *
@@ -205,5 +206,69 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    @Override
+    public List<BookingFindByCompanyResource> findBookingsByCompanyId(
+            UUID companyId, String employeeName, String employeeSurname
+    ) {
+        if (!companyRepository.existsById(companyId)) {
+            throw new EntityNotFoundException("Company doesn't exist");
+        }
 
+        List<User> users = userRepository.findByCompanyId(companyId);
+
+        if (employeeName != null && !employeeName.isEmpty()) {
+            users = users.stream()
+                    .filter(user -> user.getName().toLowerCase().contains(employeeName.toLowerCase()))
+                    .toList();
+        }
+        if (employeeSurname != null && !employeeSurname.isEmpty()) {
+            users = users.stream()
+                    .filter(user -> user.getSurname().toLowerCase().contains(employeeSurname.toLowerCase()))
+                    .toList();
+        }
+
+        List<Booking> allBookings = new ArrayList<>();
+
+        for (User user : users) {
+            List<Booking> bookings = bookingRepository.findByUser(user);
+            allBookings.addAll(bookings);
+        }
+
+        if (allBookings.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return allBookings.stream()
+                .map(booking -> {
+                    User user = booking.getUser();
+                    UserResource userResource = UserResource.builder()
+                            .id(user.getId())
+                            .name(user.getName())
+                            .surname(user.getSurname())
+                            .email(user.getEmail())
+                            .taxCode(user.getTaxCode())
+                            .type(user.getType())
+                            .barrierFreeFlag(user.isBarrierFreeFlag())
+                            .registrationDate(user.getRegistrationDate())
+                            .status(user.getStatus())
+                            .username(user.getUsername())
+                            .build();
+
+                    return BookingFindByCompanyResource.builder()
+                            .bookingId(booking.getId())
+                            .startDate(booking.getStartDate())
+                            .endDate(booking.getEndDate())
+                            .checkIn(booking.getCheckIn())
+                            .checkOut(booking.getCheckOut())
+                            .status(booking.getStatus())
+                            .hasPenalty(booking.getHasPenalty())
+                            .workStationName(booking.getWorkStation().getName())
+                            .workstationCostPerHour(booking.getWorkStation().getPricePerH())
+                            .buildingName(booking.getWorkStation().getBuilding().getName())
+                            .floorName("Floor " + booking.getWorkStation().getFloor().getNumberOfFloor())
+                            .userResource(userResource)
+                            .build();
+                })
+                .toList();
+    }
 }

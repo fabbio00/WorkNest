@@ -93,6 +93,7 @@ public class UserServiceImpl implements UserService {
             userResource.setUsername(u.getUsername());
             userResource.setRegistrationDate(u.getRegistrationDate());
             userResource.setTaxCode(u.getTaxCode());
+            userResource.setCompanyId(u.getCompany().getId());
         });
 
         return userResource;
@@ -155,7 +156,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserFindByCompanyResource> getUsersByCompany(UUID companyId) {
 
-         List<User> users = userRepository.findByCompany(companyId);
+         List<User> users = userRepository.findByCompanyId(companyId);
 
          if(users.isEmpty()){
              return Collections.emptyList();

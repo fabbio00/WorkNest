@@ -252,7 +252,7 @@ class UserServiceTest {
 
         List<User> users = Arrays.asList(user1, user2);
 
-        when(userRepository.findByCompany(companyId)).thenReturn(users);
+        when(userRepository.findByCompanyId(companyId)).thenReturn(users);
 
         List<UserFindByCompanyResource> userResources = userService.getUsersByCompany(companyId);
 

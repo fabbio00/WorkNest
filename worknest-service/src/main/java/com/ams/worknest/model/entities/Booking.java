@@ -60,7 +60,7 @@ public class Booking {
      * Indicates whether the booking has a penalty associated with it.
      */
     @Column(name = "has_penalty")
-    private boolean hasPenalty;
+    private Boolean hasPenalty;
 
     /**
      * The user associated with the booking.
