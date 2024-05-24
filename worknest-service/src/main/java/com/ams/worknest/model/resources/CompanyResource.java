@@ -44,4 +44,5 @@ public class CompanyResource {
      * Unique code of the company.
      */
     private String companyCode;
+
 }

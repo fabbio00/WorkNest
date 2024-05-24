@@ -12,5 +12,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class CompanyCodeDto {
+
+    /**
+     * The unique code associated with a company.
+     */
     private String companyCode;
+
 }

@@ -17,7 +17,6 @@ import java.util.UUID;
  * Controller for managing Building.
  * Provides endpoints for creating and retrieving building details.
  */
-
 @Slf4j
 @RestController
 @RequestMapping(value = "/buildings", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -16,6 +16,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "company")
 public class Company {
+
     /**
      * Unique identifier for the company.
      */
@@ -49,4 +50,5 @@ public class Company {
      */
     @Column(name = "company_code")
     private String companyCode;
+
 }

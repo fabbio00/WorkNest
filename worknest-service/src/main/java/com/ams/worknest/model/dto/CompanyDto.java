@@ -2,7 +2,6 @@ package com.ams.worknest.model.dto;
 
 import lombok.*;
 
-
 /**
  * Data Transfer Object representing company information.
  * This class is used to transfer company data between different layers of the application,
@@ -14,13 +13,30 @@ import lombok.*;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class CompanyDto {
+
+    /**
+     * The name of the company.
+     */
     private String name;
 
+    /**
+     * The email of the company.
+     */
     private String email;
 
+    /**
+     * The VAT code of the company.
+     */
     private String vatCode;
 
+    /**
+     * The phone number of the company.
+     */
     private String phone;
 
+    /**
+     * The unique code associated with the company.
+     */
     private String companyCode;
+
 }

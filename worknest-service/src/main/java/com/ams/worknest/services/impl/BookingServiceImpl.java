@@ -21,10 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-
 /**
  * Implementation of the {@link BookingService} interface.
- * Provides methods for creating and retrieving booking details.
+ * Provides methods for creating, retrieving, editing, and deleting booking details.
  */
 @Component
 @RequiredArgsConstructor
@@ -152,7 +151,6 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
     }
 
-
     /**
      * Deletes a booking with the specified ID and returns the details of the deleted booking.
      *
@@ -206,6 +204,15 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    /**
+     * Retrieves bookings associated with a specific company and optionally filters them by employee name and surname.
+     *
+     * @param companyId The UUID of the company to retrieve bookings for.
+     * @param employeeName The name of the employee to filter bookings by.
+     * @param employeeSurname The surname of the employee to filter bookings by.
+     * @return A list of {@link BookingFindByCompanyResource} representing bookings associated with the company.
+     * @throws EntityNotFoundException if the company doesn't exist.
+     */
     @Override
     public List<BookingFindByCompanyResource> findBookingsByCompanyId(
             UUID companyId, String employeeName, String employeeSurname

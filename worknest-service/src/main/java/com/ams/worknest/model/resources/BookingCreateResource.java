@@ -37,5 +37,4 @@ public class BookingCreateResource {
      */
     private WorkStation workStation;
 
-
 }

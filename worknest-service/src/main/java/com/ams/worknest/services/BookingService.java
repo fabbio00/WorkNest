@@ -63,6 +63,14 @@ public interface BookingService {
      */
     BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto);
 
+    /**
+     * Finds bookings by company id and optionally filters them by employee name and surname.
+     *
+     * @param companyId The unique identifier of the company.
+     * @param employeeName The name of the employee to filter bookings by.
+     * @param employeeSurname The surname of the employee to filter bookings by.
+     * @return A list of resources representing the bookings found.
+     */
     List<BookingFindByCompanyResource> findBookingsByCompanyId(
             UUID companyId,
             String employeeName,

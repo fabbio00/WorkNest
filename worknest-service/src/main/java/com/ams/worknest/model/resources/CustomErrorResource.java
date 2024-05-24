@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
-
 /**
  * CustomErrorResource class.
  * Represents a custom error resource that is returned in the HTTP response body when an exception occurs.
@@ -32,4 +31,5 @@ public class CustomErrorResource {
      * The timestamp when the error occurred.
      */
     private LocalDateTime timestamp;
+
 }
