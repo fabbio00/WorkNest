@@ -124,7 +124,7 @@ class BookingControllerTest extends BaseMvcTest {
 
         WorkStation workStation = WorkStation.builder()
                 .name("WorkStation1")
-                .pricePerH(3)
+                .pricePerH(3.0)
                 .equipment("monitor")
                 .type("desk")
                 .build();
@@ -167,7 +167,7 @@ class BookingControllerTest extends BaseMvcTest {
 
         WorkStation workStation = WorkStation.builder()
                 .name("WorkStation1")
-                .pricePerH(3)
+                .pricePerH(3.0)
                 .equipment("monitor")
                 .type("desk")
                 .build();

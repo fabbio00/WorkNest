@@ -57,6 +57,7 @@ class BookingServiceTest {
         Booking booking = new Booking();
         booking.setId(bookingId);
         booking.setStatus("active");
+        booking.setHasPenalty(false);
         WorkStation workStation = new WorkStation();
         workStation.setId(UUID.randomUUID());
         booking.setWorkStation(workStation);
