@@ -1,8 +1,10 @@
 package com.ams.worknest.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -51,4 +53,10 @@ public class Company {
     @Column(name = "company_code")
     private String companyCode;
 
+    /**
+     * The users associated with the company.
+     */
+    @JsonBackReference
+    @OneToMany(mappedBy = "company")
+    private Set<User> users;
 }

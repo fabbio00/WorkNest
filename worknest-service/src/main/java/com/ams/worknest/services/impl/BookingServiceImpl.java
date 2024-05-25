@@ -34,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final WorkStationRepository workStationRepository;
     private final CompanyRepository companyRepository;
     private static final String BOOKING_NOT_FOUND = "Booking not found!";
+    private static final String COMPANY_NOT_FOUND = "Company not found!";
 
     /**
      * Creates a booking based on the provided booking data transfer object.
@@ -218,7 +219,7 @@ public class BookingServiceImpl implements BookingService {
             UUID companyId, String employeeName, String employeeSurname
     ) {
         if (!companyRepository.existsById(companyId)) {
-            throw new EntityNotFoundException("Company doesn't exist");
+            throw new EntityNotFoundException(COMPANY_NOT_FOUND);
         }
 
         List<User> users = userRepository.findByCompanyId(companyId);

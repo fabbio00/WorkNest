@@ -83,7 +83,7 @@ public class User {
      * The company associated with the user.
      */
     @JsonManagedReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "company_id")
     private Company company;
 

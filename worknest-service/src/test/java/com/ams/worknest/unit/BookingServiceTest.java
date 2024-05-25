@@ -52,8 +52,8 @@ class BookingServiceTest {
     @DisplayName("Test find booking by id")
     @Test
      void testFindBookingById() {
-        // Arrange
-        UUID bookingId = UUID.randomUUID(); // generate a random UUID
+        
+        UUID bookingId = UUID.randomUUID(); 
         Booking booking = new Booking();
         booking.setId(bookingId);
         booking.setStatus("active");
@@ -64,10 +64,8 @@ class BookingServiceTest {
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
-        // Act
         BookingFindResource foundBooking = bookingService.findBookingById(bookingId);
 
-        // Assert
         assertEquals(booking.getWorkStation().getId(), foundBooking.getWorkStation().getId());
         assertEquals(booking.getStatus(), foundBooking.getStatus());
         assertEquals(booking.getWorkStation().getId(), foundBooking.getWorkStation().getId());
@@ -89,7 +87,7 @@ class BookingServiceTest {
         Booking booking1 = new Booking();
         booking1.setId(UUID.randomUUID());
         booking1.setStartDate(date.atStartOfDay(zoneId));
-        booking1.setWorkStation(workStation1); // set WorkStation
+        booking1.setWorkStation(workStation1);
         bookings.add(booking1);
 
         WorkStation workStation2 = new WorkStation();
@@ -98,7 +96,7 @@ class BookingServiceTest {
         Booking booking2 = new Booking();
         booking2.setId(UUID.randomUUID());
         booking2.setStartDate(date.atStartOfDay(zoneId));
-        booking2.setWorkStation(workStation2); // set WorkStation
+        booking2.setWorkStation(workStation2);
         bookings.add(booking2);
 
         when(bookingRepository.findByStartDateOnly(date)).thenReturn(bookings);
@@ -113,8 +111,8 @@ class BookingServiceTest {
     @DisplayName("Test find bookings by user id")
     @Test
      void testFindBookingsByUserId() {
-        // Arrange
-        UUID userId = UUID.randomUUID(); // generate a random UUID
+        
+        UUID userId = UUID.randomUUID();
         User user = new User();
         user.setId(userId);
         List<Booking> bookings = new ArrayList<>();
@@ -125,7 +123,7 @@ class BookingServiceTest {
         Booking booking1 = new Booking();
         booking1.setId(UUID.randomUUID());
         booking1.setUser(user);
-        booking1.setWorkStation(workStation1); // set WorkStation
+        booking1.setWorkStation(workStation1);
         bookings.add(booking1);
 
         WorkStation workStation2 = new WorkStation();
@@ -134,16 +132,14 @@ class BookingServiceTest {
         Booking booking2 = new Booking();
         booking2.setId(UUID.randomUUID());
         booking2.setUser(user);
-        booking2.setWorkStation(workStation2); // set WorkStation
+        booking2.setWorkStation(workStation2);
         bookings.add(booking2);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(bookingRepository.findByUser(user)).thenReturn(bookings);
-
-        // Act
+        
         List<BookingFindByUserResource> foundBookings = bookingService.findBookingsByUserId(userId);
-
-        // Assert
+        
         assertEquals(2, foundBookings.size());
         assertEquals(booking1.getId(), foundBookings.get(0).getBookingId());
         assertEquals(booking2.getId(), foundBookings.get(1).getBookingId());
@@ -154,8 +150,8 @@ class BookingServiceTest {
     @DisplayName("Test edit booking")
     @Test
      void testEditBooking() {
-        UUID bookingId = UUID.randomUUID(); // generate a random UUID
-        UUID workStationId = UUID.randomUUID(); // generate a random UUID
+        UUID bookingId = UUID.randomUUID(); 
+        UUID workStationId = UUID.randomUUID(); 
         Booking booking = new Booking();
         booking.setId(bookingId);
         WorkStation workStation = new WorkStation();
@@ -182,25 +178,23 @@ class BookingServiceTest {
         UUID bookingId = UUID.randomUUID();
         Booking booking = new Booking();
         booking.setId(bookingId);
-        booking.setStatus("active"); // set initial status
+        booking.setStatus("active"); 
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(i -> i.getArguments()[0]);
 
         BookingDeleteResource deletedBooking = bookingService.deleteBooking(bookingId);
 
-        // Add assertions to verify the deleted booking...
         assertEquals(bookingId, deletedBooking.getBookingId());
         assertEquals("canceled", deletedBooking.getStatus());
 
-        // Verify that the save method was called
         verify(bookingRepository, times(1)).save(any(Booking.class));
     }
 
     @DisplayName("Test find booking by id with non-existing id")
     @Test
      void testFindBookingByIdNonExisting() {
-        UUID bookingId = UUID.randomUUID(); // generate a random UUID
+        UUID bookingId = UUID.randomUUID(); 
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
@@ -222,7 +216,7 @@ class BookingServiceTest {
     @DisplayName("Test find bookings by user id with non-existing user")
     @Test
      void testFindBookingsByUserIdNonExisting() {
-        UUID userId = UUID.randomUUID(); // generate a random UUID
+        UUID userId = UUID.randomUUID(); 
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -232,8 +226,8 @@ class BookingServiceTest {
     @DisplayName("Test edit booking with non-existing booking")
     @Test
      void testEditBookingNonExisting() {
-        UUID bookingId = UUID.randomUUID(); // generate a random UUID
-        UUID workStationId = UUID.randomUUID(); // generate a random UUID
+        UUID bookingId = UUID.randomUUID(); 
+        UUID workStationId = UUID.randomUUID(); 
         BookingEditDto bookingEditDto = new BookingEditDto();
         bookingEditDto.setWorkStationId(workStationId);
         bookingEditDto.setStartDate(ZonedDateTime.now());
@@ -250,6 +244,110 @@ class BookingServiceTest {
         UUID bookingId = UUID.randomUUID();
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> bookingService.deleteBooking(bookingId));
+    }
+
+    @DisplayName("Test find bookings by user id with no bookings")
+    @Test
+    void testFindBookingsByUserIdNoBookings() {
+        UUID userId = UUID.randomUUID();
+        User user = new User();
+        user.setId(userId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findByUser(user)).thenReturn(new ArrayList<>());
+
+        List<BookingFindByUserResource> foundBookings = bookingService.findBookingsByUserId(userId);
+
+        assertEquals(0, foundBookings.size());
+    }
+
+    @DisplayName("Test edit booking with non-existing workstation")
+    @Test
+    void testEditBookingNonExistingWorkStation() {
+        UUID bookingId = UUID.randomUUID();
+        UUID workStationId = UUID.randomUUID();
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        BookingEditDto bookingEditDto = new BookingEditDto();
+        bookingEditDto.setWorkStationId(workStationId);
+        bookingEditDto.setStartDate(ZonedDateTime.now());
+        bookingEditDto.setEndDate(ZonedDateTime.now().plusDays(1));
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(workStationRepository.findById(workStationId)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> bookingService.editBooking(bookingId, bookingEditDto));
+    }
+
+    @DisplayName("Test delete booking with already canceled booking")
+    @Test
+    void testDeleteBookingAlreadyCanceled() {
+        UUID bookingId = UUID.randomUUID();
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setStatus("canceled"); 
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+
+        assertThrows(RuntimeException.class, () -> bookingService.deleteBooking(bookingId));
+    }
+
+    @DisplayName("Test find bookings by user id with one booking")
+    @Test
+    void testFindBookingsByUserIdOneBooking() {
+        UUID userId = UUID.randomUUID();
+        User user = new User();
+        user.setId(userId);
+        List<Booking> bookings = new ArrayList<>();
+
+        WorkStation workStation = new WorkStation();
+        workStation.setId(UUID.randomUUID());
+
+        Booking booking = new Booking();
+        booking.setId(UUID.randomUUID());
+        booking.setUser(user);
+        booking.setWorkStation(workStation);
+        bookings.add(booking);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findByUser(user)).thenReturn(bookings);
+
+        List<BookingFindByUserResource> foundBookings = bookingService.findBookingsByUserId(userId);
+
+        assertEquals(1, foundBookings.size());
+        assertEquals(booking.getId(), foundBookings.get(0).getBookingId());
+        assertEquals(workStation.getId(), foundBookings.get(0).getWorkStationId());
+    }
+
+    @DisplayName("Test edit booking with already canceled booking")
+    @Test
+    void testEditBookingAlreadyCanceled() {
+        UUID bookingId = UUID.randomUUID();
+        UUID workStationId = UUID.randomUUID();
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setStatus("canceled");
+        BookingEditDto bookingEditDto = new BookingEditDto();
+        bookingEditDto.setWorkStationId(workStationId);
+        bookingEditDto.setStartDate(ZonedDateTime.now());
+        bookingEditDto.setEndDate(ZonedDateTime.now().plusDays(1));
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+
+        assertThrows(RuntimeException.class, () -> bookingService.editBooking(bookingId, bookingEditDto));
+    }
+
+    @DisplayName("Test delete booking with already deleted booking")
+    @Test
+    void testDeleteBookingAlreadyDeleted() {
+        UUID bookingId = UUID.randomUUID();
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setStatus("canceled");
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
         assertThrows(RuntimeException.class, () -> bookingService.deleteBooking(bookingId));
     }
