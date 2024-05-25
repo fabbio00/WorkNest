@@ -174,9 +174,8 @@
  * Usage:
  * This component is used within a Vue application to manage employee data and display it in a table format.
  * It integrates with backend APIs to fetch employee information and allows users to perform various actions on employees.
- * @subcategory views/company
+ * @subcategory views/business/employees
  */
-
 
 export default {
   data: () => ({
