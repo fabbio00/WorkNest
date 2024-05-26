@@ -206,17 +206,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     /**
-     * Retrieves bookings associated with a specific company and optionally filters them by employee name and surname.
+     * Retrieves bookings associated with a specific company and optionally filters them by employee name, surname, start date, and end date.
      *
-     * @param companyId The UUID of the company to retrieve bookings for.
-     * @param employeeName The name of the employee to filter bookings by.
-     * @param employeeSurname The surname of the employee to filter bookings by.
+     * @param companyId       The UUID of the company to retrieve bookings for.
+     * @param employeeName    The name of the employee to filter bookings by (optional).
+     * @param employeeSurname The surname of the employee to filter bookings by (optional).
+     * @param startDate       The start date of the period to filter bookings by (optional).
+     * @param endDate         The end date of the period to filter bookings by (optional).
      * @return A list of {@link BookingFindByCompanyResource} representing bookings associated with the company.
      * @throws EntityNotFoundException if the company doesn't exist.
      */
     @Override
     public List<BookingFindByCompanyResource> findBookingsByCompanyId(
-            UUID companyId, String employeeName, String employeeSurname
+            UUID companyId, String employeeName, String employeeSurname, LocalDate startDate, LocalDate endDate
     ) {
         if (!companyRepository.existsById(companyId)) {
             throw new EntityNotFoundException(COMPANY_NOT_FOUND);
@@ -247,6 +249,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return allBookings.stream()
+                .filter(booking -> (startDate == null || !booking.getStartDate().toLocalDate().isBefore(startDate)) &&
+                        (endDate == null || !booking.getEndDate().toLocalDate().isAfter(endDate)))
                 .map(booking -> {
                     User user = booking.getUser();
                     UserResource userResource = UserResource.builder()

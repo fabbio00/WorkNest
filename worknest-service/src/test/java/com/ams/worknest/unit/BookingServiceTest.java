@@ -4,19 +4,17 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.entities.WorkStation;
-import com.ams.worknest.model.resources.BookingEditResource;
-import com.ams.worknest.model.resources.BookingFindResource;
-import com.ams.worknest.model.resources.BookingFindWorkStationResource;
-import com.ams.worknest.model.resources.BookingDeleteResource;
+import com.ams.worknest.model.resources.*;
 import com.ams.worknest.repositories.BookingRepository;
+import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
 import com.ams.worknest.services.impl.BookingServiceImpl;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
-import com.ams.worknest.model.resources.BookingFindByUserResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,8 +24,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BookingServiceTest {
@@ -37,6 +34,9 @@ class BookingServiceTest {
 
     @Mock
     private BookingRepository bookingRepository;
+
+    @Mock
+    private CompanyRepository companyRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -351,4 +351,70 @@ class BookingServiceTest {
 
         assertThrows(RuntimeException.class, () -> bookingService.deleteBooking(bookingId));
     }
+
+    @DisplayName("Test create booking with valid data")
+    @Test
+    void testCreateBookingWithValidData() {
+        UUID userId = UUID.randomUUID();
+        User user = new User();
+        user.setId(userId);
+
+        UUID workStationId = UUID.randomUUID();
+        WorkStation workStation = new WorkStation();
+        workStation.setId(workStationId);
+
+        BookingCreateDto bookingCreateDto = new BookingCreateDto();
+        bookingCreateDto.setUserId(userId); // Assuming BookingCreateDto has a userId field
+        bookingCreateDto.setWorkStationId(workStationId);
+        bookingCreateDto.setStartDate(ZonedDateTime.now());
+        bookingCreateDto.setEndDate(ZonedDateTime.now().plusDays(1));
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user)); // Mock the UserRepository
+        when(workStationRepository.findById(workStationId)).thenReturn(Optional.of(workStation)); // Mock the WorkStationRepository
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        BookingCreateResource createdBooking = bookingService.createBooking(bookingCreateDto);
+
+        assertEquals(bookingCreateDto.getStartDate(), createdBooking.getStartDate());
+        assertEquals(bookingCreateDto.getEndDate(), createdBooking.getEndDate());
+        assertEquals(workStationId, createdBooking.getWorkStation().getId()); // Verify the WorkStation
+    }
+
+    @DisplayName("Test create booking with invalid data")
+    @Test
+    void testCreateBookingWithInvalidData() {
+        BookingCreateDto bookingCreateDto = new BookingCreateDto();
+
+        assertThrows(RuntimeException.class, () -> bookingService.createBooking(bookingCreateDto));
+    }
+
+    @DisplayName("Test find bookings by company id with valid company id")
+    @Test
+    void testFindBookingsByCompanyIdWithValidCompanyId() {
+        UUID companyId = UUID.randomUUID();
+        String employeeName = "John";
+        String employeeSurname = "Doe";
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(1);
+
+        when(companyRepository.existsById(companyId)).thenReturn(true); // Mock the CompanyRepository
+
+        List<BookingFindByCompanyResource> foundBookings = bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname, startDate, endDate);
+
+        assertNotNull(foundBookings);
+    }
+
+    @DisplayName("Test find bookings by company id with non-existing company id")
+    @Test
+    void testFindBookingsByCompanyIdWithNonExistingCompanyId() {
+        UUID companyId = UUID.randomUUID();
+        String employeeName = "John";
+        String employeeSurname = "Doe";
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(1);
+
+        assertThrows(RuntimeException.class, () -> bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname, startDate, endDate));
+    }
+
+
 }

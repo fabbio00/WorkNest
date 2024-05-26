@@ -108,6 +108,8 @@ public class BookingController {
      * @param companyId the UUID of the company whose bookings are to be retrieved
      * @param employeeName the name of the employee (optional)
      * @param employeeSurname the surname of the employee (optional)
+     * @param startDate the start date for the booking period (optional)
+     * @param endDate the end date for the booking period (optional)
      * @return a list of booking resources associated with the specified company
      */
     @GetMapping("/list_by_company/{companyId}")
@@ -115,8 +117,12 @@ public class BookingController {
     public List<BookingFindByCompanyResource> getBookingsByCompanyId(
             @PathVariable("companyId") UUID companyId,
             @RequestParam(value = "employeeName", required = false) String employeeName,
-            @RequestParam(value = "employeeSurname", required = false) String employeeSurname) {
-        return bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname);
+            @RequestParam(value = "employeeSurname", required = false) String employeeSurname,
+            @RequestParam(value = "startDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname, startDate, endDate);
     }
 
 }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -189,6 +190,30 @@ class BookingControllerTest extends BaseMvcTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void getBookingsByCompanyId_WithDateRange() throws Exception {
+        Booking savedBooking = savedBookingTemplate();
+        UUID companyId = savedBooking.getUser().getCompany().getId();
+        String employeeName = savedBooking.getUser().getName();
+        String employeeSurname = savedBooking.getUser().getSurname();
+        LocalDate startDate = savedBooking.getStartDate().toLocalDate();
+        LocalDate endDate = savedBooking.getEndDate().toLocalDate();
+
+        mvc.perform(
+                        get(BOOKING_ENDPOINT + "/list_by_company/{companyId}", companyId)
+                                .param("startDate", startDate.toString())
+                                .param("endDate", endDate.toString())
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].userResource.name", is(employeeName)))
+                .andExpect(jsonPath("$[0].userResource.surname", is(employeeSurname)))
+                .andExpect(jsonPath("$[0].startDate", containsString(startDate.toString())))
+                .andExpect(jsonPath("$[0].endDate", containsString(endDate.toString())));
     }
 
     private Company savedCompanyTemplate() {

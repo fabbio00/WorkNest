@@ -68,12 +68,16 @@ public interface BookingService {
      *
      * @param companyId The unique identifier of the company.
      * @param employeeName The name of the employee to filter bookings by.
-     * @param employeeSurname The surname of the employee to filter bookings by.
+     * @param employeeSurname The surname of the employee to filter bookings by (optional).
+     * @param startDate The start date of the period to filter bookings by (optional).
+     * @param endDate The end date of the period to filter bookings by (optional).
      * @return A list of resources representing the bookings found.
      */
     List<BookingFindByCompanyResource> findBookingsByCompanyId(
             UUID companyId,
             String employeeName,
-            String employeeSurname
+            String employeeSurname,
+            LocalDate startDate,
+            LocalDate endDate
     );
 }
