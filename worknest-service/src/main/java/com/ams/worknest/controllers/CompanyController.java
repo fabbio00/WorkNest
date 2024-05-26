@@ -48,4 +48,5 @@ public class CompanyController {
         log.info("POST | /companies/companyCode | companyCodeDto = {}", companyCodeDto);
         return companyService.getCompanyByCompanyCode(companyCodeDto);
     }
+
 }

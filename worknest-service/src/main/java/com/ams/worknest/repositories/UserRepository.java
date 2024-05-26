@@ -12,6 +12,7 @@ import java.util.UUID;
 /**
  * UserRepository interface.
  * This interface handles the data access layer for the User entity.
+ * It extends JpaRepository to provide methods to perform CRUD operations.
  */
 public interface UserRepository extends JpaRepository<User, UUID> {
 
@@ -36,7 +37,16 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      */
     Optional<User> findByEmail(String email);
 
-
+    /**
+     * Retrieves a list of users by their company id.
+     *
+     * This method finds users associated with the specified company id.
+     * It returns a list of users if found.
+     *
+     * @param companyId The id of the company to find users for.
+     * @return A list of users associated with the given company id.
+     */
     @Query("SELECT u FROM User u WHERE u.company.id = :companyId")
-    List<User> findByCompany(@Param("companyId") UUID companyId);
+    List<User> findByCompanyId(@Param("companyId") UUID companyId);
+
 }

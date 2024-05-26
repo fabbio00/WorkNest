@@ -141,7 +141,7 @@
                   fill="#ffffff"
                 />
                 <ellipse
-                  data-id="93a06e73-984f-4fff-abb3-686496e5823e"
+                  data-id="d4853dcb-e483-468c-9d7a-85173028c63e"
                   stroke="#000"
                   ry="12"
                   rx="12"
@@ -186,7 +186,7 @@
                   fill="#ffffff"
                 />
                 <ellipse
-                  data-id="58f78420-6490-43c8-ac17-1a9e76b2b085"
+                  data-id="cb3b8cba-05a5-48f0-8c98-d4f726965841"
                   stroke="#000"
                   ry="12"
                   rx="12"
@@ -231,7 +231,7 @@
                   fill="#ffffff"
                 />
                 <ellipse
-                  data-id="b70c63bd-07cc-4f85-b767-f50ca4d4964e"
+                  data-id="e8c09506-0b0f-4539-b80f-0349842699ed"
                   stroke="#000"
                   ry="12"
                   rx="12"

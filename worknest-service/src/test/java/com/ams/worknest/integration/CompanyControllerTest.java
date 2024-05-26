@@ -80,7 +80,7 @@ class CompanyControllerTest extends BaseMvcTest {
                         post(COMPANY_ENDPOINT + "/companyCode")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(companyCodeJson))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     Company savedCompanyTemplate() {

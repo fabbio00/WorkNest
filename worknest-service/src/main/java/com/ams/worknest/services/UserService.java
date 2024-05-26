@@ -12,46 +12,66 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Interface for user service operations.
- * Defines the contract for user-related functionalities such as creating and retrieving users.
+ * UserService interface.
+ * This interface handles the business logic for the User entity.
+ * It provides methods for creating, retrieving, authenticating users, and changing user's type and status.
  */
 public interface UserService {
 
     /**
-     * Creates a new user based on the provided UserDto object.
+     * Creates a new user.
      *
-     * @param userDTO the user data transfer object containing the information needed to create a new user.
-     * @return UserResource containing the public-facing information of the created user.
+     * @param userDTO The data transfer object containing the details of the user to be created.
+     * @return A resource representing the created user.
      */
     UserResource createUser(UserDto userDTO);
 
     /**
-     * Retrieves the public-facing information of a user identified by the given UUID.
+     * Retrieves a user by its unique identifier.
      *
-     * @param id the unique identifier of the user to be retrieved.
-     * @return UserResource containing the public-facing information of the retrieved user.
+     * @param id The unique identifier of the user.
+     * @return A resource representing the retrieved user.
      */
     UserResource getUser(UUID id);
 
     /**
-     * Retrieves the public-facing information of a user based on their email.
+     * Retrieves a user by their email.
      *
-     * @param userEmailDto the data transfer object containing the user's email.
-     * @return UserResource containing the public-facing information of the retrieved user.
+     * @param userEmailDto The data transfer object containing the user's email.
+     * @return A resource representing the retrieved user.
      */
     UserResource getUserByEmail(UserEmailDto userEmailDto);
 
     /**
-     * Authenticate a user based on the provided login credentials.
+     * Authenticates a user.
      *
-     * @param userLoggedDto the data transfer object containing user login credentials
-     * @return the logged-in user information as a resource
+     * @param userLoggedDto The data transfer object containing user login credentials.
+     * @return A resource representing the authenticated user.
      */
     UserLoggedResource userLogin(UserLoggedDto userLoggedDto);
 
+    /**
+     * Retrieves users associated with a specific company.
+     *
+     * @param companyId The unique identifier of the company.
+     * @return A list of resources representing the users found.
+     */
     List<UserFindByCompanyResource> getUsersByCompany(UUID companyId);
 
+    /**
+     * Changes the type of user.
+     *
+     * @param userId The unique identifier of the user.
+     * @param userEditTypeDto The data transfer object containing the new type of the user.
+     * @return A resource representing the updated user.
+     */
     UserResource changeUserType(UUID userId, UserEditTypeDto userEditTypeDto);
 
+    /**
+     * Changes the status of a user.
+     *
+     * @param userId The unique identifier of the user.
+     * @return A resource representing the updated user.
+     */
     UserResource changeUserStatus(UUID userId);
 }

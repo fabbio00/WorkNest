@@ -3,6 +3,7 @@ package com.ams.worknest.unit;
 import com.ams.worknest.model.dto.UserDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.resources.UserFindByCompanyResource;
 import com.ams.worknest.model.resources.UserResource;
@@ -91,6 +92,7 @@ class UserServiceTest {
         user.setType("type");
         user.setStatus("status");
         user.setBarrierFreeFlag(true);
+        user.setCompany(new Company());
         user.setRegistrationDate(ZonedDateTime.now());
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -252,7 +254,7 @@ class UserServiceTest {
 
         List<User> users = Arrays.asList(user1, user2);
 
-        when(userRepository.findByCompany(companyId)).thenReturn(users);
+        when(userRepository.findByCompanyId(companyId)).thenReturn(users);
 
         List<UserFindByCompanyResource> userResources = userService.getUsersByCompany(companyId);
 
