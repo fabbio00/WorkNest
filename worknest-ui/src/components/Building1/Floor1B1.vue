@@ -119,7 +119,7 @@ export default {
   methods: {
     getDesks() {
       this.$ApiService.get_workstations(this.floorInfo.floorId, this.floorInfo.buildingId).then((response) => {
-        this.desks = response.data.workStationResourceList.filter((desk) => desk.numberOfSeats === 1);
+        this.desks = response.data.workStationResourceList.filter((desk) => desk.type === 'desk');
       });
     },
     handleMeetingRoomClick(event) {
