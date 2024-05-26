@@ -48,10 +48,14 @@ describe("BookingsView", () => {
         },
       },
     });
+
+    // Mock current date
+    vi.setSystemTime(new Date('2023-05-25T08:00:00Z'));
   });
 
   afterEach(() => {
     wrapper.unmount();
+    vi.useRealTimers(); // Reset mock date
   });
 
   it("should fetch company ID on mount", async () => {
@@ -64,22 +68,77 @@ describe("BookingsView", () => {
     wrapper.setData({ searchName: "John" });
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
-    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith("company1", "John", "");
+    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
+      "company1", "John", "", null, null
+    );
   });
 
   it("should search by surname", async () => {
     wrapper.setData({ searchSurname: "Doe" });
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
-    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith("company1", "", "Doe");
+    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
+      "company1", "", "Doe", null, null
+    );
+  });
+
+  it("should search by start date", async () => {
+    wrapper.setData({ startDate: "2023-05-25" });
+    await wrapper.vm.initialize_table();
+    await wrapper.vm.$nextTick();
+    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
+      "company1", "", "", "2023-05-25", null
+    );
+  });
+
+  it("should search by end date", async () => {
+    wrapper.setData({ endDate: "2023-05-26" });
+    await wrapper.vm.initialize_table();
+    await wrapper.vm.$nextTick();
+    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
+      "company1", "", "", null, "2023-05-26"
+    );
+  });
+
+  it("should search by name, surname, and date range", async () => {
+    wrapper.setData({ searchName: "Jane", searchSurname: "Smith", startDate: "2023-05-25", endDate: "2023-05-26" });
+    await wrapper.vm.initialize_table();
+    await wrapper.vm.$nextTick();
+    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
+      "company1", "Jane", "Smith", "2023-05-25", "2023-05-26"
+    );
   });
 
   it("should clear filters and fetch all bookings", async () => {
-    wrapper.setData({ searchName: "John", searchSurname: "Doe" });
+    wrapper.setData({ searchName: "John", searchSurname: "Doe", startDate: "2023-05-25", endDate: "2023-05-26" });
     await wrapper.vm.clearFilters();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.searchName).toBe("");
     expect(wrapper.vm.searchSurname).toBe("");
-    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith("company1", "", "");
+    expect(wrapper.vm.startDate).toBe(null);
+    expect(wrapper.vm.endDate).toBe(null);
+    expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
+      "company1", "", "", null, null
+    );
+  });
+
+  it("should format date correctly", () => {
+    const formattedDate = wrapper.vm.formatDate("2023-05-25T08:00:00Z");
+    expect(formattedDate).toBe("25-05-2023");
+  });
+
+  it("should format date for API correctly", () => {
+    const formattedDateForApi = wrapper.vm.formatDateForApi("2023-05-25");
+    expect(formattedDateForApi).toBe("2023-05-25");
+  });
+
+  it("should get correct status color", () => {
+    const activeColor = wrapper.vm.getStatusColor({ status: "active", startDate: `2023-05-27T08:00:00Z` });
+    const inactiveColor = wrapper.vm.getStatusColor({ status: "active", startDate: "2022-05-25T08:00:00Z" });
+    const canceledColor = wrapper.vm.getStatusColor({ status: "canceled", startDate: "2023-05-25T08:00:00Z" });
+
+    expect(activeColor).toBe("green");
+    expect(inactiveColor).toBe("gray");
+    expect(canceledColor).toBe("red");
   });
 });

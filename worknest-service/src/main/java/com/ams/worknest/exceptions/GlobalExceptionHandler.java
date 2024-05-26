@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
         } else if (BUILDING_NOT_FOUND.equals(ex.getMessage())) {
             status = HttpStatus.NOT_FOUND;
         } else if (COMPANY_CODE_NOT_FOUND.equals(ex.getMessage())) {
-            status = HttpStatus.NOT_FOUND;
+            status = HttpStatus.OK;
         } else if (COMPANY_NOT_FOUND.equals(ex.getMessage())) {
             status = HttpStatus.NOT_FOUND;
         } else {
