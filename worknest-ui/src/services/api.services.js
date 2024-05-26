@@ -80,6 +80,12 @@ class ApiService {
     });
   }
 
+  send_mail_list(email) {
+    return axios.post("http://localhost:8080/sendEmail/send-list", email).then((res) => {
+      return res;
+    });
+  }
+
   modify_booking(bookingId, newBooking) {
     return axios
       .put("http://localhost:8080/bookings/edit/" + bookingId, newBooking)
@@ -112,6 +118,13 @@ class ApiService {
 
   edit_user_type(userId, userType) {
     return axios.put("http://localhost:8080/users/type/" + userId, userType)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  save_booking_list(listBooking) {
+    return axios.post("http://localhost:8080/bookings/save-list", listBooking)
       .then((res) => {
         return res;
       });

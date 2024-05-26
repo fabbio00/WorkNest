@@ -105,6 +105,10 @@ public class BookingController {
         return bookingService.editBooking(bookingId, bookingEditDto);
     }
 
-
-
+    // save list of bookings
+    @PostMapping("/save-list")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<BookingCreateResource> saveBookings(@RequestBody List<BookingCreateDto> bookingCreateDtos){
+        return bookingService.saveBookings(bookingCreateDtos);
+    }
 }

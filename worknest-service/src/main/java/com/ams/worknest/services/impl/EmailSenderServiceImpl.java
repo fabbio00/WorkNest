@@ -1,10 +1,13 @@
 package com.ams.worknest.services.impl;
 
+import com.ams.worknest.model.dto.EmailDto;
 import com.ams.worknest.services.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Implementation of the {@link EmailSenderService} interface.
@@ -43,4 +46,15 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         message.setText(text);
         emailSender.send(message);
     }
+
+    @Override
+    public void sendSimpleMessages(List<String> to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(SENDER_EMAIL_ADDRESS);
+        message.setTo(to.toArray(new String[0]));
+        message.setSubject(subject);
+        message.setText(text);
+        emailSender.send(message);
+    }
+
 }

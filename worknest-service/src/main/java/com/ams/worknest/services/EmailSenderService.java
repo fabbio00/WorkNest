@@ -1,5 +1,9 @@
 package com.ams.worknest.services;
 
+import com.ams.worknest.model.dto.EmailDto;
+
+import java.util.List;
+
 /**
  * Service interface for sending emails.
  * Defines the contract for email-sending operations.
@@ -15,4 +19,5 @@ public interface EmailSenderService {
      */
     void sendSimpleMessage(String to, String subject, String text);
 
+    void sendSimpleMessages(List<String> to, String subject, String text);
 }

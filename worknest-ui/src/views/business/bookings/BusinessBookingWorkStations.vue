@@ -31,7 +31,7 @@
           <v-card class="mb-4 d-block rounded-lg" elevation="2" align="center">
             <v-card-text>
               <v-date-picker
-                v-model="booking.startDate"
+                v-model="this.selectedDate"
                 :min="new Date(new Date().setDate(new Date().getDate() - 1))"
                 no-title
                 scrollable
@@ -2635,13 +2635,35 @@
     </v-row>
 
     <v-row class="d-flex justify-center align-center" >
-      <div class="mx-16">
+      <div class="mx-16" v-if="isSvgVisible && bookingList.length > 0">
         <v-data-table
           class="mx-auto my-16"
           :headers="headers"
           :items="bookingList"
           style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3)"
         >
+
+        <template v-slot:top>
+        <v-toolbar flat class="bg-blue-grey-lighten-3">
+          <v-toolbar-title>Bookings</v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-dialog v-model="dialog" max-width="500px">
+            <template v-slot:activator>
+              <v-btn
+                class="mb-2"
+                color="primary"
+                dark
+                @click="createBooking"
+              >
+                Confirm booking
+              </v-btn>
+            </template>
+          </v-dialog>
+        </v-toolbar>
+        </template>
+
+
         <template v-slot:item.actions="{ item }">
           <v-icon
             size="small"
@@ -2715,9 +2737,10 @@
         dataLoaded: false,
         companyId: "",
         userId: "",
+        selectedDate: null,
         booking: {
-          startDate: null,
-          endDate: null,
+          startDate: "",
+          endDate: "",
           status: "",
           hasPenalty: false,
           workStationId: "",
@@ -2733,6 +2756,9 @@
         ],
         
         deskDetails: null,
+        alertVisible: false,
+        alertText: "",
+        alertType: "success",
       };
       
     },
@@ -2790,9 +2816,10 @@
        * based on user permissions.
        */
       findOccupiedDesks() {
+        this.bookingList = [];
         this.employeeWithBooking = [];
         this.employeeList = [];
-        const date = this.formatDate(this.booking.startDate);
+        const date = this.formatDate(this.selectedDate);
         const userId = this.userId;
   
         this.$ApiService.find_user_by_id(userId).then((u) => {
@@ -2843,7 +2870,7 @@
       bookingDesk(event) {
         this.isAddClicked = false;
         const workStationId = event.target.getAttribute("data-id");
-        const date = this.formatDate(this.booking.startDate);
+        const date = this.formatDate(this.selectedDate);
         this.employeeList = [];
   
         this.$ApiService
@@ -2876,63 +2903,49 @@
        * If an error occurs during the booking process, it displays an error message instead.
        */
       createBooking() {
-        console.log(this.bookingList);
-        console.log(this.employeeWithBooking);
-        // this.booking.startDate = this.formatDate2(this.booking.startDate);
-        // this.booking.endDate = this.booking.startDate;
-        // this.booking.status = "active";
-        // const wsId = this.booking.workStationId;
+        let bookingListOnly = this.bookingList.map(item => item.booking);
+        let mailingList = this.bookingList.map(item => item.user.email);
+        console.log(mailingList)
+        
+        this.$ApiService.save_booking_list(bookingListOnly).then((res) => {
+          this.alertType = "success";
+          this.alertText = "Booking confirmed successfully!";
+          this.alertVisible = true;
 
-        // this.$ApiService
-        //   .create_booking(this.booking)
-        //   .then((res) => {
-        //     this.alertVisible = true;
-        //     this.alertType = "success";
-        //     this.alertText = "Registration was successful!";
-  
-        //     const deskElement = document.querySelector(`[data-id="${wsId}"]`);
-        //     if (deskElement) {
-        //       deskElement.setAttribute("fill", "red");
-        //       deskElement.style.pointerEvents = "none";
-        //     }
-  
-        //     const userId = this.booking.userId;
-        //     const bookingDate = new Date(this.booking.startDate);
-        //     const formattedDate = bookingDate.toLocaleDateString("en-US", {
-        //       year: "numeric",
-        //       month: "long",
-        //       day: "numeric",
-        //     });
-  
-        //     this.$ApiService.find_desk_by_id(wsId).then((res) => {
-        //       this.$ApiService
-        //         .find_user_by_id(userId)
-        //         .then((u) => {
-        //           const emailData = {
-        //             to: u.data.email,
-        //             subject: "Desk Booking Confirmation",
-        //             text: `Your booking for the ${res.data.name} has been successfully confirmed for ${formattedDate}.`,
-        //           };
-  
-        //           this.$ApiService
-        //             .send_mail(emailData)
-        //             .then((emailRes) => {})
-        //             .catch((emailError) => {
-        //               console.error("Error sending email:", emailError);
-        //             });
-        //         })
-        //         .catch((userError) => {
-        //           console.error("Error finding user:", userError);
-        //         });
-        //     });
-        //   })
-        //   .catch((error) => {
-        //     this.alertVisible = true;
-        //     this.alertType = "error";
-        //     this.alertText = "Something went wrong, please try again!";
-        //   });
+          bookingListOnly.forEach(booking => {
+            const deskElement = document.querySelector(`[data-id="${booking.workStationId}"]`);
+            if (deskElement) {
+              deskElement.setAttribute("fill", "red");
+              deskElement.style.pointerEvents = "none";
+            }
+          });
+
+          let messages = this.bookingList.map(item => {
+            return `${item.user.name} ${item.user.surname} -> ${item.deskName}`;
+          });
+          let messageString = messages.join('\n');
+          let bookingDate = this.formatDate(this.selectedDate);
+          console.log(bookingDate)
+
+          const emailData = {
+            to: mailingList,
+            subject: "New booking",
+            text: `A reservation has been created for your team for ${bookingDate}.\n Below is the list of users with the available desk: \n` + messageString,
+          };
+          console.log(emailData);
+          this.$ApiService.send_mail_list(emailData).then((res) => {
+            console.log(res);
+          }).catch((error) => {
+            console.log(error);
+          });
+
+        }).catch((error) => {
+          this.alertVisible = true;
+          this.alertType = "error";
+          this.alertText = "Something went wrong, please try again!";
+          console.log(error);
+        });
       },
-
   
       goToRecap() {
         this.alertVisible = false;
@@ -2943,9 +2956,11 @@
 
       assignBookingToUser(){
         this.isAddClicked = true;
-        console.log(this.booking.userId);
-        //this.booking.startDate = this.formatDate2(this.booking.startDate);
-        //this.booking.endDate = this.booking.startDate;
+
+        let date = new Date(this.selectedDate);
+        //date.setDate(date.getDate() + 1);
+        this.booking.startDate = date.toISOString()
+        this.booking.endDate = this.booking.startDate;
         this.booking.status = "active";
 
         let desk = document.querySelector(`[data-id="${this.booking.workStationId}"]`);

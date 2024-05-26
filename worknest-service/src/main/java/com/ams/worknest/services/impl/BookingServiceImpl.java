@@ -10,6 +10,7 @@ import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
 import com.ams.worknest.services.BookingService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -204,6 +205,31 @@ public class BookingServiceImpl implements BookingService {
                 .endDate(bookingEdited.getEndDate())
                 .workStation(workStation)
                 .build();
+    }
+
+    @Override
+    public List<BookingCreateResource> saveBookings(List<BookingCreateDto> bookingCreateDtos) {
+        List<Booking> savedBookings = bookingRepository.saveAll(bookingCreateDtos.stream()
+                .map(bookingCreateDto -> Booking.builder()
+                        .user(userRepository.findById(bookingCreateDto.getUserId())
+                                .orElseThrow(() -> new RuntimeException("User not found")))
+                        .startDate(bookingCreateDto.getStartDate())
+                        .endDate(bookingCreateDto.getEndDate())
+                        .status(bookingCreateDto.getStatus())
+                        .hasPenalty(bookingCreateDto.isHasPenalty())
+                        .workStation(workStationRepository.findById(bookingCreateDto.getWorkStationId())
+                                .orElseThrow(() -> new RuntimeException("Workstation not found")))
+                        .build())
+                .toList());
+
+        return savedBookings.stream()
+                .map(savedBooking -> BookingCreateResource.builder()
+                        .user(savedBooking.getUser())
+                        .startDate(savedBooking.getStartDate())
+                        .endDate(savedBooking.getEndDate())
+                        .workStation(savedBooking.getWorkStation())
+                        .build())
+                .toList();
     }
 
 

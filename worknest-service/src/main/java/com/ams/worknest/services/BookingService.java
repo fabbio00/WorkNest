@@ -63,4 +63,5 @@ public interface BookingService {
      */
     BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto);
 
+    List<BookingCreateResource> saveBookings(List<BookingCreateDto> bookingCreateDtos);
 }
