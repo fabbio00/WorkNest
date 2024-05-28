@@ -418,6 +418,38 @@ import Desk from "@/components/Desk.vue";
   </svg>
 </template>
 <script>
+/**
+ * Component for displaying a specific floor layout within a building.
+ * This component renders an interactive SVG diagram of a floor with desks and meeting rooms,
+ * allowing users to view and select workstations or meeting rooms for booking.
+ *
+ * Features:
+ * - Renders a detailed SVG floor plan based on provided floor data.
+ * - Supports interactive selection of desks and meeting rooms.
+ * - Highlights desks based on occupancy and specific user requests like equipment needs or window preference.
+ * - Emits events for desk or room selection to facilitate booking actions in parent components.
+ *
+ * Props:
+ * @vue-prop {Object} floorInfo - Contains details about the floor, including IDs and structural data.
+ * @vue-prop {Array} occupiedDesks - A list of desk IDs that are currently occupied.
+ * @vue-prop {String} userType - The type of the user, which influences access levels to certain areas like meeting rooms.
+ * @vue-prop {String|null} equipment - Specifies equipment requirements for filtering desks.
+ * @vue-prop {Boolean|null} hasWindow - Specifies if the desk should have a window based on user preference.
+ *
+ * Data:
+ * @vue-data {Array} desks - Stores the list of desks on the current floor as retrieved from the server.
+ * @vue-data {Array} filteredDesks - Stores desks that meet specific criteria like equipment and window preferences.
+ *
+ * Watchers:
+ * - Watches `equipment` and `hasWindow` properties to re-filter the desks whenever these preferences change.
+ *
+ * Usage:
+ * Embed this component in any part of the application where an interactive floor plan is needed for desk booking.
+ * Ensure that the parent component manages state such as user type and booking preferences to pass them as props.
+ *
+ * @subcategory components / Building 1
+ */
+
 export default {
   props: {
     floorInfo: {
@@ -448,6 +480,11 @@ export default {
     this.getFilteredDesks();
   },
   methods: {
+    /**
+     * Fetches and filters the desks on the current floor based on the type "desk".
+     * This method makes an API call to retrieve a list of all workstations on the current floor and filters out those
+     * which are specifically designated as desks. It updates the `desks` data property with these filtered results.
+     */
     getDesks() {
       this.$ApiService
         .get_workstations(this.floorInfo.floorId, this.floorInfo.buildingId)
@@ -457,6 +494,12 @@ export default {
           );
         });
     },
+    /**
+     * Filters desks based on user-specified equipment and window preferences.
+     * This method is triggered whenever the `equipment` or `hasWindow` props change. It performs an API call
+     * to fetch workstations that meet the specified criteria. If no equipment is specified, it filters based on the
+     * window preference alone. The results are used to update the `filteredDesks` data property.
+     */
     getFilteredDesks() {
       this.$ApiService
         .get_workstations(
@@ -479,6 +522,14 @@ export default {
           );
         });
     },
+    /**
+     * Handles user interactions with meeting rooms within the SVG floor plan.
+     * When a meeting room is clicked, this method checks if the user type is allowed to book meeting rooms
+     * (e.g., 'business' users). It emits an `deskClicked` event with the meeting room's ID if the room is available
+     * and the user is permitted, allowing the parent component to process the booking.
+     *
+     * @param {Event} event - The DOM event triggered when a meeting room element in the SVG is clicked.
+     */
     handleMeetingRoomClick(event) {
       if (this.userType === "business") {
         const meetingRoomId = event.target.getAttribute("data-id");

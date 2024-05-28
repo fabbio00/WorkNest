@@ -223,7 +223,6 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                 enter-active-class="animate__animated animate__fadeIn"
                 leave-active-class="animate__animated animate__fadeOut"
               >
-                <!-- Aggiungo class="d-flex align-center" per centrare verticalmente l'icona con la checkbox -->
                 <div v-if="wantsWindow != null" class="d-flex align-center">
                   <v-icon
                     @click="wantsWindow = null"
@@ -233,7 +232,6 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                   >
                 </div>
               </Transition>
-              <!-- Aggiungo class="d-flex align-center" per mantenere allineata la checkbox -->
               <v-checkbox
                 v-model="wantsWindow"
                 label="I want a window"
@@ -540,6 +538,18 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
  * @vue-data {string} alertText - Text content for the alert.
  * @vue-data {string} alertType - Type of alert.
  * @vue-data {Object} modifyBooking - Contains details for modifying an existing booking, including startDate, endDate, and workStationId.
+ * @vue-data {Array} buildings - List of buildings available for booking.
+ * @vue-data {Object|null} selectedBuilding - Currently selected building object.
+ * @vue-data {Boolean} chooseDeskAlertVisible - Flag to show/hide the alert to prompt user selection.
+ * @vue-data {Array} occupiedDesks - List of desks that are already booked and not available.
+ * @vue-data {String} userType - User type derived from user session to tailor available options.
+ * @vue-data {Array} equipmentItems - List of available equipment types for desks.
+ * @vue-data {Number} selectedFloor - Currently selected floor number.
+ * @vue-data {Object|null} selectedEquipment - Currently selected equipment options.
+ * @vue-data {Boolean|null} wantsWindow - User preference for a desk near a window.
+ *
+ * Props:
+ * @vue-prop {String} bookingId - The ID of the booking to modify.
  *
  * Methods:
  * @vue-method {Function} formatDate - Formats date to YYYY-MM-DD format.
@@ -549,11 +559,14 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
  * @vue-method {Function} createBooking - Creates a new booking with the provided details.
  * @vue-method {Function} editBooking - Modifies an existing booking with the provided details.
  * @vue-method {Function} goToRecap - Redirects the user to the booking list page after successful booking or modification.
+ * @vue-method getBuildings - Fetches the list of available buildings from the server.
+ * @vue-method countWorkstations - Counts desks and meeting rooms available on the selected floor.
+ * @vue-method getEquipmentIcon - Returns the appropriate icon class for given equipment type.
  *
  * Usage:
  * This component is used within a Vue application to manage desk booking functionality.
  * It integrates with backend APIs to retrieve desk availability and create new bookings.
- * @subcategory views/bookings
+ * @subcategory views / bookings
  */
 
 export default {
@@ -829,18 +842,33 @@ export default {
           this.alertText = "Something went wrong, please try again!";
         });
     },
-
+    /**
+     * Redirects the user to the bookings recap page after a successful booking or booking modification.
+     * This method checks the type of alert ('success' or 'error') and redirects based on the result of the booking process.
+     * Upon successful booking actions, the user is navigated to a page where all their bookings are listed.
+     */
     goToRecap() {
       this.alertVisible = false;
       if (this.alertType == "success") {
         this.$router.push("/bookingList");
       }
     },
+    /**
+     * Fetches and stores the list of available buildings for booking from the server.
+     * Each building includes floors and each floor has its specific details such as available desks and rooms,
+     * which are critical for enabling users to make informed booking decisions.
+     */
+
     getBuildings() {
       this.$ApiService.get_buildings().then((res) => {
         this.buildings = res.data;
       });
     },
+    /**
+     * Counts the number of desks and meeting rooms available on each floor of the selected building.
+     * This method is typically called after selecting a building to ensure the latest desk availability and room counts are displayed.
+     * It updates each floor's details with the number of available workstations and meeting rooms, using data retrieved from the server.
+     */
     countWorkstations() {
       this.selectedBuilding.floors.forEach((floor) => {
         this.$ApiService
@@ -856,6 +884,14 @@ export default {
           });
       });
     },
+    /**
+     * Returns the icon class for the specified equipment type.
+     * This method helps in dynamically displaying the appropriate icons for equipment types listed in desk details.
+     * Each equipment type like 'monitor', 'keyboard', or 'mouse' is associated with a specific icon to visually represent it.
+     * @param {string} item - The equipment type string which can include one or multiple equipment items.
+     * @returns {string} - The icon class for the Vuetify icon component.
+     */
+
     getEquipmentIcon(item) {
       if (item.includes("mouse")) {
         return "mdi-mouse";
