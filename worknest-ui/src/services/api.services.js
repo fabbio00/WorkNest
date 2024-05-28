@@ -96,21 +96,30 @@ class ApiService {
       });
   }
 
-  get_buildings(){
+  get_buildings() {
     return axios.get("http://localhost:8080/buildings/list").then((res) => {
       return res;
     });
   }
 
-  get_workstations(floorId, buildingId, equipment="", isPresentWindow = ""){
-    return axios.get("http://localhost:8080/workstations", {
-      params: {
-      floorId: floorId,
-      buildingId: buildingId,
-      }
-    }).then((res) => {
-      return res;
-    });
+  get_workstations(
+    floorId,
+    buildingId,
+    equipment = null,
+    isPresentWindow = null,
+  ) {
+    return axios
+      .get("http://localhost:8080/workstations", {
+        params: {
+          floorId: floorId,
+          buildingId: buildingId,
+          equipment: equipment,
+          isPresentWindow: isPresentWindow,
+        },
+      })
+      .then((res) => {
+        return res;
+      });
   }
 }
 

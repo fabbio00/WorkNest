@@ -25,7 +25,7 @@ public interface WorkStationRepository extends JpaRepository<WorkStation, UUID> 
     @Query("SELECT ws FROM WorkStation ws " +
             "WHERE (:floorId IS NULL OR ws.floor.id = :floorId) " +
             "AND (:buildingId IS NULL OR ws.building.id = :buildingId) " +
-            "AND (:equipment IS NULL OR ws.equipment LIKE %:equipment%) " +
+            "AND (:equipment IS NULL OR ws.equipment = :equipment) " +
             "AND (:isPresentWindow IS NULL OR ws.isPresentWindow = :isPresentWindow)")
     List<WorkStation> findByCriteria(@Param("floorId") UUID floorId,
                                      @Param("buildingId") UUID buildingId,

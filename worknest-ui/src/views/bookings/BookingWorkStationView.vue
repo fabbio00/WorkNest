@@ -1,39 +1,81 @@
 <script setup>
-import Floor1B1 from '@/components/Building1/Floor1B1.vue';
-import Floor2B1 from '@/components/Building1/Floor2B1.vue';
-import Floor3B1 from '@/components/Building1/Floor3B1.vue';
-import Floor1B2 from '@/components/Building2/Floor1B2.vue';
-import Floor2B2 from '@/components/Building2/Floor2B2.vue';
-import Floor3B2 from '@/components/Building2/Floor3B2.vue';
-import Floor1B3 from '@/components/Building3/Floor1B3.vue';
-import Floor2B3 from '@/components/Building3/Floor2B3.vue';
+import Floor1B1 from "@/components/Building1/Floor1B1.vue";
+import Floor2B1 from "@/components/Building1/Floor2B1.vue";
+import Floor3B1 from "@/components/Building1/Floor3B1.vue";
+import Floor1B2 from "@/components/Building2/Floor1B2.vue";
+import Floor2B2 from "@/components/Building2/Floor2B2.vue";
+import Floor3B2 from "@/components/Building2/Floor3B2.vue";
+import Floor1B3 from "@/components/Building3/Floor1B3.vue";
+import Floor2B3 from "@/components/Building3/Floor2B3.vue";
 </script>
 <template>
   <div class="text-center my-7">
-    <img src="/worknest-logo.ico" class="d-inline-flex" style="max-height: 100px" align="center" />
-    <p v-if="!bookingId" class="text-h3 d-inline font-italic ml-5" style="vertical-align: middle">
+    <img
+      src="/worknest-logo.ico"
+      class="d-inline-flex"
+      style="max-height: 100px"
+      align="center"
+    />
+    <p
+      v-if="!bookingId"
+      class="text-h3 d-inline font-italic ml-5"
+      style="vertical-align: middle"
+    >
       Book your desk
     </p>
-    <p v-else class="text-h3 d-inline font-italic ml-5" style="vertical-align: middle">
+    <p
+      v-else
+      class="text-h3 d-inline font-italic ml-5"
+      style="vertical-align: middle"
+    >
       Modify your booking
     </p>
   </div>
-  <Transition enter-active-class="animate__animated animate__fadeIn"
-    enter-leave-class="animate__animated animate__fadeOut" appear>
+  <Transition
+    enter-active-class="animate__animated animate__fadeIn"
+    enter-leave-class="animate__animated animate__fadeOut"
+    appear
+  >
     <v-row justify="center" v-show="!isSvgVisible" class="mx-auto px-12">
       <v-col cols="12" md="8" lg="6">
         <v-card class="mb-4 d-block rounded-lg" elevation="2">
           <v-row>
             <v-col>
-              <v-date-picker v-model="booking.startDate" :min="new Date(new Date().setDate(new Date().getDate() - 1))"
-                no-title scrollable class="ml-8"></v-date-picker>
+              <v-date-picker
+                v-model="booking.startDate"
+                :min="new Date(new Date().setDate(new Date().getDate() - 1))"
+                no-title
+                scrollable
+                class="ml-8"
+              ></v-date-picker>
             </v-col>
             <v-col>
-              <p class="text-h4 mt-12 pt-5" style="font-size: 32px !important">Select building</p>
-              <v-select class="my-8 mr-5" label="Select" chips variant="outlined" :items="buildings" item-title="name"
+              <p class="text-h4 mt-12 pt-5" style="font-size: 32px !important">
+                Select building
+              </p>
+              <v-select
+                class="my-8 mr-5"
+                label="Select"
+                chips
+                variant="outlined"
+                :items="buildings"
+                item-title="name"
                 v-model="selectedBuilding"
-                :hint="selectedBuilding !== null ? (selectedBuilding.address + ' ' + selectedBuilding.streetNumber + ', ' + selectedBuilding.city + ' (' + selectedBuilding.province + ')') : ''"
-                return-object persistent-hint>
+                :hint="
+                  selectedBuilding !== null
+                    ? selectedBuilding.address +
+                      ' ' +
+                      selectedBuilding.streetNumber +
+                      ', ' +
+                      selectedBuilding.city +
+                      ' (' +
+                      selectedBuilding.province +
+                      ')'
+                    : ''
+                "
+                return-object
+                persistent-hint
+              >
                 <template v-slot:label>
                   <v-card-text>
                     <v-icon>mdi-office-building</v-icon>
@@ -41,15 +83,17 @@ import Floor2B3 from '@/components/Building3/Floor2B3.vue';
                   </v-card-text>
                 </template>
                 <template v-slot:item="{ props, item }">
-                  <v-list-item v-bind="props">
+                  <v-list-item v-bind="props" id="prettySelect">
                     <v-list-item-content>
                       <v-list-item-title>
                         {{ item.raw.name }}
                       </v-list-item-title>
                       <v-list-item-subtitle class="d-flex align-center">
                         <v-icon class="mr-2">mdi-office-building-marker</v-icon>
-                        <p>{{ item.raw.address }} {{ item.raw.streetNumber }}, {{ item.raw.city }} ({{
-                          item.raw.province }})</p>
+                        <p>
+                          {{ item.raw.address }} {{ item.raw.streetNumber }},
+                          {{ item.raw.city }} ({{ item.raw.province }})
+                        </p>
                       </v-list-item-subtitle>
                     </v-list-item-content>
                   </v-list-item>
@@ -58,13 +102,23 @@ import Floor2B3 from '@/components/Building3/Floor2B3.vue';
             </v-col>
           </v-row>
           <Transition enter-active-class="animate__animated animate__flipInX">
-            <v-alert v-if="chooseDeskAlertVisible" border="top" type="warning" class="mb-2 mx-auto" style="width:60%">
-              Please choose a date and a building</v-alert>
+            <v-alert
+              v-if="chooseDeskAlertVisible"
+              border="top"
+              type="warning"
+              class="mb-2 mx-auto"
+              style="width: 60%"
+            >
+              Please choose a date and a building</v-alert
+            >
           </Transition>
           <v-card-actions>
-
-            <v-btn color="primary" class="mx-auto rounded-pill" @click="findOccupiedDesks()">Find Available
-              Desks</v-btn>
+            <v-btn
+              color="primary"
+              class="mx-auto rounded-pill"
+              @click="findOccupiedDesks()"
+              >Find Available Desks</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -73,125 +127,281 @@ import Floor2B3 from '@/components/Building3/Floor2B3.vue';
 
   <v-row scrollable class="ml-12">
     <v-col cols="12" md="3" class="my-12">
-      <v-card v-if="isSvgVisible" elevation="5" class="rounded-lg mx-auto" style="width:95%">
-        <v-row class="d-flex flex-column align-center my-auto">
-          <v-col cols="12" class="text-center">
-            <p class="text-h5">Select Floor</p>
-          </v-col>
-          <v-col cols="12" md="8">
-            <v-select v-model="selectedFloor" :items="selectedBuilding.floors" class="my-auto mx-2" label="Floor"
-              item-title="numberOfFloor" item-value="numberOfFloor" variant="outlined" chips>
-              <template v-slot:label>
-                <v-card-text>
-                  <v-icon>mdi-floor-plan</v-icon>
-                  Floor
-                </v-card-text>
-              </template>
-              <template v-slot:item="{ props, item }">
-                <v-list-item v-bind="props">
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      <v-icon class="mr-2">mdi-home-floor-{{ item.raw.numberOfFloor }}</v-icon>Floor {{
-                        item.raw.numberOfFloor }}
-                    </v-list-item-title>
-                    <v-list-item-subtitle class="d-flex align-center">
-                      <v-icon class="ml-4 mr-2">mdi-information-outline</v-icon>
-                      <p>Bathrooms: {{ item.raw.numBathrooms }}, Workstations: {{ item.raw.numOfDesks }}, Meeting Rooms:
-                        {{ item.raw.numOfMeetingRooms }}</p>
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-select>
-          </v-col>
-          <v-col cols="12" class="text-center">
-            <p class="text-h5">Select Equimpent</p>
-          </v-col>
-          <v-col cols="12" md="8">
-            <v-select v-model="selectedEquipment" :items="equipmentItems" class="my-auto mx-2" label="Equipment"
-              variant="outlined" clearable chips>
-              <template v-slot:label>
-                <v-card-text>
-                  <v-icon>mdi-desk</v-icon>
-                  Equipment
-                </v-card-text>
-              </template>
-              <template v-slot:item="{ props, item }">
-                <v-list-item v-bind="props">
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ item.raw.title }}
-                    </v-list-item-title>
-                    <v-list-item-subtitle class="d-flex align-center">
-                      <v-icon v-for="equip in item.value.split(', ')" class="mr-2">{{ getEquipmentIcon(equip)
-                        }}</v-icon>
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-select>
-
-          </v-col>
-          <v-col cols="12" md="8" class="d-flex align-center">
-            <v-checkbox v-model="wantsWindow" label="I want a window" class="my-auto mx-auto"></v-checkbox>
-          </v-col>
-        </v-row>
-      </v-card>
-
-      <Transition enter-active-class="animate__animated animate__backInUp"
-        leave-active-class="animate__animated animate__backOutDown">
-        <v-btn size="x-large" icon="mdi-calendar" class="d-flex position-fixed ml-auto" color="blue-grey-lighten-4"
+      <Transition
+        enter-active-class="animate__animated animate__backInLeft"
+        leave-active-class="animate__animated animate__backOutLeft"
+      >
+        <v-card
+          v-if="isSvgVisible"
+          elevation="5"
+          class="rounded-lg mx-auto"
+          style="width: 95%"
+        >
+          <v-row class="d-flex flex-column align-center my-auto">
+            <v-col cols="12" class="text-center">
+              <p class="text-h5">Select Floor</p>
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-select
+                v-model="selectedFloor"
+                :items="selectedBuilding.floors"
+                class="my-auto mx-2"
+                label="Floor"
+                item-title="numberOfFloor"
+                item-value="numberOfFloor"
+                variant="outlined"
+                chips
+              >
+                <template v-slot:label>
+                  <v-card-text>
+                    <v-icon>mdi-floor-plan</v-icon>
+                    Floor
+                  </v-card-text>
+                </template>
+                <template v-slot:item="{ props, item }">
+                  <v-list-item v-bind="props" id="prettySelect">
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <v-icon class="mr-2"
+                          >mdi-home-floor-{{ item.raw.numberOfFloor }}</v-icon
+                        >Floor {{ item.raw.numberOfFloor }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="d-flex align-center">
+                        <v-icon class="ml-4 mr-2"
+                          >mdi-information-outline</v-icon
+                        >
+                        <p>
+                          Bathrooms: {{ item.raw.numBathrooms }}, Workstations:
+                          {{ item.raw.numOfDesks }}, Meeting Rooms:
+                          {{ item.raw.numOfMeetingRooms }}
+                        </p>
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" class="text-center">
+              <p class="text-h5">Select Equimpent</p>
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-select
+                v-model="selectedEquipment"
+                :items="equipmentItems"
+                class="my-auto mx-2"
+                label="Equipment"
+                variant="outlined"
+                clearable
+                chips
+              >
+                <template v-slot:label>
+                  <v-card-text>
+                    <v-icon>mdi-desk</v-icon>
+                    Equipment
+                  </v-card-text>
+                </template>
+                <template v-slot:item="{ props, item }">
+                  <v-list-item v-bind="props" id="prettySelect">
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.raw.title }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="d-flex align-center">
+                        <v-icon
+                          v-for="equip in item.value.split(', ')"
+                          class="mr-2"
+                          >{{ getEquipmentIcon(equip) }}</v-icon
+                        >
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" md="8" class="d-flex align-center justify-center">
+              <Transition
+                enter-active-class="animate__animated animate__fadeIn"
+                leave-active-class="animate__animated animate__fadeOut"
+              >
+                <!-- Aggiungo class="d-flex align-center" per centrare verticalmente l'icona con la checkbox -->
+                <div v-if="wantsWindow != null" class="d-flex align-center">
+                  <v-icon
+                    @click="wantsWindow = null"
+                    color="red"
+                    style="position: absolute"
+                    >mdi-close-circle</v-icon
+                  >
+                </div>
+              </Transition>
+              <!-- Aggiungo class="d-flex align-center" per mantenere allineata la checkbox -->
+              <v-checkbox
+                v-model="wantsWindow"
+                label="I want a window"
+                class="ml-6 d-flex align-center"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card>
+      </Transition>
+      <Transition
+        enter-active-class="animate__animated animate__backInUp"
+        leave-active-class="animate__animated animate__backOutDown"
+      >
+        <v-btn
+          size="x-large"
+          icon="mdi-calendar"
+          class="d-flex position-fixed ml-auto"
+          color="blue-grey-lighten-4"
           style="bottom: 2%; right: 2%"
-          @click="isSvgVisible = false; selectedFloor = 1; selectedEquipment = null; wantsWindow = null"
-          v-if="isSvgVisible" elevation="12">
+          @click="
+            isSvgVisible = false;
+            selectedFloor = 1;
+            selectedEquipment = null;
+            wantsWindow = null;
+          "
+          v-if="isSvgVisible"
+          elevation="12"
+        >
         </v-btn>
       </Transition>
     </v-col>
     <v-col cols="12" md="6" class="my-12">
-      <div class="svg-container" style="text-align: center; ">
-
+      <div class="svg-container" style="text-align: center">
         <div v-if="isSvgVisible && selectedBuilding.name == 'Building1'">
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor1B1 v-if="selectedFloor == 1" :floorInfo="selectedBuilding.floors[0]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor1B1
+              v-if="selectedFloor == 1"
+              :floorInfo="selectedBuilding.floors[0]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor2B1 v-if="selectedFloor == 2" :floorInfo="selectedBuilding.floors[1]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor2B1
+              v-if="selectedFloor == 2"
+              :floorInfo="selectedBuilding.floors[1]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor3B1 v-if="selectedFloor == 3" :floorInfo="selectedBuilding.floors[2]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor3B1
+              v-if="selectedFloor == 3"
+              :floorInfo="selectedBuilding.floors[2]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
         </div>
         <div v-else-if="isSvgVisible && selectedBuilding.name == 'Building2'">
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor1B2 v-if="selectedFloor == 1" :floorInfo="selectedBuilding.floors[0]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor1B2
+              v-if="selectedFloor == 1"
+              :floorInfo="selectedBuilding.floors[0]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor2B2 v-if="selectedFloor == 2" :floorInfo="selectedBuilding.floors[1]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor2B2
+              v-if="selectedFloor == 2"
+              :floorInfo="selectedBuilding.floors[1]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor3B2 v-if="selectedFloor == 3" :floorInfo="selectedBuilding.floors[2]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor3B2
+              v-if="selectedFloor == 3"
+              :floorInfo="selectedBuilding.floors[2]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
         </div>
         <div v-else-if="isSvgVisible && selectedBuilding.name == 'Building3'">
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor1B3 v-if="selectedFloor == 1" :floorInfo="selectedBuilding.floors[0]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor1B3
+              v-if="selectedFloor == 1"
+              :floorInfo="selectedBuilding.floors[0]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
-          <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <Floor2B3 v-if="selectedFloor == 2" :floorInfo="selectedBuilding.floors[1]" :occupiedDesks="occupiedDesks"
-              :userType="userType" @deskClicked="bookingDesk" style="background-color: #37474F40;" />
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor2B3
+              v-if="selectedFloor == 2"
+              :floorInfo="selectedBuilding.floors[1]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
           </Transition>
         </div>
-
       </div>
     </v-col>
-    <v-col cols="12" md="5" class="my-12 mx-auto" justify="center" style="max-width: 400px">
+    <v-col
+      cols="12"
+      md="5"
+      class="my-12 mx-auto"
+      justify="center"
+      style="max-width: 400px"
+    >
       <Transition enter-active-class="animate__animated animate__fadeIn">
         <div v-if="deskDetails && isSvgVisible" class="desk-details">
           <v-card elevation="5" class="rounded-lg">
@@ -200,38 +410,54 @@ import Floor2B3 from '@/components/Building3/Floor2B3.vue';
               <v-list>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title><strong>Name desk:</strong>
-                      {{ deskDetails.name }}</v-list-item-title>
+                    <v-list-item-title
+                      ><strong>Name desk:</strong>
+                      {{ deskDetails.name }}</v-list-item-title
+                    >
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title><strong>Type:</strong>
-                      {{ deskDetails.type }}</v-list-item-title>
+                    <v-list-item-title
+                      ><strong>Type:</strong>
+                      {{ deskDetails.type }}</v-list-item-title
+                    >
                   </v-list-item-content>
                 </v-list-item>
-                <v-list-item v-if="deskDetails.equipment && deskDetails.equipment !== 'null'">
+                <v-list-item
+                  v-if="
+                    deskDetails.equipment && deskDetails.equipment !== 'null'
+                  "
+                >
                   <v-list-item-content>
-                    <v-list-item-title><strong>Equipment:</strong>
-                      {{ deskDetails.equipment }}</v-list-item-title>
+                    <v-list-item-title
+                      ><strong>Equipment:</strong>
+                      {{ deskDetails.equipment }}</v-list-item-title
+                    >
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title><strong>Floor:</strong>
-                      {{ selectedFloor }}</v-list-item-title>
+                    <v-list-item-title
+                      ><strong>Floor:</strong>
+                      {{ selectedFloor }}</v-list-item-title
+                    >
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title><strong>Price:</strong>
-                      {{ deskDetails.pricePerH * 8 }}€</v-list-item-title>
+                    <v-list-item-title
+                      ><strong>Price:</strong>
+                      {{ deskDetails.pricePerH * 8 }}€</v-list-item-title
+                    >
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
             </v-card-text>
             <v-card-actions>
-              <v-btn v-if="!bookingId" color="primary" @click="createBooking">Book</v-btn>
+              <v-btn v-if="!bookingId" color="primary" @click="createBooking"
+                >Book</v-btn
+              >
               <v-btn v-else color="primary" @click="editBooking">Modify</v-btn>
             </v-card-actions>
           </v-card>
@@ -239,13 +465,29 @@ import Floor2B3 from '@/components/Building3/Floor2B3.vue';
       </Transition>
     </v-col>
     <v-fade-transition hide-on-leave>
-      <v-dialog v-model="alertVisible" persistent min-width="500" max-width="800">
-        <v-card class="mx-auto booking-alert" elevation="16" min-width="500" max-width="800" :title="alertType === 'success' ? 'Confirmed booking' : 'Error booking'
-          ">
+      <v-dialog
+        v-model="alertVisible"
+        persistent
+        min-width="500"
+        max-width="800"
+      >
+        <v-card
+          class="mx-auto booking-alert"
+          elevation="16"
+          min-width="500"
+          max-width="800"
+          :title="
+            alertType === 'success' ? 'Confirmed booking' : 'Error booking'
+          "
+        >
           <v-divider></v-divider>
 
           <div class="py-12 text-center">
-            <v-icon class="mb-6" size="128" :color="alertType === 'success' ? 'success' : 'error'">
+            <v-icon
+              class="mb-6"
+              size="128"
+              :color="alertType === 'success' ? 'success' : 'error'"
+            >
               {{
                 alertType === "success"
                   ? "mdi-check-circle-outline"
@@ -261,8 +503,14 @@ import Floor2B3 from '@/components/Building3/Floor2B3.vue';
           <v-divider></v-divider>
 
           <div class="pa-4 text-end">
-            <v-btn class="text-none" color="medium-emphasis" min-width="92" variant="outlined" rounded
-              @click="goToRecap">
+            <v-btn
+              class="text-none"
+              color="medium-emphasis"
+              min-width="92"
+              variant="outlined"
+              rounded
+              @click="goToRecap"
+            >
               Close
             </v-btn>
           </div>
@@ -340,19 +588,23 @@ export default {
       chooseDeskAlertVisible: false,
       occupiedDesks: [],
       userType: "",
-      equipmentItems: [{
-        title: "Monitor",
-        value: "monitor",
-        icon: "mdi-monitor"
-      }, {
-        title: "Monitor + Keyboard",
-        value: "monitor, keyboard",
-        icon: "mdi-keyboard"
-      }, {
-        title: "Monitor + Keyboard + Mouse",
-        value: "monitor, keyboard, mouse",
-        icon: "mdi-mouse"
-      }],
+      equipmentItems: [
+        {
+          title: "Monitor",
+          value: "monitor",
+          icon: "mdi-monitor",
+        },
+        {
+          title: "Monitor + Keyboard",
+          value: "monitor, keyboard",
+          icon: "mdi-keyboard",
+        },
+        {
+          title: "Monitor + Keyboard + Mouse",
+          value: "monitor, keyboard, mouse",
+          icon: "mdi-mouse",
+        },
+      ],
       selectedFloor: 1,
       selectedEquipment: null,
       wantsWindow: null,
@@ -420,7 +672,9 @@ export default {
         const date = this.formatDate(this.booking.startDate);
 
         this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
-          this.occupiedDesks = occupiedDesks.data.filter((ws) => ws.status != "canceled").map(ws => ws.workStationId);
+          this.occupiedDesks = occupiedDesks.data
+            .filter((ws) => ws.status != "canceled")
+            .map((ws) => ws.workStationId);
           this.isSvgVisible = true;
         });
         this.countWorkstations();
@@ -497,7 +751,7 @@ export default {
 
                 this.$ApiService
                   .send_mail(emailData)
-                  .then((emailRes) => { })
+                  .then((emailRes) => {})
                   .catch((emailError) => {
                     console.error("Error sending email:", emailError);
                   });
@@ -584,28 +838,34 @@ export default {
     },
     getBuildings() {
       this.$ApiService.get_buildings().then((res) => {
-        console.log(res)
         this.buildings = res.data;
       });
     },
     countWorkstations() {
       this.selectedBuilding.floors.forEach((floor) => {
-        this.$ApiService.get_workstations(floor.floorId, floor.buildingId).then((response) => {
-          floor.numOfDesks = response.data.workStationResourceList.filter((desk) => desk.type === 'desk').length;
-          floor.numOfMeetingRooms = response.data.workStationResourceList.filter((desk) => desk.type === 'meeting_room').length;
-        });
+        this.$ApiService
+          .get_workstations(floor.floorId, floor.buildingId)
+          .then((response) => {
+            floor.numOfDesks = response.data.workStationResourceList.filter(
+              (desk) => desk.type === "desk",
+            ).length;
+            floor.numOfMeetingRooms =
+              response.data.workStationResourceList.filter(
+                (desk) => desk.type === "meeting_room",
+              ).length;
+          });
       });
     },
     getEquipmentIcon(item) {
-      if (item.includes('mouse')) {
-        return 'mdi-mouse';
-      } else if (item.includes('keyboard')) {
-        return 'mdi-keyboard';
-      } else if (item.includes('monitor')) {
-        return 'mdi-monitor';
+      if (item.includes("mouse")) {
+        return "mdi-mouse";
+      } else if (item.includes("keyboard")) {
+        return "mdi-keyboard";
+      } else if (item.includes("monitor")) {
+        return "mdi-monitor";
       }
-      return '';
-    }
+      return "";
+    },
   },
 };
 </script>
@@ -636,7 +896,8 @@ export default {
   overflow-wrap: break-word;
 }
 
-ellipse[fill="green"] {
+ellipse[fill="green"],
+ellipse[fill="#40C4FF"] {
   cursor: pointer;
 }
 
@@ -644,7 +905,7 @@ ellipse[fill="green"] {
   overflow: auto;
 }
 
-.v-list-item__content>.v-list-item-title {
+#prettySelect .v-list-item__content > .v-list-item-title {
   display: none;
 }
 </style>

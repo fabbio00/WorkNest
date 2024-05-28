@@ -151,7 +151,9 @@ export default {
     const userId = localStorage.getItem("userId");
     if (userId) {
       await this.$ApiService.find_user_by_id(userId).then((res) => {
-        this.user = res.data;
+        this.$nextTick(() => {
+          this.user = res.data;
+        });
       });
     }
   },
