@@ -19,5 +19,12 @@ public interface EmailSenderService {
      */
     void sendSimpleMessage(String to, String subject, String text);
 
+    /**
+     * Sends a simple text email to the specified recipients.
+     *
+     * @param to      The list of recipients' email addresses.
+     * @param subject The subject line of the email.
+     * @param text    The text body of the email.
+     */
     void sendSimpleMessages(List<String> to, String subject, String text);
 }

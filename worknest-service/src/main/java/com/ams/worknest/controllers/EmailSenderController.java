@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 /**
  * Controller for managing email sending operations.
@@ -39,7 +37,12 @@ public class EmailSenderController {
     }
 
 
-
+    /**
+     * Email a list of users with the provided email details.
+     *
+     * @param emailListDto the email data transfer object containing the details of the email to be sent
+     * @return an email resource indicating the success of the operation
+     */
     @PostMapping("/send-list")
     public EmailResource sendEmails(@RequestBody EmailListDto emailListDto) {
         emailService.sendSimpleMessages(emailListDto.getTo(), emailListDto.getSubject(), emailListDto.getText());
@@ -47,6 +50,8 @@ public class EmailSenderController {
                 .message("Email sent successfully")
                 .build();
     }
+
+
 
 
 

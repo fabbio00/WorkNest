@@ -47,6 +47,13 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         emailSender.send(message);
     }
 
+    /**
+     * Sends a simple email message to multiple recipients.
+     *
+     * @param to      The list of recipients' email addresses.
+     * @param subject The subject of the email.
+     * @param text    The text content of the email.
+     */
     @Override
     public void sendSimpleMessages(List<String> to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
