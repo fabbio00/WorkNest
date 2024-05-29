@@ -78,4 +78,12 @@ public class Booking {
     @JoinColumn(name = "workstation_id")
     private WorkStation workStation;
 
+    /**
+     * The booking business associated with the booking.
+     */
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "booking_business_id")
+    private BookingBusiness bookingBusiness;
+
 }

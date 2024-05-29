@@ -105,7 +105,14 @@ public class BookingController {
         return bookingService.editBooking(bookingId, bookingEditDto);
     }
 
-    // save list of bookings
+    /**
+     * Saves a list of bookings.
+     * This endpoint accepts a list of booking creation DTOs, processes them to create multiple bookings,
+     * and returns a list of resources representing the created bookings.
+     *
+     * @param bookingCreateDtos A list of {@link BookingCreateDto} objects containing the details for each booking to be created.
+     * @return A list of {@link BookingCreateResource} objects representing the created bookings.
+     */
     @PostMapping("/save-list")
     @ResponseStatus(HttpStatus.CREATED)
     public List<BookingCreateResource> saveBookings(@RequestBody List<BookingCreateDto> bookingCreateDtos){
