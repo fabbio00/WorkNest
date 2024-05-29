@@ -8,20 +8,25 @@ import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -102,6 +107,47 @@ class BookingControllerTest extends BaseMvcTest {
 
     }
 
+    @Test
+    void saveBooking() throws Exception {
+        BookingCreateDto bookingCreateDto = bookingDtoCreation2();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String bookingCreateDtosJson = mapper.writeValueAsString(bookingCreateDto);
+
+        mvc.perform(
+                        post(BOOKING_ENDPOINT)
+                                .content(bookingCreateDtosJson)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void saveMultipleBookings() throws Exception {
+        List<BookingCreateDto> bookingCreateDtos = Arrays.asList(bookingDtoCreation2(), bookingDtoCreation2());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String bookingCreateDtosJson = mapper.writeValueAsString(bookingCreateDtos);
+
+        mvc.perform(
+                        post(BOOKING_ENDPOINT + "/save-list")
+                                .content(bookingCreateDtosJson)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+
+
 
     Booking savedBookingTemplate(){
 
@@ -181,6 +227,47 @@ class BookingControllerTest extends BaseMvcTest {
                 .hasPenalty(false)
                 .userId(savedUser.getId())
                 .workStationId(savedWorkStation.getId())
+                .build();
+    }
+
+    BookingCreateDto bookingDtoCreation2(){
+
+        String str = "2024-04-06T10:15:30+01:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter);
+
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("prova.user@gmail.com")
+                .password("password")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("basic_user")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        WorkStation workStation = WorkStation.builder()
+                .name("WorkStation1")
+                .pricePerH(3)
+                .equipment("monitor")
+                .type("desk")
+                .build();
+
+        WorkStation savedWorkStation = workStationRepository.save(workStation);
+
+        return BookingCreateDto.builder()
+                .startDate(zonedDateTime)
+                .endDate(zonedDateTime)
+                .status("active")
+                .hasPenalty(false)
+                .userId(savedUser.getId())
+                .workStationId(savedWorkStation.getId())
+                .bookingBusinessId(null)
                 .build();
     }
 

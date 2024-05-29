@@ -63,5 +63,11 @@ public interface BookingService {
      */
     BookingEditResource editBooking(UUID bookingId, BookingEditDto bookingEditDto);
 
+    /**
+     * Saves a list of bookings.
+     *
+     * @param bookingCreateDtos The list of data transfer objects containing the details of the bookings to be saved.
+     * @return A list of resources representing the created bookings.
+     */
     List<BookingCreateResource> saveBookings(List<BookingCreateDto> bookingCreateDtos);
 }

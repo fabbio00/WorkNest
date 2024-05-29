@@ -31,4 +31,18 @@ class EmailSenderControllerTest extends BaseMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Email sent successfully")));
     }
+
+    @Test
+    void sendEmails() throws Exception {
+        // Prepare a list of emails
+        String emailListJson = "{ \"to\": [\"test1@example.com\", \"test2@example.com\"], \"subject\": \"Test Subject\", \"text\": \"Test message\" }";
+
+        // Perform the POST request and check the response
+        mvc.perform(
+                post("/sendEmail/send-list")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(emailListJson))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Email sent successfully")));
+    }
 }

@@ -5,7 +5,9 @@ import com.ams.worknest.model.dto.UserDto;
 import com.ams.worknest.model.dto.UserEditTypeDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.entities.User;
+import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -35,6 +37,9 @@ class UserControllerTest extends BaseMvcTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
 
     private static final String USER_ENDPOINT = "/users";
 
@@ -88,6 +93,16 @@ class UserControllerTest extends BaseMvcTest {
 
 
     User savedUserTemplate(){
+        Company company = Company.builder()
+                .name("Test Company")
+                .email("test@company.com")
+                .vatCode("IT12345678901")
+                .phone("1234567890")
+                .companyCode("TEST123")
+                .build();
+
+        companyRepository.save(company);
+
         User user = User.builder()
                 .barrierFreeFlag(true)
                 .email("prova22.user@gmail.com")
@@ -99,6 +114,7 @@ class UserControllerTest extends BaseMvcTest {
                 .taxCode("FDSAFDAR343")
                 .registrationDate(ZonedDateTime.now())
                 .status("active")
+                .company(company)
                 .build();
 
         return userRepository.save(user);

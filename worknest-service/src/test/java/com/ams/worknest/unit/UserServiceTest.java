@@ -3,6 +3,7 @@ package com.ams.worknest.unit;
 import com.ams.worknest.model.dto.UserDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.resources.UserFindByCompanyResource;
 import com.ams.worknest.model.resources.UserResource;
@@ -78,6 +79,14 @@ class UserServiceTest {
     @DisplayName("Get user by id successfully")
     @Test
      void getUserByIdSuccessfully() {
+        Company company = Company.builder()
+                .name("Test Company")
+                .email("test@company.com")
+                .vatCode("IT12345678901")
+                .phone("1234567890")
+                .companyCode("TEST123")
+                .build();
+
         UUID userId = UUID.randomUUID();
 
         User user = new User();
@@ -92,6 +101,7 @@ class UserServiceTest {
         user.setStatus("status");
         user.setBarrierFreeFlag(true);
         user.setRegistrationDate(ZonedDateTime.now());
+        user.setCompany(company);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 

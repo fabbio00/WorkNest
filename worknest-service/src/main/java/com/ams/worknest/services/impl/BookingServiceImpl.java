@@ -3,9 +3,11 @@ package com.ams.worknest.services.impl;
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.entities.Booking;
+import com.ams.worknest.model.entities.BookingBusiness;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
 import com.ams.worknest.model.resources.*;
+import com.ams.worknest.repositories.BookingBusinessRepository;
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
@@ -31,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final WorkStationRepository workStationRepository;
+    private final BookingBusinessRepository bookingBusinessRepository;
     private static final String BOOKING_NOT_FOUND = "Booking not found!";
 
     /**
@@ -207,20 +210,44 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    /**
+     * Saves a list of bookings based on the provided booking data transfer objects.
+     *
+     * @param bookingCreateDtos the list of booking data transfer objects containing booking details
+     * @return the list of created bookings as resources
+     * @throws RuntimeException if the user, workstation, or booking business associated with the booking is not found
+     */
     @Override
     public List<BookingCreateResource> saveBookings(List<BookingCreateDto> bookingCreateDtos) {
-        List<Booking> savedBookings = bookingRepository.saveAll(bookingCreateDtos.stream()
-                .map(bookingCreateDto -> Booking.builder()
-                        .user(userRepository.findById(bookingCreateDto.getUserId())
-                                .orElseThrow(() -> new RuntimeException("User not found")))
-                        .startDate(bookingCreateDto.getStartDate())
-                        .endDate(bookingCreateDto.getEndDate())
-                        .status(bookingCreateDto.getStatus())
-                        .hasPenalty(bookingCreateDto.isHasPenalty())
-                        .workStation(workStationRepository.findById(bookingCreateDto.getWorkStationId())
-                                .orElseThrow(() -> new RuntimeException("Workstation not found")))
-                        .build())
-                .toList());
+        List<Booking> savedBookings = bookingRepository.saveAll(
+                bookingCreateDtos.stream()
+                        .map(bookingCreateDto -> {
+                            // Fetch user and workstation
+                            User user = userRepository.findById(bookingCreateDto.getUserId())
+                                    .orElseThrow(() -> new RuntimeException("User not found"));
+                            WorkStation workStation = workStationRepository.findById(bookingCreateDto.getWorkStationId())
+                                    .orElseThrow(() -> new RuntimeException("Workstation not found"));
+
+                            // Conditionally fetch booking business
+                            BookingBusiness bookingBusiness = null;
+                            if (bookingCreateDto.getBookingBusinessId() != null) {
+                                bookingBusiness = bookingBusinessRepository.findById(bookingCreateDto.getBookingBusinessId())
+                                        .orElseThrow(() -> new RuntimeException("Booking Business not found"));
+                            }
+
+                            // Build and return Booking object
+                            return Booking.builder()
+                                    .user(user)
+                                    .startDate(bookingCreateDto.getStartDate())
+                                    .endDate(bookingCreateDto.getEndDate())
+                                    .status(bookingCreateDto.getStatus())
+                                    .hasPenalty(bookingCreateDto.isHasPenalty())
+                                    .bookingBusiness(bookingBusiness)
+                                    .workStation(workStation)
+                                    .build();
+                        })
+                        .toList()
+        );
 
         return savedBookings.stream()
                 .map(savedBooking -> BookingCreateResource.builder()
@@ -228,9 +255,11 @@ public class BookingServiceImpl implements BookingService {
                         .startDate(savedBooking.getStartDate())
                         .endDate(savedBooking.getEndDate())
                         .workStation(savedBooking.getWorkStation())
-                        .build())
+                        .build()
+                )
                 .toList();
     }
+
 
 
 }
