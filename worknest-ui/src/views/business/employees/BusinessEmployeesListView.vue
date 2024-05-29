@@ -79,7 +79,7 @@
         <template v-slot:item.actions="{ item }">
         <v-icon
             size="small"
-            @click=""
+            @click="createBookingForEmployee(item)"
             :class="{
               disabled:
                 item.status !== 'inactive'
@@ -356,6 +356,11 @@ export default {
      */
     closeEdit() {
       this.dialogEdit = false;
+    },
+
+
+    createBookingForEmployee(item){
+      this.$router.push({ name: 'create_booking_for_employee', params: { employeeId: item.userId } });
     },
 
     /**

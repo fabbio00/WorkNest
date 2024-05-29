@@ -51,7 +51,7 @@
     </Transition>
   
     <v-row>
-      <v-col cols="12" md="1" style="max-width: 90px">
+      <v-col cols="12" md="6" style="max-width: 400px">
         <Transition
           enter-active-class="animate__animated animate__backInUp"
           leave-active-class="animate__animated animate__backOutDown"
@@ -70,30 +70,6 @@
         </Transition>
       </v-col>
 
-      <v-col
-        cols="12"
-        md="5"
-        class="my-12 mx-auto"
-        justify="center"
-        style="max-width: 300px"
-      >
-      <div class="desk-details" v-if="employeeWithBooking.length > 0 && isSvgVisible">
-        <v-card elevation="5">
-          <v-card-title class="headline">Warning!</v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item>
-                <p>It is not possible to reserve a desk for the following users because they alredy have a booking for the current day: <br><br></p>
-                <li v-for="(employee, index) in employeeWithBooking" :key="index">
-                  {{ employee.user.name }} {{ employee.user.surname }}
-                </li>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </div>
-      
-      </v-col>
 
       <v-col cols="12" md="6">
         <div class="svg-container" style="text-align: center">
@@ -2488,7 +2464,7 @@
                     fill="#ffffff"
                   />
                   <rect
-                     
+                    data-id="7ac68b59-f717-43e8-b629-bff0fdd9da74"
                     stroke="#000"
                     rx="8"
                     id="svg_403"
@@ -2514,7 +2490,7 @@
       >
         <Transition enter-active-class="animate__animated animate__fadeIn">
           <div v-if="deskDetails && isSvgVisible" class="desk-details">
-            <v-card elevation="5">
+            <v-card elevation="5" v-if="deskDetails.type!=='meeting_room'">
               <v-card-title class="headline">Desk Details</v-card-title>
               <v-card-text>
                 <v-list>
@@ -2562,9 +2538,6 @@
                   <v-list-item>
                     <p>Assign to:</p>
                     <v-select :items="employeeList" item-value="user.id" item-title="fullName" label="User" v-model="booking.userId" :disabled="isAddClicked">
-                      <template v-slot:item="{ props }">
-                        <v-list-item v-bind="props"></v-list-item>
-                      </template>
                     </v-select>
                   </v-list-item>
 
@@ -2572,6 +2545,69 @@
               </v-card-text>
               <v-card-actions>
                 <v-btn color="primary" @click="assignBookingToUser" :disabled="!booking.userId"
+                  >Add</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+            <v-card elevation="5" v-else>
+              <v-card-title class="headline">Meeting Room Details</v-card-title>
+              <v-card-text>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        ><strong>Name room:</strong>
+                        {{ deskDetails.name }}</v-list-item-title
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        ><strong>Number of seats:</strong>
+                        {{ deskDetails.numberOfSeats }}</v-list-item-title
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        ><strong>Floor:</strong>
+                        {{ deskDetails.floor }}</v-list-item-title
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        ><strong>Price:</strong>
+                        {{ deskDetails.pricePerH * 8 }}€</v-list-item-title
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <p>Assign to:</p>
+                      <v-select
+                        class="mt-4"
+                        clearable
+                        label="Select"
+                        :items="employeeList"
+                        item-value="user"
+                        item-title="fullName"
+                        v-model="meetingRoomList"
+                        chips
+                        multiple
+                        variant="outlined"
+                        :disabled="isAddClicked || savedUsersMeetingRoomList.length >= deskDetails.numberOfSeats"
+                    >
+                  </v-select>
+                </v-list-item>
+
+                </v-list>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="primary" @click="assignMeetingRoomToUsers" :disabled="meetingRoomList.length == 0 || isAddClicked"
                   >Add</v-btn
                 >
               </v-card-actions>
@@ -2592,15 +2628,16 @@
             min-width="500"
             max-width="800"
             :title="
-              alertType === 'success' ? 'Confirmed booking' : 'Error booking'
+              alertType === 'success' ? 'Confirmed booking' : (alertType === 'warning' ? 'Warning!' : 'Error booking')
             "
+            :text="alertText" style="white-space: pre-line;"
           >
-            <v-divider></v-divider>
+            <v-divider v-if="alertType !== 'warning'"></v-divider>
   
-            <div class="py-12 text-center">
+            <div class="py-12 text-center" v-if="alertType !== 'warning'">
               <v-icon
                 class="mb-6"
-                size="128"
+                size="100"
                 :color="alertType === 'success' ? 'success' : 'error'"
               >
                 {{
@@ -2610,9 +2647,7 @@
                 }}
               </v-icon>
   
-              <div class="text-h4 font-weight-bold" style="word-wrap: break-word">
-                {{ alertText }}
-              </div>
+
             </div>
   
             <v-divider></v-divider>
@@ -2731,6 +2766,9 @@
       return {
         isSvgVisible: false,
         isAddClicked: false,
+        savedUsersMeetingRoomList: [],
+        meetingRoomList: [],
+        selectedEmployees: [],
         employeeWithBooking: [],
         employeeList: [],
         bookingList: [],
@@ -2751,7 +2789,7 @@
           { title: "Surname", key: "user.surname" },
           { title: "Name", key: "user.name" },
           { title: "User type", key: "user.type" },
-          { title: "WorkStation", key: "deskName" },
+          { title: "WorkStation", key: "workstation.name" },
           { title: "Actions", key: "actions", sortable: false },
         ],
         
@@ -2816,6 +2854,8 @@
        * based on user permissions.
        */
       findOccupiedDesks() {
+        console.log(this.selectedDate);
+        this.deskDetails = null;
         this.bookingList = [];
         this.employeeWithBooking = [];
         this.employeeList = [];
@@ -2830,7 +2870,7 @@
             desk.style.pointerEvents = "auto";
   
             this.$ApiService.find_desk_by_id(workStationId).then((ws) => {
-              if (ws.data.type == "meeting room" && u.data.type !== "BUSINESS") {
+              if (ws.data.type == "meeting_room" && u.data.type !== "BUSINESS") {
                 desk.setAttribute("fill", "red");
                 desk.style.pointerEvents = "none";
               }
@@ -2846,7 +2886,7 @@
                 deskElement.setAttribute("fill", "red");
                 deskElement.style.pointerEvents = "none";
               
-                  if(wsOccupied.user.company.id == this.companyId && wsOccupied.user.id != userId){
+                  if(wsOccupied.user.company.id == this.companyId){
                       this.employeeWithBooking.push({
                           user: wsOccupied.user,
                       });
@@ -2854,6 +2894,14 @@
               }
             });
             this.dataLoaded = true;
+            console.log(this.employeeWithBooking);
+            if(this.employeeWithBooking.length > 0){
+              this.alertVisible = true;
+              this.alertType = "warning";
+              let employeeNames = this.employeeWithBooking.map(employee => `• ${employee.user.name} ${employee.user.surname}`).join('\n');
+              this.alertText = "It is not possible to reserve a desk for the following users because they alredy have a booking for the current day:\n\n" + employeeNames;
+            }
+
           });
           
         });
@@ -2885,7 +2933,7 @@
         
         this.$ApiService.get_list_employee(this.companyId).then((res) => {
           res.data.forEach((employee) => { 
-            if (employee.id !== this.userId && employee.status !== "inactive" && !this.employeeWithBooking.some(e => e.user.id === employee.id)) {
+            if (employee.status !== "inactive" && !this.employeeWithBooking.some(e => e.user.id === employee.id)) {
               this.employeeList.push({
                 user: employee,
                 fullName: `${employee.surname} ${employee.name}`,
@@ -2905,46 +2953,63 @@
       createBooking() {
         let bookingListOnly = this.bookingList.map(item => item.booking);
         let mailingList = this.bookingList.map(item => item.user.email);
-        console.log(mailingList)
-        
-        this.$ApiService.save_booking_list(bookingListOnly).then((res) => {
-          this.alertType = "success";
-          this.alertText = "Booking confirmed successfully!";
-          this.alertVisible = true;
+        let bookingBusiness = {
+          bookingDate: this.booking.startDate,
+          userId: this.userId,
+        };
+    
+        let bookingBusinessId = "";
 
+        this.$ApiService.create_booking_business(bookingBusiness).then((res) => {
+          bookingBusinessId = res.data.bookingBusinessId;
           bookingListOnly.forEach(booking => {
-            const deskElement = document.querySelector(`[data-id="${booking.workStationId}"]`);
-            if (deskElement) {
-              deskElement.setAttribute("fill", "red");
-              deskElement.style.pointerEvents = "none";
-            }
+            booking.bookingBusinessId = bookingBusinessId;
           });
 
-          let messages = this.bookingList.map(item => {
-            return `${item.user.name} ${item.user.surname} -> ${item.deskName}`;
-          });
-          let messageString = messages.join('\n');
-          let bookingDate = this.formatDate(this.selectedDate);
-          console.log(bookingDate)
-
-          const emailData = {
-            to: mailingList,
-            subject: "New booking",
-            text: `A reservation has been created for your team for ${bookingDate}.\n Below is the list of users with the available desk: \n` + messageString,
-          };
-          console.log(emailData);
-          this.$ApiService.send_mail_list(emailData).then((res) => {
+          this.$ApiService.save_booking_list(bookingListOnly).then((res) => {
             console.log(res);
+            this.alertType = "success";
+            this.alertText = "Booking confirmed successfully!";
+            this.alertVisible = true;
+
+            bookingListOnly.forEach(booking => {
+              const deskElement = document.querySelector(`[data-id="${booking.workStationId}"]`);
+              if (deskElement) {
+                deskElement.setAttribute("fill", "red");
+                deskElement.style.pointerEvents = "none";
+              }
+            });
+
+            let messages = this.bookingList.map(item => {
+              return `${item.user.name} ${item.user.surname} -> ${item.workstation.name}`;
+            });
+            let messageString = messages.join('\n');
+            let bookingDate = this.formatDate(this.selectedDate);
+            console.log(bookingDate)
+
+            const emailData = {
+              to: mailingList,
+              subject: "New booking",
+              text: `A reservation has been created for your team for ${bookingDate}.\n Below is the list of users with the available desk: \n` + messageString,
+            };
+            console.log(emailData);
+            this.$ApiService.send_mail_list(emailData).then((res) => {
+              console.log(res);
+            }).catch((error) => {
+              console.log(error);
+            });
+
           }).catch((error) => {
+            this.alertVisible = true;
+            this.alertType = "error";
+            this.alertText = "Something went wrong, please try again!";
             console.log(error);
           });
 
         }).catch((error) => {
-          this.alertVisible = true;
-          this.alertType = "error";
-          this.alertText = "Something went wrong, please try again!";
           console.log(error);
         });
+      
       },
   
       goToRecap() {
@@ -2958,10 +3023,16 @@
         this.isAddClicked = true;
 
         let date = new Date(this.selectedDate);
-        //date.setDate(date.getDate() + 1);
-        this.booking.startDate = date.toISOString()
+        date.setDate(date.getDate() + 1);
+        let dateToSave = date.toISOString().replace('Z', '+00:00');
+        const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+        const newData = dateToSave.replace(regexTime, "00:00:00.000");
+
+        this.booking.startDate = newData;
         this.booking.endDate = this.booking.startDate;
         this.booking.status = "active";
+
+        console.log(this.booking.startDate);
 
         let desk = document.querySelector(`[data-id="${this.booking.workStationId}"]`);
         if (desk) {
@@ -2982,27 +3053,101 @@
         }
 
         this.$ApiService.find_user_by_id(this.booking.userId).then((u) => {
-          this.employeeWithBooking.push({
-            user: u.data,
-          });
-          this.bookingList.push({
-            booking: newBooking,
-            user: u.data,
-            deskName: this.deskDetails.name,
-          });
+            this.employeeWithBooking.push({
+                user: u.data,
+            });
+            this.bookingList.push({
+                booking: newBooking,
+                user: u.data,
+                workstation: this.deskDetails,
+            });
         });
         
         this.booking.userId = null;
       },
 
 
+      assignMeetingRoomToUsers(){
+        let usersInMeetingRoom = this.savedUsersMeetingRoomList.length + this.meetingRoomList.length;
+        console.log(this.savedUsersMeetingRoomList.length, this.meetingRoomList.length);
+        if(usersInMeetingRoom > this.deskDetails.numberOfSeats){
+          this.alertVisible = true;
+          this.alertType = "error";
+          this.alertText = "You have selected more users than the number of seats available!";
+          return;
+        }
+        else {
+          this.isAddClicked = true;
+
+          let date = new Date(this.selectedDate);
+          date.setDate(date.getDate() + 1);
+          let dateToSave = date.toISOString().replace('Z', '+00:00');
+          const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+          const newData = dateToSave.replace(regexTime, "00:00:00.000");
+          
+          this.booking.startDate = newData;
+          this.booking.endDate = this.booking.startDate;
+          this.booking.status = "active";
+
+          let desk = document.querySelector(`[data-id="${this.booking.workStationId}"]`);
+          if (desk) {
+            desk.setAttribute("fill", "gray");
+            desk.style.pointerEvents = "auto";
+            desk.style.cursor = "pointer";
+          }
+
+          this.meetingRoomList.forEach((user) => {
+            const newBooking = Object.assign({}, this.booking);
+            newBooking.userId = user.id;
+            const index = this.bookingList.findIndex(booking => booking.user.id === newBooking.userId);
+            let removedBooking;
+            if (index !== -1) {
+              removedBooking = this.bookingList.splice(index, 1);
+            }
+            
+            if (removedBooking) {
+              this.employeeWithBooking = this.employeeWithBooking.filter(employee => employee.user.id !== removedBooking[0].booking.userId);
+            }
+
+            this.$ApiService.find_user_by_id(user.id).then((u) => {
+                this.employeeWithBooking.push({
+                    user: u.data,
+                });
+                this.bookingList.push({
+                    booking: newBooking,
+                    user: u.data,
+                    workstation: this.deskDetails,
+                });
+            });
+          });
+          this.savedUsersMeetingRoomList = this.savedUsersMeetingRoomList.concat(this.meetingRoomList.filter(user => !this.savedUsersMeetingRoomList.some(u => u.id === user.id)));
+          this.meetingRoomList = [];
+        }
+      },
+
+
       deleteItem(item){
-        const index = this.bookingList.findIndex(booking => booking.booking.workStationId === item.booking.workStationId);
+        let index = this.bookingList.findIndex(booking => booking.user.id === item.user.id);
         this.bookingList.splice(index, 1);
-        this.employeeWithBooking = this.employeeWithBooking.filter(employee => employee.user.id !== item.booking.userId);
+
+        index = this.employeeWithBooking.findIndex(employee => employee.user.id === item.booking.userId);
+        this.employeeWithBooking.splice(index, 1);
+
+        if(item.workstation.type === "meeting_room"){
+          index = this.meetingRoomList.findIndex(user => user.id === item.booking.userId);
+          this.meetingRoomList.splice(index, 1);
+
+          index = this.savedUsersMeetingRoomList.findIndex(user => user.id === item.booking.userId);
+          this.savedUsersMeetingRoomList.splice(index, 1);
+        }
 
         let desk = document.querySelector(`[data-id="${item.booking.workStationId}"]`);
-        if (desk) {
+        if(desk && item.workstation.type === "meeting_room" && this.savedUsersMeetingRoomList.length == 0){
+          desk.setAttribute("fill", "green");
+          desk.style.pointerEvents = "auto";
+          desk.style.cursor = "pointer"; 
+        } 
+        else if (desk && item.workstation.type !== "meeting_room"){
           desk.setAttribute("fill", "green");
           desk.style.pointerEvents = "auto";
           desk.style.cursor = "pointer";

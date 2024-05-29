@@ -31,6 +31,15 @@ const router = createRouter({
       },
     },
     {
+      path: "/booking/:employeeId",
+      name: "create_booking_for_employee",
+      props: (route) => ({ employeeId: route.params.employeeId }),
+      component: () => import("../views/bookings/BookingWorkStationView.vue"),
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
       path: "/booking",
       name: "booking",
       component: () => import("../views/bookings/BookingWorkStationView.vue"),

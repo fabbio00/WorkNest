@@ -130,6 +130,12 @@ class ApiService {
       });
   }
 
+  create_booking_business(bookingBusiness) {
+    return axios.post("http://localhost:8080/booking-business", bookingBusiness).then((res) => {
+      return res;
+    });
+  }
+
 }
 
 export default new ApiService();
