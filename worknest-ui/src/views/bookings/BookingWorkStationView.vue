@@ -1,3 +1,13 @@
+<script setup>
+import Floor1B1 from "@/components/Building1/Floor1B1.vue";
+import Floor2B1 from "@/components/Building1/Floor2B1.vue";
+import Floor3B1 from "@/components/Building1/Floor3B1.vue";
+import Floor1B2 from "@/components/Building2/Floor1B2.vue";
+import Floor2B2 from "@/components/Building2/Floor2B2.vue";
+import Floor3B2 from "@/components/Building2/Floor3B2.vue";
+import Floor1B3 from "@/components/Building3/Floor1B3.vue";
+import Floor2B3 from "@/components/Building3/Floor2B3.vue";
+</script>
 <template>
   <div class="text-center my-7">
     <img
@@ -26,17 +36,82 @@
     enter-leave-class="animate__animated animate__fadeOut"
     appear
   >
-    <v-row justify="center" v-show="!isSvgVisible">
+    <v-row justify="center" v-show="!isSvgVisible" class="mx-auto px-12">
       <v-col cols="12" md="8" lg="6">
-        <v-card class="mb-4 d-block rounded-lg" elevation="2" align="center">
-          <v-card-text>
-            <v-date-picker
-              v-model="booking.startDate"
-              :min="new Date(new Date().setDate(new Date().getDate() - 1))"
-              no-title
-              scrollable
-            ></v-date-picker>
-          </v-card-text>
+        <v-card class="mb-4 d-block rounded-lg" elevation="2">
+          <v-row>
+            <v-col>
+              <v-date-picker
+                v-model="booking.startDate"
+                :min="new Date(new Date().setDate(new Date().getDate() - 1))"
+                no-title
+                scrollable
+                class="ml-8"
+              ></v-date-picker>
+            </v-col>
+            <v-col>
+              <p class="text-h4 mt-12 pt-5" style="font-size: 32px !important">
+                Select building
+              </p>
+              <v-select
+                class="my-8 mr-5"
+                label="Select"
+                chips
+                variant="outlined"
+                :items="buildings"
+                item-title="name"
+                v-model="selectedBuilding"
+                :hint="
+                  selectedBuilding !== null
+                    ? selectedBuilding.address +
+                      ' ' +
+                      selectedBuilding.streetNumber +
+                      ', ' +
+                      selectedBuilding.city +
+                      ' (' +
+                      selectedBuilding.province +
+                      ')'
+                    : ''
+                "
+                return-object
+                persistent-hint
+              >
+                <template v-slot:label>
+                  <v-card-text>
+                    <v-icon>mdi-office-building</v-icon>
+                    Select
+                  </v-card-text>
+                </template>
+                <template v-slot:item="{ props, item }">
+                  <v-list-item v-bind="props" id="prettySelect">
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.raw.name }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="d-flex align-center">
+                        <v-icon class="mr-2">mdi-office-building-marker</v-icon>
+                        <p>
+                          {{ item.raw.address }} {{ item.raw.streetNumber }},
+                          {{ item.raw.city }} ({{ item.raw.province }})
+                        </p>
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+          </v-row>
+          <Transition enter-active-class="animate__animated animate__flipInX">
+            <v-alert
+              v-if="chooseDeskAlertVisible"
+              border="top"
+              type="warning"
+              class="mb-2 mx-auto"
+              style="width: 60%"
+            >
+              Please choose a date and a building</v-alert
+            >
+          </Transition>
           <v-card-actions>
             <v-btn
               color="primary"
@@ -50,8 +125,122 @@
     </v-row>
   </Transition>
 
-  <v-row>
-    <v-col cols="12" md="3">
+  <v-row scrollable class="ml-12">
+    <v-col cols="12" md="3" class="my-12">
+      <Transition
+        enter-active-class="animate__animated animate__backInLeft"
+        leave-active-class="animate__animated animate__backOutLeft"
+      >
+        <v-card
+          v-if="isSvgVisible"
+          elevation="5"
+          class="rounded-lg mx-auto"
+          style="width: 95%"
+        >
+          <v-row class="d-flex flex-column align-center my-auto">
+            <v-col cols="12" class="text-center">
+              <p class="text-h5">Select Floor</p>
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-select
+                v-model="selectedFloor"
+                :items="selectedBuilding.floors"
+                class="my-auto mx-2"
+                label="Floor"
+                item-title="numberOfFloor"
+                item-value="numberOfFloor"
+                variant="outlined"
+                chips
+              >
+                <template v-slot:label>
+                  <v-card-text>
+                    <v-icon>mdi-floor-plan</v-icon>
+                    Floor
+                  </v-card-text>
+                </template>
+                <template v-slot:item="{ props, item }">
+                  <v-list-item v-bind="props" id="prettySelect">
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <v-icon class="mr-2"
+                          >mdi-home-floor-{{ item.raw.numberOfFloor }}</v-icon
+                        >Floor {{ item.raw.numberOfFloor }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="d-flex align-center">
+                        <v-icon class="ml-4 mr-2"
+                          >mdi-information-outline</v-icon
+                        >
+                        <p>
+                          Bathrooms: {{ item.raw.numBathrooms }}, Workstations:
+                          {{ item.raw.numOfDesks }}, Meeting Rooms:
+                          {{ item.raw.numOfMeetingRooms }}
+                        </p>
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" class="text-center">
+              <p class="text-h5">Select Equimpent</p>
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-select
+                v-model="selectedEquipment"
+                :items="equipmentItems"
+                class="my-auto mx-2"
+                label="Equipment"
+                variant="outlined"
+                clearable
+                chips
+              >
+                <template v-slot:label>
+                  <v-card-text>
+                    <v-icon>mdi-desk</v-icon>
+                    Equipment
+                  </v-card-text>
+                </template>
+                <template v-slot:item="{ props, item }">
+                  <v-list-item v-bind="props" id="prettySelect">
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.raw.title }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle class="d-flex align-center">
+                        <v-icon
+                          v-for="equip in item.value.split(', ')"
+                          class="mr-2"
+                          >{{ getEquipmentIcon(equip) }}</v-icon
+                        >
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" md="8" class="d-flex align-center justify-center">
+              <Transition
+                enter-active-class="animate__animated animate__fadeIn"
+                leave-active-class="animate__animated animate__fadeOut"
+              >
+                <div v-if="wantsWindow != null" class="d-flex align-center">
+                  <v-icon
+                    @click="wantsWindow = null"
+                    color="red"
+                    style="position: absolute"
+                    >mdi-close-circle</v-icon
+                  >
+                </div>
+              </Transition>
+              <v-checkbox
+                v-model="wantsWindow"
+                label="I want a window"
+                class="ml-6 d-flex align-center"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card>
+      </Transition>
       <Transition
         enter-active-class="animate__animated animate__backInUp"
         leave-active-class="animate__animated animate__backOutDown"
@@ -62,2421 +251,147 @@
           class="d-flex position-fixed ml-auto"
           color="blue-grey-lighten-4"
           style="bottom: 2%; right: 2%"
-          @click="isSvgVisible = false"
+          @click="
+            isSvgVisible = false;
+            selectedFloor = 1;
+            selectedEquipment = null;
+            wantsWindow = null;
+            deskDetails = null;
+          "
           v-if="isSvgVisible"
           elevation="12"
         >
         </v-btn>
       </Transition>
     </v-col>
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="6" class="my-12">
       <div class="svg-container" style="text-align: center">
-        <Transition enter-active-class="animate__animated animate__fadeIn">
-          <svg
-            v-show="isSvgVisible"
-            width="900"
-            height="600"
-            xmlns="http://www.w3.org/2000/"
+        <div v-if="isSvgVisible && selectedBuilding.name == 'Building1'">
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
           >
-            <defs>
-              <filter id="svg_21_blur">
-                <feGaussianBlur stdDeviation="0" in="SourceGraphic" />
-              </filter>
-            </defs>
-            <g>
-              <title>Layer 1</title>
-              <line
-                stroke="#000"
-                stroke-linecap="undefined"
-                stroke-linejoin="undefined"
-                id="svg_5"
-                y2="585.08183"
-                x2="17"
-                y1="53"
-                x1="17"
-                fill="none"
-              />
-              <line
-                stroke="#000"
-                stroke-linecap="undefined"
-                stroke-linejoin="undefined"
-                id="svg_7"
-                y2="585"
-                x2="507.18118"
-                y1="585"
-                x1="17"
-                fill="none"
-              />
-              <g id="svg_29">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_21"
-                  height="56"
-                  width="28"
-                  y="81"
-                  x="80"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_22"
-                  height="25"
-                  width="13"
-                  y="96"
-                  x="67"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_30">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_24"
-                  cy="109"
-                  cx="91"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="d4853dcb-e483-468c-9d7a-85173028c63e"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_28"
-                  cy="109"
-                  cx="91"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_33">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_31"
-                  height="56"
-                  width="28"
-                  y="148"
-                  x="81"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_32"
-                  height="25"
-                  width="13"
-                  y="163"
-                  x="68"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_36">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_34"
-                  cy="176"
-                  cx="92"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="cb3b8cba-05a5-48f0-8c98-d4f726965841"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_35"
-                  cy="176"
-                  cx="92"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 141.5 109)" id="svg_51">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_49"
-                  height="56"
-                  width="28"
-                  y="81"
-                  x="134"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_50"
-                  height="25"
-                  width="13"
-                  y="96"
-                  x="121"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_54">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_52"
-                  cy="109"
-                  cx="138"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e8c09506-0b0f-4539-b80f-0349842699ed"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_53"
-                  cy="109"
-                  cx="138"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 142.5 176)" id="svg_57">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_55"
-                  height="56"
-                  width="28"
-                  y="148"
-                  x="135"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_56"
-                  height="25"
-                  width="13"
-                  y="163"
-                  x="122"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_60">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_58"
-                  cy="175"
-                  cx="139"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="08502a3c-402c-428f-bfe7-e883cd6b682b"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_59"
-                  cy="175"
-                  cx="139"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_63">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_61"
-                  height="56"
-                  width="28"
-                  y="78"
-                  x="242"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_62"
-                  height="25"
-                  width="13"
-                  y="93"
-                  x="229"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_66">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_64"
-                  cy="106"
-                  cx="253"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e2e169d3-c64e-4912-80b0-c7510fb1f7e7"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_65"
-                  cy="106"
-                  cx="253"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_69">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_67"
-                  height="56"
-                  width="28"
-                  y="145"
-                  x="243"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_68"
-                  height="25"
-                  width="13"
-                  y="160"
-                  x="230"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_72">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_70"
-                  cy="173"
-                  cx="254"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="957e31be-e283-48f5-8c96-cf6a41279017"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_71"
-                  cy="173"
-                  cx="254"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 303.5 106)" id="svg_75">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_73"
-                  height="56"
-                  width="28"
-                  y="78"
-                  x="296"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_74"
-                  height="25"
-                  width="13"
-                  y="93"
-                  x="283"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_78">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_76"
-                  cy="106"
-                  cx="300"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="a63eec37-65e7-484b-8e2e-d4c7fc79a928"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_77"
-                  cy="106"
-                  cx="300"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 304.5 173)" id="svg_81">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_79"
-                  height="56"
-                  width="28"
-                  y="145"
-                  x="297"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_80"
-                  height="25"
-                  width="13"
-                  y="160"
-                  x="284"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_84">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_82"
-                  cy="172"
-                  cx="301"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="960e2d84-1618-4109-8088-15da69d8c1e1"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_83"
-                  cy="172"
-                  cx="301"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_87">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_85"
-                  height="56"
-                  width="28"
-                  y="77"
-                  x="408"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_86"
-                  height="25"
-                  width="13"
-                  y="92"
-                  x="395"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_90">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_88"
-                  cy="105"
-                  cx="419"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="7a66bc1c-b0b3-4d12-a56a-3e49139534ca"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_89"
-                  cy="105"
-                  cx="419"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_93">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_91"
-                  height="56"
-                  width="28"
-                  y="144"
-                  x="409"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_92"
-                  height="25"
-                  width="13"
-                  y="159"
-                  x="396"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_96">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_94"
-                  cy="172"
-                  cx="420"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="4ad0e33a-82c8-409e-bcac-aa788ed3d2ff"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_95"
-                  cy="172"
-                  cx="420"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 469.5 105)" id="svg_99">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_97"
-                  height="56"
-                  width="28"
-                  y="77"
-                  x="462"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_98"
-                  height="25"
-                  width="13"
-                  y="92"
-                  x="449"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_102">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_100"
-                  cy="105"
-                  cx="466"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="4e12a22d-30fd-4029-bdce-e4754c82000b"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_101"
-                  cy="105"
-                  cx="466"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 470.5 172)" id="svg_105">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_103"
-                  height="56"
-                  width="28"
-                  y="144"
-                  x="463"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_104"
-                  height="25"
-                  width="13"
-                  y="159"
-                  x="450"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_108">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_106"
-                  cy="171"
-                  cx="467"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="c9800449-3050-4203-adc0-43c6bbb5f96f"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_107"
-                  cy="171"
-                  cx="467"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_111">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_109"
-                  height="56"
-                  width="28"
-                  y="275"
-                  x="84"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_110"
-                  height="25"
-                  width="13"
-                  y="290"
-                  x="71"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_114">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_112"
-                  cy="303"
-                  cx="95"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="36f8d6a4-299e-4cca-8ba8-8fd8c2578dc3"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_113"
-                  cy="303"
-                  cx="95"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_117">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_115"
-                  height="56"
-                  width="28"
-                  y="342"
-                  x="85"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_116"
-                  height="25"
-                  width="13"
-                  y="357"
-                  x="72"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_120">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_118"
-                  cy="370"
-                  cx="96"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="92bbcbeb-2845-4ad0-8051-132f83968185"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_119"
-                  cy="370"
-                  cx="96"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 145.5 303)" id="svg_123">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_121"
-                  height="56"
-                  width="28"
-                  y="275"
-                  x="138"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_122"
-                  height="25"
-                  width="13"
-                  y="290"
-                  x="125"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_126">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_124"
-                  cy="303"
-                  cx="142"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="08ea3555-db10-41b6-999f-4da0a2f1a293"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_125"
-                  cy="303"
-                  cx="142"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 146.5 370)" id="svg_129">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_127"
-                  height="56"
-                  width="28"
-                  y="342"
-                  x="139"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_128"
-                  height="25"
-                  width="13"
-                  y="357"
-                  x="126"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_132">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_130"
-                  cy="369"
-                  cx="143"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="0d212398-dd13-46af-a711-cf980d00c1d1"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_131"
-                  cy="369"
-                  cx="143"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_135">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_133"
-                  height="56"
-                  width="28"
-                  y="409"
-                  x="84"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_134"
-                  height="25"
-                  width="13"
-                  y="424"
-                  x="71"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_138">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_136"
-                  cy="437"
-                  cx="95"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="992f87da-1e30-4c0a-8f90-d8feed78dcf5"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_137"
-                  cy="437"
-                  cx="95"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 145.5 437)" id="svg_141">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_139"
-                  height="56"
-                  width="28"
-                  y="409"
-                  x="138"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_140"
-                  height="25"
-                  width="13"
-                  y="424"
-                  x="125"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_144">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_142"
-                  cy="436"
-                  cx="142"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="590d6d7d-a533-4f1a-ae44-d2ba3d426e11"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_143"
-                  cy="436"
-                  cx="142"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_147">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_145"
-                  height="56"
-                  width="28"
-                  y="476"
-                  x="84"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_146"
-                  height="25"
-                  width="13"
-                  y="491"
-                  x="71"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_150">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_148"
-                  cy="504"
-                  cx="95"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="1e73ae60-8b9c-4947-b8b1-eb50eef1b03f"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_149"
-                  cy="504"
-                  cx="95"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 145.5 504)" id="svg_153">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_151"
-                  height="56"
-                  width="28"
-                  y="476"
-                  x="138"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_152"
-                  height="25"
-                  width="13"
-                  y="491"
-                  x="125"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_156">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_154"
-                  cy="503"
-                  cx="142"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="2a091352-be82-425f-a85b-c9c3fecd9974"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_155"
-                  cy="503"
-                  cx="142"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_159">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_157"
-                  height="56"
-                  width="28"
-                  y="275"
-                  x="242"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_158"
-                  height="25"
-                  width="13"
-                  y="290"
-                  x="229"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_162">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_160"
-                  cy="303"
-                  cx="253"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="3ba6cc39-07cc-436f-a495-516bcbca5843"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_161"
-                  cy="303"
-                  cx="253"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_165">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_163"
-                  height="56"
-                  width="28"
-                  y="342"
-                  x="243"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_164"
-                  height="25"
-                  width="13"
-                  y="357"
-                  x="230"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_168">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_166"
-                  cy="370"
-                  cx="254"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="048d4521-fa2b-4aff-9d8f-c136659363ca"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_167"
-                  cy="370"
-                  cx="254"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 303.5 303)" id="svg_171">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_169"
-                  height="56"
-                  width="28"
-                  y="275"
-                  x="296"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_170"
-                  height="25"
-                  width="13"
-                  y="290"
-                  x="283"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_174">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_172"
-                  cy="303"
-                  cx="300"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="54c6318e-5c7b-4c92-93f7-7ea5a40d480a"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_173"
-                  cy="303"
-                  cx="300"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 304.5 370)" id="svg_177">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_175"
-                  height="56"
-                  width="28"
-                  y="342"
-                  x="297"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_176"
-                  height="25"
-                  width="13"
-                  y="357"
-                  x="284"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_180">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_178"
-                  cy="369"
-                  cx="301"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e702347a-0527-4c2f-b17a-7dcdf2fef95d"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_179"
-                  cy="369"
-                  cx="301"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_183">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_181"
-                  height="56"
-                  width="28"
-                  y="409"
-                  x="242"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_182"
-                  height="25"
-                  width="13"
-                  y="424"
-                  x="229"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_186">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_184"
-                  cy="437"
-                  cx="253"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="a40c1d82-ed0c-4835-b6a0-70d7a202afcd"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_185"
-                  cy="437"
-                  cx="253"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 303.5 437)" id="svg_189">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_187"
-                  height="56"
-                  width="28"
-                  y="409"
-                  x="296"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_188"
-                  height="25"
-                  width="13"
-                  y="424"
-                  x="283"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_192">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_190"
-                  cy="436"
-                  cx="300"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="1bcc6d12-5fe1-43a7-9224-c2d0de4c7514"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_191"
-                  cy="436"
-                  cx="300"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_195">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_193"
-                  height="56"
-                  width="28"
-                  y="476"
-                  x="242"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_194"
-                  height="25"
-                  width="13"
-                  y="491"
-                  x="229"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_198">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_196"
-                  cy="504"
-                  cx="253"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="ee35b609-093d-4e50-9e46-859391b7d01d"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_197"
-                  cy="504"
-                  cx="253"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 303.5 504)" id="svg_201">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_199"
-                  height="56"
-                  width="28"
-                  y="476"
-                  x="296"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_200"
-                  height="25"
-                  width="13"
-                  y="491"
-                  x="283"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_204">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_202"
-                  cy="503"
-                  cx="300"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="ad723744-0fc6-431c-a620-5ff289ed68d7"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_203"
-                  cy="503"
-                  cx="300"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_207">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_205"
-                  height="56"
-                  width="28"
-                  y="279"
-                  x="405"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_206"
-                  height="25"
-                  width="13"
-                  y="294"
-                  x="392"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_210">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_208"
-                  cy="307"
-                  cx="416"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="1bfc7b14-8324-4e9f-8040-a81347ca06bc"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_209"
-                  cy="307"
-                  cx="416"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_213">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_211"
-                  height="56"
-                  width="28"
-                  y="346"
-                  x="406"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_212"
-                  height="25"
-                  width="13"
-                  y="361"
-                  x="393"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_216">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_214"
-                  cy="374"
-                  cx="417"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="28ae76c9-9ae9-418d-a21c-a89b3fd5e9ca"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_215"
-                  cy="374"
-                  cx="417"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 466.5 307)" id="svg_219">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_217"
-                  height="56"
-                  width="28"
-                  y="279"
-                  x="459"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_218"
-                  height="25"
-                  width="13"
-                  y="294"
-                  x="446"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_222">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_220"
-                  cy="307"
-                  cx="463"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="dca9335c-ae25-4b8c-98f5-8090cf0b0a62"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_221"
-                  cy="307"
-                  cx="463"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 467.5 374)" id="svg_225">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_223"
-                  height="56"
-                  width="28"
-                  y="346"
-                  x="460"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_224"
-                  height="25"
-                  width="13"
-                  y="361"
-                  x="447"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_228">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_226"
-                  cy="373"
-                  cx="464"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="d1f6b04b-cfb8-417e-afb0-22806d657ed0"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_227"
-                  cy="373"
-                  cx="464"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_231">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_229"
-                  height="56"
-                  width="28"
-                  y="413"
-                  x="405"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_230"
-                  height="25"
-                  width="13"
-                  y="428"
-                  x="392"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_234">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_232"
-                  cy="441"
-                  cx="416"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="b3fd12ec-4415-4012-9efc-bc7a1fdf89c0"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_233"
-                  cy="441"
-                  cx="416"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 466.5 441)" id="svg_237">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_235"
-                  height="56"
-                  width="28"
-                  y="413"
-                  x="459"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_236"
-                  height="25"
-                  width="13"
-                  y="428"
-                  x="446"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_240">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_238"
-                  cy="440"
-                  cx="463"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e7a1608f-6f5f-4f55-95e9-1377f26802b1"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_239"
-                  cy="440"
-                  cx="463"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_243">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_241"
-                  height="56"
-                  width="28"
-                  y="480"
-                  x="405"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_242"
-                  height="25"
-                  width="13"
-                  y="495"
-                  x="392"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_246">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_244"
-                  cy="508"
-                  cx="416"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="47c3a3e2-ce12-4331-8865-02e2c0ab27b3"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_245"
-                  cy="508"
-                  cx="416"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 466.5 508)" id="svg_249">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_247"
-                  height="56"
-                  width="28"
-                  y="480"
-                  x="459"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_248"
-                  height="25"
-                  width="13"
-                  y="495"
-                  x="446"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_252">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_250"
-                  cy="507"
-                  cx="463"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="43582b98-cd28-4d6e-9518-3d159b28bb68"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_251"
-                  cy="507"
-                  cx="463"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <line
-                stroke="#000"
-                id="svg_253"
-                y2="53"
-                x2="297.53076"
-                y1="53"
-                x1="17"
-                fill="none"
-              />
-              <line
-                stroke="#000"
-                id="svg_256"
-                y2="53"
-                x2="509.01073"
-                y1="53"
-                x1="404.13953"
-                fill="none"
-              />
-              <line
-                stroke="#000"
-                id="svg_258"
-                y2="586.01178"
-                x2="508.00174"
-                y1="52.66719"
-                x1="508.00174"
-                fill="none"
-              />
-              <line
-                stroke="#000"
-                id="svg_259"
-                y2="53.33386"
-                x2="664.0137"
-                y1="53.33386"
-                x1="507.33507"
-                fill="none"
-              />
-              <g id="svg_263">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_261"
-                  height="56"
-                  width="28"
-                  y="73.66666"
-                  x="566.6669"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_262"
-                  height="25"
-                  width="13"
-                  y="88.66666"
-                  x="553.6669"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_266">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_264"
-                  cy="101.66666"
-                  cx="577.6669"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="b2d1a53e-7bd5-4d96-980c-fead4b4ae634"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_265"
-                  cy="101.66666"
-                  cx="577.6669"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_269">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_267"
-                  height="56"
-                  width="28"
-                  y="140.66666"
-                  x="567.6669"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_268"
-                  height="25"
-                  width="13"
-                  y="155.66666"
-                  x="554.6669"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_272">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_270"
-                  cy="168.66666"
-                  cx="578.6669"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e3ba5436-bacc-4893-a8ce-0eb6a92ab3dc"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_271"
-                  cy="168.66666"
-                  cx="578.6669"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 628.167 101.667)" id="svg_275">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_273"
-                  height="56"
-                  width="28"
-                  y="73.66666"
-                  x="620.6669"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_274"
-                  height="25"
-                  width="13"
-                  y="88.66666"
-                  x="607.6669"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_278">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_276"
-                  cy="101.66666"
-                  cx="624.6669"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="28d62173-7f14-43e5-a7bf-35a322695cf2"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_277"
-                  cy="101.66666"
-                  cx="624.6669"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 629.167 168.667)" id="svg_281">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_279"
-                  height="56"
-                  width="28"
-                  y="140.66666"
-                  x="621.6669"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_280"
-                  height="25"
-                  width="13"
-                  y="155.66666"
-                  x="608.6669"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_284">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_282"
-                  cy="167.66666"
-                  cx="625.6669"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="f486f10c-afae-420e-bf24-ac0e2a3651f9"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_283"
-                  cy="167.66666"
-                  cx="625.6669"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_287">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_285"
-                  height="56"
-                  width="28"
-                  y="74.33333"
-                  x="749.33385"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_286"
-                  height="25"
-                  width="13"
-                  y="89.33333"
-                  x="736.33385"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_290">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_288"
-                  cy="102.33333"
-                  cx="760.33385"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="d369fc70-73e5-4563-8fc2-2cc8116a021f"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_289"
-                  cy="102.33333"
-                  cx="760.33385"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_293">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_291"
-                  height="56"
-                  width="28"
-                  y="141.33333"
-                  x="750.33385"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_292"
-                  height="25"
-                  width="13"
-                  y="156.33333"
-                  x="737.33385"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_296">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_294"
-                  cy="169.33333"
-                  cx="761.33385"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="c5f19007-e249-4c3e-82d3-d10db52ca88c"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_295"
-                  cy="169.33333"
-                  cx="761.33385"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 810.834 102.334)" id="svg_299">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_297"
-                  height="56"
-                  width="28"
-                  y="74.33333"
-                  x="803.33385"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_298"
-                  height="25"
-                  width="13"
-                  y="89.33333"
-                  x="790.33385"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_302">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_300"
-                  cy="102.33333"
-                  cx="807.33385"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="b8bf6efa-6c0a-4677-b90a-fcf605937083"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_301"
-                  cy="102.33333"
-                  cx="807.33385"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 811.834 169.334)" id="svg_305">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_303"
-                  height="56"
-                  width="28"
-                  y="141.33333"
-                  x="804.33385"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_304"
-                  height="25"
-                  width="13"
-                  y="156.33333"
-                  x="791.33385"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_308">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_306"
-                  cy="168.33333"
-                  cx="808.33385"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e4a7209b-be94-4c58-8796-19aeccb15c3e"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_307"
-                  cy="168.33333"
-                  cx="808.33385"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_311">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_309"
-                  height="56"
-                  width="28"
-                  y="206.66676"
-                  x="567.6669"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_310"
-                  height="25"
-                  width="13"
-                  y="221.66676"
-                  x="554.6669"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_314">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_312"
-                  cy="234.66676"
-                  cx="578.6669"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="0169f9a5-e57a-43a4-a88d-4ce40605f225"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_313"
-                  cy="234.66676"
-                  cx="578.6669"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 629.167 234.667)" id="svg_317">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_315"
-                  height="56"
-                  width="28"
-                  y="206.66676"
-                  x="621.6669"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_316"
-                  height="25"
-                  width="13"
-                  y="221.66676"
-                  x="608.6669"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_320">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_318"
-                  cy="233.66676"
-                  cx="625.6669"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="e041bec9-b6d7-4866-8585-a5e9d0ebe6f5"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_319"
-                  cy="233.66676"
-                  cx="625.6669"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g id="svg_323">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_321"
-                  height="56"
-                  width="28"
-                  y="206.00009"
-                  x="751.00051"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_322"
-                  height="25"
-                  width="13"
-                  y="221.00009"
-                  x="738.00051"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_326">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_324"
-                  cy="234.00009"
-                  cx="762.00051"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="0571b046-4134-4388-818d-e47d9fae0f7e"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_325"
-                  cy="234.00009"
-                  cx="762.00051"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <g transform="rotate(-180 812.501 234.001)" id="svg_329">
-                <rect
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_327"
-                  height="56"
-                  width="28"
-                  y="206.00009"
-                  x="805.00051"
-                  fill="#f2efef"
-                />
-                <rect
-                  stroke="#000"
-                  rx="2"
-                  id="svg_328"
-                  height="25"
-                  width="13"
-                  y="221.00009"
-                  x="792.00051"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_332">
-                <ellipse
-                  stroke="#000"
-                  ry="16"
-                  rx="16"
-                  id="svg_330"
-                  cy="233.00009"
-                  cx="809.00051"
-                  fill="#ffffff"
-                />
-                <ellipse
-                  data-id="8f1937bf-d34a-4164-9cfb-0b3a496633d7"
-                  stroke="#000"
-                  ry="12"
-                  rx="12"
-                  id="svg_331"
-                  cy="233.00009"
-                  cx="809.00051"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-              <line
-                stroke="#000"
-                id="svg_333"
-                y2="284.66754"
-                x2="860.67141"
-                y1="284.66754"
-                x1="508.00174"
-                fill="none"
-              />
-              <line
-                id="svg_334"
-                y2="286.04821"
-                x2="861.3356"
-                y1="56.00053"
-                x1="861.3356"
-                stroke="#000"
-                fill="none"
-              />
-              <line
-                id="svg_335"
-                y2="55.33386"
-                x2="740.65209"
-                y1="55.33386"
-                x1="860.66894"
-                stroke="#000"
-                fill="none"
-              />
-              <line
-                stroke="#000"
-                id="svg_336"
-                y2="584.00132"
-                x2="861.57794"
-                y1="584.00132"
-                x1="508.00174"
-                fill="none"
-              />
-              <line
-                stroke="#000"
-                id="svg_338"
-                y2="584.668"
-                x2="861.3356"
-                y1="376.00102"
-                x1="861.3356"
-                fill="none"
-              />
-              <g id="svg_400">
-                <rect
-                  transform="rotate(-90 678.668 429.002)"
-                  stroke="#000"
-                  rx="8"
-                  filter="url(#svg_21_blur)"
-                  id="svg_347"
-                  height="236.00027"
-                  width="84.66675"
-                  y="311.00211"
-                  x="636.3346"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 640.002 293.002)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_348"
-                  height="25"
-                  width="13"
-                  y="231.33527"
-                  x="546.0011"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 695.335 292.336)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_387"
-                  height="25"
-                  width="13"
-                  y="230.6686"
-                  x="601.33451"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 750.001 292.335)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_388"
-                  height="25"
-                  width="13"
-                  y="230.6686"
-                  x="656.00126"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 802.668 292.335)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_389"
-                  height="25"
-                  width="13"
-                  y="230.6686"
-                  x="708.668"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 639.335 389.669)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_390"
-                  height="25"
-                  width="13"
-                  y="328.00208"
-                  x="545.33443"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 694.001 389.669)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_391"
-                  height="25"
-                  width="13"
-                  y="328.00208"
-                  x="600.00118"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 750.002 389.002)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_392"
-                  height="25"
-                  width="13"
-                  y="327.33541"
-                  x="656.00126"
-                  fill="#f2efef"
-                />
-                <rect
-                  transform="rotate(-90 802.668 389.002)"
-                  stroke="#000"
-                  rx="2"
-                  id="svg_393"
-                  height="25"
-                  width="13"
-                  y="327.33541"
-                  x="708.668"
-                  fill="#f2efef"
-                />
-              </g>
-              <g id="svg_404">
-                <rect
-                  rx="8"
-                  id="svg_401"
-                  height="61.33343"
-                  width="61.33343"
-                  y="396.66771"
-                  x="648.00195"
-                  stroke="#000"
-                  fill="#ffffff"
-                />
-                <rect
-                  data-id="6cdece00-bd46-4853-a683-d337c69082f0"
-                  stroke="#000"
-                  rx="8"
-                  id="svg_403"
-                  height="53.33341"
-                  width="53.33341"
-                  y="400.66771"
-                  x="652.00196"
-                  fill="green"
-                  @click="bookingDesk($event)"
-                />
-              </g>
-            </g>
-          </svg>
-        </Transition>
+            <Floor1B1
+              v-if="selectedFloor == 1"
+              :floorInfo="selectedBuilding.floors[0]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor2B1
+              v-if="selectedFloor == 2"
+              :floorInfo="selectedBuilding.floors[1]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor3B1
+              v-if="selectedFloor == 3"
+              :floorInfo="selectedBuilding.floors[2]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+        </div>
+        <div v-else-if="isSvgVisible && selectedBuilding.name == 'Building2'">
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor1B2
+              v-if="selectedFloor == 1"
+              :floorInfo="selectedBuilding.floors[0]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor2B2
+              v-if="selectedFloor == 2"
+              :floorInfo="selectedBuilding.floors[1]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor3B2
+              v-if="selectedFloor == 3"
+              :floorInfo="selectedBuilding.floors[2]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+        </div>
+        <div v-else-if="isSvgVisible && selectedBuilding.name == 'Building3'">
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor1B3
+              v-if="selectedFloor == 1"
+              :floorInfo="selectedBuilding.floors[0]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="animate__animated animate__fadeIn"
+            appear
+          >
+            <Floor2B3
+              v-if="selectedFloor == 2"
+              :floorInfo="selectedBuilding.floors[1]"
+              :occupiedDesks="occupiedDesks"
+              :userType="userType"
+              :equipment="selectedEquipment"
+              :hasWindow="wantsWindow"
+              @deskClicked="bookingDesk"
+              style="background-color: #37474f40"
+            />
+          </Transition>
+        </div>
       </div>
     </v-col>
     <v-col
@@ -2488,7 +403,7 @@
     >
       <Transition enter-active-class="animate__animated animate__fadeIn">
         <div v-if="deskDetails && isSvgVisible" class="desk-details">
-          <v-card elevation="5">
+          <v-card elevation="5" class="rounded-lg">
             <v-card-title class="headline">Desk Details</v-card-title>
             <v-card-text>
               <v-list>
@@ -2508,7 +423,11 @@
                     >
                   </v-list-item-content>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item
+                  v-if="
+                    deskDetails.equipment && deskDetails.equipment !== 'null'
+                  "
+                >
                   <v-list-item-content>
                     <v-list-item-title
                       ><strong>Equipment:</strong>
@@ -2520,7 +439,7 @@
                   <v-list-item-content>
                     <v-list-item-title
                       ><strong>Floor:</strong>
-                      {{ deskDetails.floor }}</v-list-item-title
+                      {{ selectedFloor }}</v-list-item-title
                     >
                   </v-list-item-content>
                 </v-list-item>
@@ -2620,6 +539,18 @@
  * @vue-data {string} alertText - Text content for the alert.
  * @vue-data {string} alertType - Type of alert.
  * @vue-data {Object} modifyBooking - Contains details for modifying an existing booking, including startDate, endDate, and workStationId.
+ * @vue-data {Array} buildings - List of buildings available for booking.
+ * @vue-data {Object|null} selectedBuilding - Currently selected building object.
+ * @vue-data {Boolean} chooseDeskAlertVisible - Flag to show/hide the alert to prompt user selection.
+ * @vue-data {Array} occupiedDesks - List of desks that are already booked and not available.
+ * @vue-data {String} userType - User type derived from user session to tailor available options.
+ * @vue-data {Array} equipmentItems - List of available equipment types for desks.
+ * @vue-data {Number} selectedFloor - Currently selected floor number.
+ * @vue-data {Object|null} selectedEquipment - Currently selected equipment options.
+ * @vue-data {Boolean|null} wantsWindow - User preference for a desk near a window.
+ *
+ * Props:
+ * @vue-prop {String} bookingId - The ID of the booking to modify.
  *
  * Methods:
  * @vue-method {Function} formatDate - Formats date to YYYY-MM-DD format.
@@ -2629,11 +560,14 @@
  * @vue-method {Function} createBooking - Creates a new booking with the provided details.
  * @vue-method {Function} editBooking - Modifies an existing booking with the provided details.
  * @vue-method {Function} goToRecap - Redirects the user to the booking list page after successful booking or modification.
+ * @vue-method getBuildings - Fetches the list of available buildings from the server.
+ * @vue-method countWorkstations - Counts desks and meeting rooms available on the selected floor.
+ * @vue-method getEquipmentIcon - Returns the appropriate icon class for given equipment type.
  *
  * Usage:
  * This component is used within a Vue application to manage desk booking functionality.
  * It integrates with backend APIs to retrieve desk availability and create new bookings.
- * @subcategory views/bookings
+ * @subcategory views / bookings
  */
 
 export default {
@@ -2663,13 +597,41 @@ export default {
       alertVisible: false,
       alertText: "",
       alertType: "success",
+      buildings: [],
+      selectedBuilding: null,
+      chooseDeskAlertVisible: false,
+      occupiedDesks: [],
+      userType: "",
+      equipmentItems: [
+        {
+          title: "Monitor",
+          value: "monitor",
+          icon: "mdi-monitor",
+        },
+        {
+          title: "Monitor + Keyboard",
+          value: "monitor, keyboard",
+          icon: "mdi-keyboard",
+        },
+        {
+          title: "Monitor + Keyboard + Mouse",
+          value: "monitor, keyboard, mouse",
+          icon: "mdi-mouse",
+        },
+      ],
+      selectedFloor: 1,
+      selectedEquipment: null,
+      wantsWindow: null,
     };
   },
 
   mounted() {
     this.booking.userId = localStorage.getItem("userId");
+    this.$ApiService.find_user_by_id(this.booking.userId).then((res) => {
+      this.userType = res.data.type;
+    });
+    this.getBuildings();
   },
-
   methods: {
     /**
      * Formats date to YYYY-MM-DD format.
@@ -2719,37 +681,20 @@ export default {
      * based on user permissions.
      */
     findOccupiedDesks() {
-      const date = this.formatDate(this.booking.startDate);
-      const userId = this.booking.userId;
+      if (this.booking.startDate !== null && this.selectedBuilding !== null) {
+        this.chooseDeskAlertVisible = false;
+        const date = this.formatDate(this.booking.startDate);
 
-      this.$ApiService.find_user_by_id(userId).then((u) => {
-        document.querySelectorAll("[data-id]").forEach((desk) => {
-          let workStationId = desk.getAttribute("data-id");
-          desk.setAttribute("fill", "green");
-          desk.style.pointerEvents = "auto";
-
-          this.$ApiService.find_desk_by_id(workStationId).then((ws) => {
-            if (ws.data.type == "meeting room" && u.data.type !== "business") {
-              desk.setAttribute("fill", "red");
-              desk.style.pointerEvents = "none";
-            }
-          });
+        this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
+          this.occupiedDesks = occupiedDesks.data
+            .filter((ws) => ws.status != "canceled")
+            .map((ws) => ws.workStationId);
+          this.isSvgVisible = true;
         });
-      });
-
-      this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
-        occupiedDesks.data.forEach((ws) => {
-          const deskElement = document.querySelector(
-            `[data-id="${ws.workStationId}"]`,
-          );
-          if (deskElement && ws.status !== "canceled") {
-            deskElement.setAttribute("fill", "red");
-            deskElement.style.pointerEvents = "none";
-          }
-        });
-      });
-
-      this.isSvgVisible = true;
+        this.countWorkstations();
+      } else {
+        this.chooseDeskAlertVisible = true;
+      }
     },
 
     /**
@@ -2759,8 +704,8 @@ export default {
      * allowing them to review the desk information before confirming the booking.
      * @param {Event} event - The click event triggered when selecting a desk.
      */
-    bookingDesk(event) {
-      const workStationId = event.target.getAttribute("data-id");
+    bookingDesk(deskId) {
+      const workStationId = deskId;
       const date = this.formatDate(this.booking.startDate);
 
       this.$ApiService
@@ -2898,12 +843,65 @@ export default {
           this.alertText = "Something went wrong, please try again!";
         });
     },
-
+    /**
+     * Redirects the user to the bookings recap page after a successful booking or booking modification.
+     * This method checks the type of alert ('success' or 'error') and redirects based on the result of the booking process.
+     * Upon successful booking actions, the user is navigated to a page where all their bookings are listed.
+     */
     goToRecap() {
       this.alertVisible = false;
       if (this.alertType == "success") {
         this.$router.push("/bookingList");
       }
+    },
+    /**
+     * Fetches and stores the list of available buildings for booking from the server.
+     * Each building includes floors and each floor has its specific details such as available desks and rooms,
+     * which are critical for enabling users to make informed booking decisions.
+     */
+
+    getBuildings() {
+      this.$ApiService.get_buildings().then((res) => {
+        this.buildings = res.data;
+      });
+    },
+    /**
+     * Counts the number of desks and meeting rooms available on each floor of the selected building.
+     * This method is typically called after selecting a building to ensure the latest desk availability and room counts are displayed.
+     * It updates each floor's details with the number of available workstations and meeting rooms, using data retrieved from the server.
+     */
+    countWorkstations() {
+      this.selectedBuilding.floors.forEach((floor) => {
+        this.$ApiService
+          .get_workstations(floor.floorId, floor.buildingId)
+          .then((response) => {
+            floor.numOfDesks = response.data.workStationResourceList.filter(
+              (desk) => desk.type === "desk",
+            ).length;
+            floor.numOfMeetingRooms =
+              response.data.workStationResourceList.filter(
+                (desk) => desk.type === "meeting_room",
+              ).length;
+          });
+      });
+    },
+    /**
+     * Returns the icon class for the specified equipment type.
+     * This method helps in dynamically displaying the appropriate icons for equipment types listed in desk details.
+     * Each equipment type like 'monitor', 'keyboard', or 'mouse' is associated with a specific icon to visually represent it.
+     * @param {string} item - The equipment type string which can include one or multiple equipment items.
+     * @returns {string} - The icon class for the Vuetify icon component.
+     */
+
+    getEquipmentIcon(item) {
+      if (item.includes("mouse")) {
+        return "mdi-mouse";
+      } else if (item.includes("keyboard")) {
+        return "mdi-keyboard";
+      } else if (item.includes("monitor")) {
+        return "mdi-monitor";
+      }
+      return "";
     },
   },
 };
@@ -2935,11 +933,16 @@ export default {
   overflow-wrap: break-word;
 }
 
-ellipse[fill="green"] {
+ellipse[fill="green"],
+ellipse[fill="#40C4FF"] {
   cursor: pointer;
 }
 
 .svg-container {
   overflow: auto;
+}
+
+#prettySelect .v-list-item__content > .v-list-item-title {
+  display: none;
 }
 </style>

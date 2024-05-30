@@ -386,7 +386,7 @@ export default {
         let isUnique = false;
         while (!isUnique) {
           const code =
-            this.company.name.slice(0, 3) + Math.floor(Math.random() * 1000);
+            this.company.name.slice(0, 3) + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
           isUnique = await isCompanyCodeUnique(code);
           if (isUnique) {
             this.company.companyCode = code;
