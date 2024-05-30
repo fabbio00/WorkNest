@@ -2815,11 +2815,9 @@ export default {
       this.booking.status = "active";
       const wsId = this.booking.workStationId;
 
-      console.log(this.booking)
       this.$ApiService
         .create_booking(this.booking)
         .then((res) => {
-          console.log(res);
           this.alertVisible = true;
           this.alertType = "success";
           this.alertText = "Registration was successful!";

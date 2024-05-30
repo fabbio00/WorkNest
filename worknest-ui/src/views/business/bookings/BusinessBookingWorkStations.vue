@@ -968,7 +968,7 @@
    * Usage:
    * This component is used within a Vue application to manage desk and meeting room booking functionality.
    * It integrates with backend APIs to retrieve desk availability, create new bookings, and manage bookings for multiple users.
-   * @subcategory views/bookings
+   * @subcategory views/company
    */
 
   export default {

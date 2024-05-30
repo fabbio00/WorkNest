@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Controller for managing booking businesses.
+ * Provides endpoints for creating and retrieving booking business details.
+ */
 @Slf4j
 @RestController
 @RequestMapping(value = "/booking-business", produces = MediaType.APPLICATION_JSON_VALUE)
