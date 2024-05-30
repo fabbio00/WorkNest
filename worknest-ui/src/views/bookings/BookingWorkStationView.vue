@@ -256,6 +256,7 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
             selectedFloor = 1;
             selectedEquipment = null;
             wantsWindow = null;
+            deskDetails = null;
           "
           v-if="isSvgVisible"
           elevation="12"
