@@ -19,4 +19,5 @@ public class UserLoggedResource {
      * The unique identifier of the logged-in user.
      */
     private UUID id;
+
 }

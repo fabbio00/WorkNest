@@ -43,4 +43,5 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         message.setText(text);
         emailSender.send(message);
     }
+
 }

@@ -83,7 +83,6 @@ public class BuildingServiceImpl implements BuildingService {
                         .toList();
             }
 
-
             return BuildingFindResource.builder()
                     .id(building.getId())
                     .name(building.getName())

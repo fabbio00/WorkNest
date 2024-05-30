@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
+
     private final CompanyRepository companyRepository;
 
     private static final String COMPANY_CODE_NOT_FOUND = "Company code not found!";
@@ -65,6 +66,6 @@ public class CompanyServiceImpl implements CompanyService {
                 .phone(company.getPhone())
                 .companyCode(company.getCompanyCode())
                 .build();
-
     }
+
 }

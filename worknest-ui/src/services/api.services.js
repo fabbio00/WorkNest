@@ -96,6 +96,41 @@ class ApiService {
       });
   }
 
+  get_list_employee(companyId) {
+    return axios.get("http://localhost:8080/users/company/" + companyId)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  delete_user(userId) {
+    return axios.put("http://localhost:8080/users/status/" + userId)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  edit_user_type(userId, userType) {
+    return axios.put("http://localhost:8080/users/type/" + userId, userType)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  get_list_by_company_booking(companyId, employeeName = '', employeeSurname = '', startDate = null, endDate = null) {
+    const params = new URLSearchParams();
+    if (employeeName) params.append('employeeName', employeeName);
+    if (employeeSurname) params.append('employeeSurname', employeeSurname);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    return axios
+      .get("http://localhost:8080/bookings/list_by_company/" + companyId + "?" + params.toString())
+      .then((res) => {
+        return res;
+      });
+  }
+
+
   get_buildings() {
     return axios.get("http://localhost:8080/buildings/list").then((res) => {
       return res;

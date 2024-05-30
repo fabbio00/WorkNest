@@ -74,7 +74,7 @@ import { RouterView } from "vue-router";
               @click="redirect('/')"
             >
               <template v-slot:title>
-                <p class="font-weight-black">View all company</p>
+                <p class="font-weight-black">View all companies</p>
               </template>
             </v-list-item>
 
@@ -86,6 +86,28 @@ import { RouterView } from "vue-router";
             >
               <template v-slot:title>
                 <p class="font-weight-black">View all users</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-calendar-multiple"
+              title=""
+              @click="redirect('/businessBookingsList')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all bookings</p>
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-account-multiple"
+              title=""
+              @click="redirect('/businessEmployeesList')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">View all employees</p>
               </template>
             </v-list-item>
           </v-list>

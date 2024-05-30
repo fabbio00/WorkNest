@@ -18,9 +18,8 @@ import java.util.UUID;
 
 /**
  * Implementation of the {@link WorkStationService} interface.
- * Provides methods for finding workstation details.
+ * Provides methods for retrieving workstation details.
  */
-
 @Component
 @RequiredArgsConstructor
 public class WorkStationServiceImpl implements WorkStationService {
@@ -30,8 +29,14 @@ public class WorkStationServiceImpl implements WorkStationService {
      */
     private final WorkStationRepository workStationRepository;
 
+    /**
+     * The repository for accessing building data from the database.
+     */
     private final BuildingRepository buildingRepository;
 
+    /**
+     * The repository for accessing floor data from the database.
+     */
     private final FloorRepository floorRepository;
 
     /**

@@ -3,7 +3,9 @@ package com.ams.worknest.unit;
 import com.ams.worknest.model.dto.UserDto;
 import com.ams.worknest.model.dto.UserEmailDto;
 import com.ams.worknest.model.dto.UserLoggedDto;
+import com.ams.worknest.model.entities.Company;
 import com.ams.worknest.model.entities.User;
+import com.ams.worknest.model.resources.UserFindByCompanyResource;
 import com.ams.worknest.model.resources.UserResource;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.services.impl.UserServiceImpl;
@@ -17,6 +19,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -88,6 +92,7 @@ class UserServiceTest {
         user.setType("type");
         user.setStatus("status");
         user.setBarrierFreeFlag(true);
+        user.setCompany(new Company());
         user.setRegistrationDate(ZonedDateTime.now());
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -214,5 +219,95 @@ class UserServiceTest {
         userLoggedDto.setPassword(incorrectPassword);
 
         assertThrows(EntityNotFoundException.class, () -> userService.userLogin(userLoggedDto));
+    }
+
+    @DisplayName("Get users by company successfully")
+    @Test
+    void getUsersByCompanySuccessfully() {
+        UUID companyId = UUID.randomUUID();
+
+        User user1 = new User();
+        user1.setId(UUID.randomUUID());
+        user1.setEmail("test1@test.com");
+        user1.setName("Test1");
+        user1.setUsername("testuser1");
+        user1.setPassword("password1");
+        user1.setSurname("User1");
+        user1.setTaxCode("taxcode1");
+        user1.setType("type1");
+        user1.setStatus("status1");
+        user1.setBarrierFreeFlag(true);
+        user1.setRegistrationDate(ZonedDateTime.now());
+
+        User user2 = new User();
+        user2.setId(UUID.randomUUID());
+        user2.setEmail("test2@test.com");
+        user2.setName("Test2");
+        user2.setUsername("testuser2");
+        user2.setPassword("password2");
+        user2.setSurname("User2");
+        user2.setTaxCode("taxcode2");
+        user2.setType("type2");
+        user2.setStatus("status2");
+        user2.setBarrierFreeFlag(true);
+        user2.setRegistrationDate(ZonedDateTime.now());
+
+        List<User> users = Arrays.asList(user1, user2);
+
+        when(userRepository.findByCompanyId(companyId)).thenReturn(users);
+
+        List<UserFindByCompanyResource> userResources = userService.getUsersByCompany(companyId);
+
+        assertEquals(users.size(), userResources.size());
+    }
+
+    @DisplayName("Change user status successfully")
+    @Test
+    void changeUserStatusSuccessfully() {
+        UUID userId = UUID.randomUUID();
+
+        User user = new User();
+        user.setId(userId);
+        user.setEmail("test@test.com");
+        user.setName("Test");
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setSurname("User");
+        user.setTaxCode("taxcode");
+        user.setType("type");
+        user.setStatus("active");
+        user.setBarrierFreeFlag(true);
+        user.setRegistrationDate(ZonedDateTime.now());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        UserResource userResource = userService.changeUserStatus(userId);
+
+        assertEquals("inactive", userResource.getStatus());
+    }
+
+    @DisplayName("Activate user successfully")
+    @Test
+    void activateUserSuccessfully() {
+        UUID userId = UUID.randomUUID();
+
+        User user = new User();
+        user.setId(userId);
+        user.setEmail("test@test.com");
+        user.setName("Test");
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setSurname("User");
+        user.setTaxCode("taxcode");
+        user.setType("type");
+        user.setStatus("inactive");
+        user.setBarrierFreeFlag(true);
+        user.setRegistrationDate(ZonedDateTime.now());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        UserResource userResource = userService.changeUserStatus(userId);
+
+        assertEquals("inactive", userResource.getStatus());
     }
 }

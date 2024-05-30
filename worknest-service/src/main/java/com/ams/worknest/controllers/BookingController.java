@@ -15,12 +15,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-
 /**
  * Controller for managing bookings.
  * Provides endpoints for creating and retrieving booking details.
  */
-
 @Slf4j
 @RestController
 @RequestMapping(value = "/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,7 +50,6 @@ public class BookingController {
     public BookingFindResource bookingFindById(@PathVariable("bookingId") UUID bookingId){
         return bookingService.findBookingById(bookingId);
     }
-
 
     /**
      * Retrieve bookings for a specific date.
@@ -105,6 +102,27 @@ public class BookingController {
         return bookingService.editBooking(bookingId, bookingEditDto);
     }
 
-
+    /**
+     * Retrieves a list of bookings associated with a specific company.
+     *
+     * @param companyId the UUID of the company whose bookings are to be retrieved
+     * @param employeeName the name of the employee (optional)
+     * @param employeeSurname the surname of the employee (optional)
+     * @param startDate the start date for the booking period (optional)
+     * @param endDate the end date for the booking period (optional)
+     * @return a list of booking resources associated with the specified company
+     */
+    @GetMapping("/list_by_company/{companyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindByCompanyResource> getBookingsByCompanyId(
+            @PathVariable("companyId") UUID companyId,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "employeeSurname", required = false) String employeeSurname,
+            @RequestParam(value = "startDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname, startDate, endDate);
+    }
 
 }
