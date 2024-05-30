@@ -12,7 +12,6 @@ import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
 import com.ams.worknest.services.BookingService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final WorkStationRepository workStationRepository;
     private final BookingBusinessRepository bookingBusinessRepository;
     private static final String BOOKING_NOT_FOUND = "Booking not found!";
+    private static final String WORKSTATION_NOT_FOUND = "Workstation not found!";
 
     /**
      * Creates a booking based on the provided booking data transfer object.
@@ -50,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         WorkStation workStation = workStationRepository.findById(bookingDto.getWorkStationId())
-                .orElseThrow(() -> new RuntimeException("Workstation not found"));
+                .orElseThrow(() -> new RuntimeException(WORKSTATION_NOT_FOUND));
 
         Booking booking = Booking.builder()
                 .user(user)
@@ -195,7 +195,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new RuntimeException(BOOKING_NOT_FOUND));
 
         WorkStation workStation = workStationRepository.findById(bookingEditDto.getWorkStationId())
-                .orElseThrow(() -> new RuntimeException("Workstation not found"));
+                .orElseThrow(() -> new RuntimeException(WORKSTATION_NOT_FOUND));
 
         booking.setStartDate(bookingEditDto.getStartDate());
         booking.setEndDate(bookingEditDto.getEndDate());
@@ -226,7 +226,7 @@ public class BookingServiceImpl implements BookingService {
                             User user = userRepository.findById(bookingCreateDto.getUserId())
                                     .orElseThrow(() -> new RuntimeException("User not found"));
                             WorkStation workStation = workStationRepository.findById(bookingCreateDto.getWorkStationId())
-                                    .orElseThrow(() -> new RuntimeException("Workstation not found"));
+                                    .orElseThrow(() -> new RuntimeException(WORKSTATION_NOT_FOUND));
 
                             // Conditionally fetch booking business
                             BookingBusiness bookingBusiness = null;

@@ -7,19 +7,27 @@
       align="center"
     />
     <p
-      v-if="!bookingId"
+      v-if="employeeId"
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
-      Book your desk
+      Book desk for your employee
+    </p>
+    <p
+      v-else-if = "bookingId"
+      class="text-h3 d-inline font-italic ml-5"
+      style="vertical-align: middle"
+    >
+      Modify your booking
     </p>
     <p
       v-else
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
-      Modify your booking
+      Book your desk
     </p>
+
   </div>
   <Transition
     enter-active-class="animate__animated animate__fadeIn"
@@ -2666,11 +2674,16 @@ export default {
       alertVisible: false,
       alertText: "",
       alertType: "success",
+      alreadyBooked: false,
     };
   },
 
   mounted() {
-    this.booking.userId = localStorage.getItem("userId");
+    if(this.employeeId) {
+      this.booking.userId = this.employeeId;
+    } else {
+      this.booking.userId = localStorage.getItem("userId");
+    }
   },
 
   methods: {
@@ -2755,6 +2768,12 @@ export default {
             deskElement.setAttribute("fill", "red");
             deskElement.style.pointerEvents = "none";
           }
+          if(ws.user.id === userId) {
+            this.alertVisible = true;
+            this.alertType = "error";
+            this.alertText = "You already have a booking for this date!";
+            this.alreadyBooked = true;
+          }
         });
       });
 
@@ -2792,14 +2811,15 @@ export default {
      */
     createBooking() {
       this.booking.startDate = this.formatDate2(this.booking.startDate);
-      console.log(this.booking.startDate)
       this.booking.endDate = this.booking.startDate;
       this.booking.status = "active";
       const wsId = this.booking.workStationId;
 
+      console.log(this.booking)
       this.$ApiService
         .create_booking(this.booking)
         .then((res) => {
+          console.log(res);
           this.alertVisible = true;
           this.alertType = "success";
           this.alertText = "Registration was successful!";
@@ -2923,6 +2943,9 @@ export default {
       this.alertVisible = false;
       if (this.alertType == "success") {
         this.$router.push("/bookingList");
+      }
+      if (this.alreadyBooked) {
+        window.location.reload();
       }
     },
   },
