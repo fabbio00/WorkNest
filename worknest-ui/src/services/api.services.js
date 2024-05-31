@@ -80,6 +80,12 @@ class ApiService {
     });
   }
 
+  send_mail_list(email) {
+    return axios.post("http://localhost:8080/sendEmail/send-list", email).then((res) => {
+      return res;
+    });
+  }
+
   modify_booking(bookingId, newBooking) {
     return axios
       .put("http://localhost:8080/bookings/edit/" + bookingId, newBooking)
@@ -115,6 +121,19 @@ class ApiService {
       .then((res) => {
         return res;
       });
+  }
+
+  save_booking_list(listBooking) {
+    return axios.post("http://localhost:8080/bookings/save-list", listBooking)
+      .then((res) => {
+        return res;
+      });
+  }
+
+  create_booking_business(bookingBusiness) {
+    return axios.post("http://localhost:8080/booking-business", bookingBusiness).then((res) => {
+      return res;
+    });
   }
 
   get_list_by_company_booking(companyId, employeeName = '', employeeSurname = '', startDate = null, endDate = null) {

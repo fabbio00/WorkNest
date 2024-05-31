@@ -328,12 +328,12 @@ import Desk from "@/components/Desk.vue";
         y="643.89609"
         x="367.84121"
         :fill="
-          occupiedDesks.includes('6ba7b810-9dad-11d1-80b4-00c04fd430cd') ||
-          userType !== 'business'
+          occupiedDesks.includes('e8dcce17-04cc-4689-924e-69c0c9c05f60') ||
+          userType !== 'BUSINESS'
             ? 'red'
             : 'green'
         "
-        data-id="6ba7b810-9dad-11d1-80b4-00c04fd430cd"
+        data-id="e8dcce17-04cc-4689-924e-69c0c9c05f60"
         @click="handleMeetingRoomClick"
       />
       <rect
@@ -615,13 +615,13 @@ export default {
     /**
      * Handles user interactions with meeting rooms within the SVG floor plan.
      * When a meeting room is clicked, this method checks if the user type is allowed to book meeting rooms
-     * (e.g., 'business' users). It emits an `deskClicked` event with the meeting room's ID if the room is available
+     * (e.g., 'BUSINESS' users). It emits an `deskClicked` event with the meeting room's ID if the room is available
      * and the user is permitted, allowing the parent component to process the booking.
      *
      * @param {Event} event - The DOM event triggered when a meeting room element in the SVG is clicked.
      */
     handleMeetingRoomClick(event) {
-      if (this.userType === "business") {
+      if (this.userType === "BUSINESS") {
         const meetingRoomId = event.target.getAttribute("data-id");
         if (meetingRoomId && !this.occupiedDesks.includes(meetingRoomId)) {
           this.$emit("deskClicked", meetingRoomId);

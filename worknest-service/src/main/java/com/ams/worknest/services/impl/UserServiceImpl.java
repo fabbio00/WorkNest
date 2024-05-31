@@ -93,7 +93,11 @@ public class UserServiceImpl implements UserService {
             userResource.setUsername(u.getUsername());
             userResource.setRegistrationDate(u.getRegistrationDate());
             userResource.setTaxCode(u.getTaxCode());
-            userResource.setCompanyId(u.getCompany().getId());
+
+            // Check if the company is not null before trying to access its id
+            if (u.getCompany() != null) {
+                userResource.setCompanyId(u.getCompany().getId());
+            }
         });
 
         return userResource;

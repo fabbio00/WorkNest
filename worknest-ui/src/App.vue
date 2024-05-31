@@ -110,6 +110,18 @@ import { RouterView } from "vue-router";
                 <p class="font-weight-black">View all employees</p>
               </template>
             </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-table"
+              title=""
+              @click="redirect('/businessBookingDesks')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">Make a booking for employees</p>
+              </template>
+            </v-list-item>
+
           </v-list>
         </v-navigation-drawer>
       </v-layout>

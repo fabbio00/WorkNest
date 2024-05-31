@@ -258,6 +258,7 @@ export default {
         taxCode: "",
         companyId: "",
         type: "PRIVATE",
+        status: "active",
         barrerFreeFlag: false,
       },
       companyCode: "",

@@ -17,19 +17,27 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
       align="center"
     />
     <p
-      v-if="!bookingId"
+      v-if="employeeId"
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
-      Book your desk
+      Book desk for your employee
+    </p>
+    <p
+      v-else-if = "bookingId"
+      class="text-h3 d-inline font-italic ml-5"
+      style="vertical-align: middle"
+    >
+      Modify your booking
     </p>
     <p
       v-else
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
-      Modify your booking
+      Book your desk
     </p>
+
   </div>
   <Transition
     enter-active-class="animate__animated animate__fadeIn"
@@ -42,7 +50,7 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
           <v-row>
             <v-col>
               <v-date-picker
-                v-model="booking.startDate"
+                v-model="selectedDate"
                 :min="new Date(new Date().setDate(new Date().getDate() - 1))"
                 no-title
                 scrollable
@@ -151,6 +159,7 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                 item-value="numberOfFloor"
                 variant="outlined"
                 chips
+                @update:modelValue="deskDetails = null"
               >
                 <template v-slot:label>
                   <v-card-text>
@@ -575,28 +584,33 @@ export default {
     bookingId: {
       type: String,
     },
+    employeeId: {
+      type: String,
+    },
   },
 
   data() {
     return {
       isSvgVisible: false,
+      selectedDate: null,
       booking: {
-        startDate: null,
-        endDate: null,
+        startDate: "",
+        endDate: "",
         status: "",
         hasPenalty: false,
         workStationId: "",
         userId: "",
       },
       modifyBooking: {
-        startDate: null,
-        endDate: null,
+        startDate: "",
+        endDate: "",
         workStationId: "",
       },
       deskDetails: null,
       alertVisible: false,
       alertText: "",
       alertType: "success",
+      alreadyBooked: false,
       buildings: [],
       selectedBuilding: null,
       chooseDeskAlertVisible: false,
@@ -626,7 +640,11 @@ export default {
   },
 
   mounted() {
-    this.booking.userId = localStorage.getItem("userId");
+    if(this.employeeId) {
+      this.booking.userId = this.employeeId;
+    } else {
+      this.booking.userId = localStorage.getItem("userId");
+    }
     this.$ApiService.find_user_by_id(this.booking.userId).then((res) => {
       this.userType = res.data.type;
     });
@@ -680,16 +698,31 @@ export default {
      * Additionally, it highlights desks that are unavailable, such as those already booked or restricted
      * based on user permissions.
      */
-    findOccupiedDesks() {
-      if (this.booking.startDate !== null && this.selectedBuilding !== null) {
+     findOccupiedDesks() {
+      if (this.selectedDate !== null && this.selectedBuilding !== null) {
         this.chooseDeskAlertVisible = false;
-        const date = this.formatDate(this.booking.startDate);
+        const date = this.formatDate(this.selectedDate);
+
+        let userId = "";
+        if(this.employeeId) {
+          userId = this.employeeId;
+        } else {
+          userId = this.booking.userId;
+        }
 
         this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
           this.occupiedDesks = occupiedDesks.data
             .filter((ws) => ws.status != "canceled")
             .map((ws) => ws.workStationId);
           this.isSvgVisible = true;
+          occupiedDesks.data.forEach((ws) => {
+            if(ws.user.id === userId) {
+              this.alertVisible = true;
+              this.alertType = "error";
+              this.alertText = "You already have a booking for this date!";
+              this.alreadyBooked = true;
+            }
+          });
         });
         this.countWorkstations();
       } else {
@@ -706,7 +739,6 @@ export default {
      */
     bookingDesk(deskId) {
       const workStationId = deskId;
-      const date = this.formatDate(this.booking.startDate);
 
       this.$ApiService
         .find_desk_by_id(workStationId)
@@ -727,7 +759,13 @@ export default {
      * If an error occurs during the booking process, it displays an error message instead.
      */
     createBooking() {
-      this.booking.startDate = this.formatDate2(this.booking.startDate);
+      let date = new Date(this.selectedDate);
+      date.setDate(date.getDate() + 1);
+      let dateToSave = date.toISOString().replace('Z', '+00:00');
+      const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+      const newDate = dateToSave.replace(regexTime, "00:00:00.000");
+
+      this.booking.startDate = newDate;
       this.booking.endDate = this.booking.startDate;
       this.booking.status = "active";
       const wsId = this.booking.workStationId;
@@ -737,7 +775,7 @@ export default {
         .then((res) => {
           this.alertVisible = true;
           this.alertType = "success";
-          this.alertText = "Registration was successful!";
+          this.alertText = "Booking was successful!";
 
           const deskElement = document.querySelector(`[data-id="${wsId}"]`);
           if (deskElement) {
@@ -745,7 +783,12 @@ export default {
             deskElement.style.pointerEvents = "none";
           }
 
-          const userId = this.booking.userId;
+          let userId = "";
+          if(this.employeeId) {
+            userId = this.employeeId;
+          } else {
+            userId = this.booking.userId;
+          }
           const bookingDate = new Date(this.booking.startDate);
           const formattedDate = bookingDate.toLocaleDateString("en-US", {
             year: "numeric",
@@ -790,7 +833,13 @@ export default {
      * If an error occurs during the modification process, it displays an error message instead.
      */
     editBooking() {
-      this.modifyBooking.startDate = this.formatDate2(this.booking.startDate);
+      let date = new Date(this.selectedDate);
+      date.setDate(date.getDate() + 1);
+      let dateToSave = date.toISOString().replace('Z', '+00:00');
+      const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+      const newDate = dateToSave.replace(regexTime, "00:00:00.000");
+
+      this.modifyBooking.startDate = newDate;
       this.modifyBooking.endDate = this.modifyBooking.startDate;
       this.modifyBooking.workStationId = this.booking.workStationId;
       const wsId = this.modifyBooking.workStationId;
@@ -808,7 +857,12 @@ export default {
             deskElement.style.pointerEvents = "none";
           }
 
-          const userId = this.booking.userId;
+          let userId = "";
+          if(this.employeeId) {
+            userId = this.employeeId;
+          } else {
+            userId = this.booking.userId;
+          }
           const bookingDate = new Date(this.booking.startDate);
           const formattedDate = bookingDate.toLocaleDateString("en-US", {
             year: "numeric",
@@ -851,7 +905,14 @@ export default {
     goToRecap() {
       this.alertVisible = false;
       if (this.alertType == "success") {
-        this.$router.push("/bookingList");
+        if(this.employeeId){
+          this.$router.push("/businessBookingsList");
+        } else{
+          this.$router.push("/bookingList");
+        }
+      }
+      if (this.alreadyBooked) {
+        window.location.reload();
       }
     },
     /**

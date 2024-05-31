@@ -31,6 +31,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/booking/employee/:employeeId",
+      name: "create_booking_for_employee",
+      props: (route) => ({ employeeId: route.params.employeeId }),
+      component: () => import("../views/bookings/BookingWorkStationView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
       path: "/booking",
       name: "booking",
       component: () => import("../views/bookings/BookingWorkStationView.vue"),
@@ -73,6 +83,16 @@ const router = createRouter({
         role: "BUSINESS",
       },
     },
+    {
+      path: "/businessBookingDesks",
+      name: "businessBookingDesks",
+      component: () => import("../views/business/bookings/BusinessBookingWorkStations.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+
   ],
 });
 

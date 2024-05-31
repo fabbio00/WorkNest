@@ -47,7 +47,7 @@
                     <v-btn
                         color="blue-darken-1"
                         variant="text"
-                        @click="editItemConfirm"
+                        @click="editTypeItemConfirm"
                         >OK</v-btn
                     >
                     <v-spacer></v-spacer>
@@ -64,7 +64,7 @@
           <v-icon
             class="me-2"
             size="small"
-            @click="editItem(item)"
+            @click="editTypeItem(item)"
             :class="{
               disabled:
                 item.status !== 'inactive' &&
@@ -79,7 +79,7 @@
         <template v-slot:item.actions="{ item }">
         <v-icon
             size="small"
-            @click=""
+            @click="createBookingForEmployee(item)"
             :class="{
               disabled:
                 item.status !== 'inactive'
@@ -166,8 +166,8 @@
  * @vue-method {Function} deleteItem - Opens the delete confirmation dialog for the specified employee.
  * @vue-method {Function} deleteItemConfirm - Confirms the deletion of an employee.
  * @vue-method {Function} closeDelete - Closes the delete confirmation dialog.
- * @vue-method {Function} editItem - Opens the edit confirmation dialog for the specified employee.
- * @vue-method {Function} editItemConfirm - Confirms the editing of an employee.
+ * @vue-method {Function} editTypeItem - Opens the edit confirmation dialog for the specified employee.
+ * @vue-method {Function} editTypeItemConfirm - Confirms the editing of an employee.
  * @vue-method {Function} closeEdit - Closes the edit confirmation dialog.
  * @vue-method {Function} initialize_table - Initializes the table by fetching employee data and populating the employees array.
  *
@@ -179,8 +179,8 @@
 
 export default {
   data: () => ({
-    companyId: "356869f3-8402-4b65-b0e3-d8eb1f0de532",
-    userId: "c0cae2ca-8085-4772-9237-e09e9c22cd6b",
+    companyId: "",
+    userId: "",
     dialog: false,
     dialogDelete: false,
     dialogEdit: false,
@@ -209,7 +209,11 @@ export default {
   }),
 
   mounted() {
-    this.initialize_table();
+    this.userId = localStorage.getItem("userId");
+    this.$ApiService.find_user_by_id(this.userId).then((res) => {
+      this.companyId = res.data.companyId;
+      this.initialize_table();
+    });
   },
 
   methods: {
@@ -300,7 +304,7 @@ export default {
      * Opens the edit confirmation dialog for the specified employee.
      * @param {Object} item - The employee item to be edited.
      */
-    editItem(item) {
+    editTypeItem(item) {
       if (item.status !== "inactive") {
         this.editedIndex = this.employees.indexOf(item);
         this.editedItem = Object.assign({}, item);
@@ -312,7 +316,7 @@ export default {
      * Confirms the editing of an employee.
      * Edits the employee type in the database and sends a confirmation email.
      */
-    editItemConfirm() {
+    editTypeItemConfirm() {
         this.editType.type = "BUSINESS";
         this.$ApiService.edit_user_type(this.editedItem.userId, this.editType).then((response) => {
 
@@ -353,10 +357,16 @@ export default {
       this.dialogEdit = false;
     },
 
+
+    createBookingForEmployee(item){
+      this.$router.push({ name: 'create_booking_for_employee', params: { employeeId: item.userId } });
+    },
+
     /**
      * Initializes the table by fetching employee data and populating the employees array.
      */
     initialize_table() {
+      console.log(this.companyId);
       this.$ApiService
         .get_list_employee(this.companyId)
         .then((response) => {
@@ -364,6 +374,7 @@ export default {
             console.log(employees);
 
             employees.forEach((employee) => {
+              if(employee.id !== this.userId) {
                 this.employees.push({
                     name: employee.name,
                     surname: employee.surname,
@@ -371,6 +382,7 @@ export default {
                     status: employee.status,
                     userId: employee.id,
                 });
+              }
             });
 
         })

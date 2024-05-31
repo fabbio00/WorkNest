@@ -360,7 +360,7 @@ import Desk from "@/components/Desk.vue";
       <rect
         :fill="
           occupiedDesks.includes('7ac68b59-f717-43e8-b629-bff0fdd9da74') ||
-          userType !== 'business'
+          userType !== 'BUSINESS'
             ? 'red'
             : 'green'
         "
@@ -618,7 +618,7 @@ export default {
      * @param {Event} event - The DOM event triggered when a meeting room element in the SVG is clicked.
      */
     handleMeetingRoomClick(event) {
-      if (this.userType === "business") {
+      if (this.userType === "BUSINESS") {
         const meetingRoomId = event.target.getAttribute("data-id");
         if (meetingRoomId && !this.occupiedDesks.includes(meetingRoomId)) {
           this.$emit("deskClicked", meetingRoomId);
