@@ -35,7 +35,7 @@ public class WorkStation {
      * The price per hour for using the workstation.
      */
     @Column(name = "price_per_h")
-    private double pricePerH;
+    private Double pricePerH;
 
     /**
      * Equipment available at the workstation.

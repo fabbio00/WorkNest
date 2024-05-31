@@ -40,6 +40,7 @@ class WorkStationServiceTest {
         UUID workStationId = UUID.randomUUID();
         WorkStation workStation = new WorkStation();
         workStation.setId(workStationId);
+        workStation.setPricePerH(3.9);
 
         when(workStationRepository.findById(workStationId)).thenReturn(Optional.of(workStation));
 

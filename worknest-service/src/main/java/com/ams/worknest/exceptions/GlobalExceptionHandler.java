@@ -25,6 +25,8 @@ public class GlobalExceptionHandler {
     private static final String USER_NOT_FOUND = "User not found or credentials are incorrect";
     private static final String COMPANY_CODE_NOT_FOUND = "Company code not found!";
     private static final String BUILDING_NOT_FOUND = "Building not found!";
+    private static final String COMPANY_NOT_FOUND = "Company not found!";
+
 
     /**
      * Handles RuntimeExceptions thrown within the application.
@@ -43,6 +45,8 @@ public class GlobalExceptionHandler {
         } else if (BUILDING_NOT_FOUND.equals(ex.getMessage())) {
             status = HttpStatus.NOT_FOUND;
         } else if (COMPANY_CODE_NOT_FOUND.equals(ex.getMessage())) {
+            status = HttpStatus.OK;
+        } else if (COMPANY_NOT_FOUND.equals(ex.getMessage())) {
             status = HttpStatus.NOT_FOUND;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;

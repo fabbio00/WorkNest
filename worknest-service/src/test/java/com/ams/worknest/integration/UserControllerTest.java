@@ -20,6 +20,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
@@ -41,10 +43,15 @@ class UserControllerTest extends BaseMvcTest {
     @Autowired
     private CompanyRepository companyRepository;
 
+    private final List<UUID> createdCompanyIds = new ArrayList<>();
+
+    private final List<UUID> createdUserIds = new ArrayList<>();
+
+
     private static final String USER_ENDPOINT = "/users";
 
     @Test
-    void getUserById() throws Exception{
+    void getUserById() throws Exception {
         User savedUser = savedUserTemplate();
         mvc.perform(
                         get(USER_ENDPOINT + "/{userId}", savedUser.getId())
@@ -57,7 +64,7 @@ class UserControllerTest extends BaseMvcTest {
     }
 
     @Test
-    void getUserByMail() throws Exception{
+    void getUserByMail() throws Exception {
         User savedUser = savedUserTemplate();
         UserEmailDto userEmailDto = userEmailDtoCreation();
 
@@ -91,56 +98,6 @@ class UserControllerTest extends BaseMvcTest {
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
     }
 
-
-    User savedUserTemplate(){
-        Company company = Company.builder()
-                .name("Test Company")
-                .email("test@company.com")
-                .vatCode("IT12345678901")
-                .phone("1234567890")
-                .companyCode("TEST123")
-                .build();
-
-        companyRepository.save(company);
-
-        User user = User.builder()
-                .barrierFreeFlag(true)
-                .email("prova22.user@gmail.com")
-                .password("password")
-                .name("Mario")
-                .surname("Rossi")
-                .username("username")
-                .type("basic_user")
-                .taxCode("FDSAFDAR343")
-                .registrationDate(ZonedDateTime.now())
-                .status("active")
-                .company(company)
-                .build();
-
-        return userRepository.save(user);
-
-    }
-
-    UserDto userDtoCreation(){
-        return UserDto.builder()
-                .barrierFreeFlag(true)
-                .email("prova.user@gmail.com")
-                .password("password")
-                .name("Mario")
-                .surname("Rossi")
-                .username("username")
-                .type("basic_user")
-                .taxCode("FDSAFDAR343")
-                .status("active")
-                .build();
-    }
-
-    UserEmailDto userEmailDtoCreation(){
-        return UserEmailDto.builder()
-                .email("prova22.user@gmail.com")
-                .build();
-    }
-
     @Test
     void userLogin() throws Exception {
         UserLoggedDto userLoggedDto = userLoggedDtoCreation();
@@ -171,26 +128,23 @@ class UserControllerTest extends BaseMvcTest {
                 .andExpect(status().isUnauthorized()).andReturn();
     }
 
-    UserLoggedDto userLoggedDtoCreation(){
-
-        User user = User.builder()
+    UserDto userDtoCreation() {
+        return UserDto.builder()
                 .barrierFreeFlag(true)
-                .email("test@gmail.com")
-                .password("prova24!")
+                .email("prova.user@gmail.com")
+                .password("password")
                 .name("Mario")
                 .surname("Rossi")
                 .username("username")
                 .type("basic_user")
                 .taxCode("FDSAFDAR343")
-                .registrationDate(ZonedDateTime.now())
                 .status("active")
                 .build();
+    }
 
-        userRepository.save(user);
-
-        return UserLoggedDto.builder()
-                .email("test@gmail.com")
-                .password("prova24!")
+    UserEmailDto userEmailDtoCreation() {
+        return UserEmailDto.builder()
+                .email("prova22.user@gmail.com")
                 .build();
     }
 
@@ -234,10 +188,81 @@ class UserControllerTest extends BaseMvcTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
-    @AfterEach
-    void cleanUp() throws Exception {
-        userRepository.deleteAll();
+    User savedUserTemplate() {
+        Company company = Company.builder()
+                .name("ProvaBusiness")
+                .vatCode("ddadasda")
+                .email("aaa@gmail.com")
+                .phone("3335714426")
+                .companyCode("Pro505")
+                .build();
+
+        company = companyRepository.save(company);
+        createdCompanyIds.add(company.getId());
+
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("prova22.user@gmail.com")
+                .password("password")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("EMPLOYEE")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .company(company)
+                .build();
+
+        user = userRepository.save(user);
+        createdUserIds.add(user.getId());
+
+        return user;
+    }
+
+    UserLoggedDto userLoggedDtoCreation() {
+        Company company = Company.builder()
+                .name("ProvaBusiness")
+                .vatCode("ddadasda")
+                .email("aaa@gmail.com")
+                .phone("3335714426")
+                .companyCode("Pro505")
+                .build();
+
+        company = companyRepository.save(company);
+        createdCompanyIds.add(company.getId());
+
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("test@gmail.com")
+                .password("prova24!")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("BUSINESS")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .company(company)
+                .build();
+
+        user = userRepository.save(user);
+        createdUserIds.add(user.getId());
+
+        return UserLoggedDto.builder()
+                .email("test@gmail.com")
+                .password("prova24!")
+                .build();
     }
 
 
+    @AfterEach
+    void cleanUp() {
+        createdUserIds.forEach(id -> userRepository.deleteById(id));
+        createdCompanyIds.forEach(id -> companyRepository.deleteById(id));
+        createdUserIds.clear();
+        createdCompanyIds.clear();
+    }
 }
+
+

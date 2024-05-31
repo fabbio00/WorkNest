@@ -26,4 +26,5 @@ public class EmailDto {
      * The text content of the email.
      */
     private String text;
+
 }

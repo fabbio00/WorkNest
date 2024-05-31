@@ -37,6 +37,7 @@ const router = createRouter({
       component: () => import("../views/bookings/BookingWorkStationView.vue"),
       meta: {
         requiresAuth: true,
+        role: "BUSINESS",
       },
     },
     {
@@ -70,6 +71,16 @@ const router = createRouter({
       component: () => import("../views/business/employees/BusinessEmployeesListView.vue"),
       meta: {
         requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
+      path: "/businessBookingsList",
+      name: "businessBookingsList",
+      component: () => import("../views/business/bookings/BusinessBookingsListView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
       },
     },
     {
@@ -78,6 +89,7 @@ const router = createRouter({
       component: () => import("../views/business/bookings/BusinessBookingWorkStations.vue"),
       meta: {
         requiresAuth: true,
+        role: "BUSINESS",
       },
     },
 

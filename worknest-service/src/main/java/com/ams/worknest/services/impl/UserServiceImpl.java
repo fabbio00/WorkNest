@@ -93,7 +93,11 @@ public class UserServiceImpl implements UserService {
             userResource.setUsername(u.getUsername());
             userResource.setRegistrationDate(u.getRegistrationDate());
             userResource.setTaxCode(u.getTaxCode());
-            userResource.setCompanyId(u.getCompany().getId());
+
+            // Check if the company is not null before trying to access its id
+            if (u.getCompany() != null) {
+                userResource.setCompanyId(u.getCompany().getId());
+            }
         });
 
         return userResource;
@@ -136,13 +140,13 @@ public class UserServiceImpl implements UserService {
      * @return the logged-in user information as a resource
      * @throws ResponseStatusException with status code 401 (Unauthorized) if the user is not found or credentials are incorrect
      */
-
      @Override
      public UserLoggedResource userLogin(UserLoggedDto userLoggedDto) {
 
          User user = userRepository.findByEmailAndPassword(userLoggedDto.getEmail(), userLoggedDto.getPassword())
                  .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
          return new UserLoggedResource(user.getId());
+
      }
 
     /**
@@ -156,7 +160,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserFindByCompanyResource> getUsersByCompany(UUID companyId) {
 
-         List<User> users = userRepository.findByCompany(companyId);
+         List<User> users = userRepository.findByCompanyId(companyId);
 
          if(users.isEmpty()){
              return Collections.emptyList();
@@ -176,7 +180,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * This method is used to change the type of a user.
+     * This method is used to change the type of user.
      * It first tries to find the user in the database using the provided UUID. If the user is found, it changes the user's type to the type provided in the
      * UserEditTypeDto object, saves the updated User entity in the database, and then creates a UserResource object and sets its properties to the corresponding
      * properties of the updated User entity. If the user is not found, it returns an empty UserResource object.
@@ -238,7 +242,7 @@ public class UserServiceImpl implements UserService {
             userResource.setRegistrationDate(u.getRegistrationDate());
             userResource.setTaxCode(u.getTaxCode());
         });
-
         return userResource;
     }
+
 }

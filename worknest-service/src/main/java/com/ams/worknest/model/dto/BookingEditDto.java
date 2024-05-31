@@ -33,5 +33,4 @@ public class BookingEditDto {
      */
     private UUID workStationId;
 
-
 }

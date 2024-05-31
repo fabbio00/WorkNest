@@ -17,4 +17,5 @@ public class EmailResource {
      * The message indicating the result of the email operation.
      */
     String message;
+
 }

@@ -55,6 +55,12 @@ public class UserController {
         return userService.getUser(id);
     }
 
+    /**
+     * Retrieve a user by their email.
+     *
+     * @param userEmailDto the email data transfer object containing the user's email
+     * @return the requested user as a resource
+     */
     @PostMapping("/email")
     @ResponseStatus(HttpStatus.OK)
     public UserResource getUserByEmail(@RequestBody UserEmailDto userEmailDto) {
@@ -88,7 +94,7 @@ public class UserController {
     }
 
     /**
-     * Change the type of a user.
+     * Change the type of user.
      *
      * @param userId the UUID of the user to change the type for
      * @param userEditTypeDto the data transfer object containing the new user type

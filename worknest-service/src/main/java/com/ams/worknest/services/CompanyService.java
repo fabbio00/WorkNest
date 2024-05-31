@@ -25,4 +25,5 @@ public interface CompanyService {
      * @return CompanyResource containing the public-facing information of the retrieved company.
      */
     CompanyResource getCompanyByCompanyCode(CompanyCodeDto companyCodeDto);
+
 }
