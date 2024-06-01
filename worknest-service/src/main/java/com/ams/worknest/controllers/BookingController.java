@@ -2,14 +2,29 @@ package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
-import com.ams.worknest.model.resources.*;
+import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingDeleteResource;
+import com.ams.worknest.model.resources.BookingEditResource;
+import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.BookingFindByCompanyResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
+
 import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.util.List;

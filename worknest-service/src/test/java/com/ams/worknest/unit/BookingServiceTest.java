@@ -7,7 +7,14 @@ import java.util.*;
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.entities.WorkStation;
-import com.ams.worknest.model.resources.*;
+import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingDeleteResource;
+import com.ams.worknest.model.resources.BookingEditResource;
+import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
+import com.ams.worknest.model.resources.BookingFindByCompanyResource;
+
 import com.ams.worknest.repositories.BookingRepository;
 import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.repositories.UserRepository;

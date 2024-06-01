@@ -2,8 +2,11 @@ package com.ams.worknest.integration;
 
 import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.dto.BookingCreateDto;
+import com.ams.worknest.model.dto.BookingEditDto;
 import com.ams.worknest.model.entities.*;
 import com.ams.worknest.repositories.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,8 +26,11 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
@@ -191,6 +198,62 @@ class BookingControllerTest extends BaseMvcTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+    @Test
+    void createBooking() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        BookingCreateDto bookingCreateDto = bookingDtoCreation();
+        String bookingCreateJson = objectMapper.writeValueAsString(bookingCreateDto);
+
+        mvc.perform(
+                        post("/bookings")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(bookingCreateJson)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.startDate").value(bookingCreateDto.getStartDate().toInstant().toString()))
+                .andExpect(jsonPath("$.endDate").value(bookingCreateDto.getEndDate().toInstant().toString()))
+                .andExpect(jsonPath("$.user.id", is(bookingCreateDto.getUserId().toString())))
+                .andExpect(jsonPath("$.workStation.id", is(bookingCreateDto.getWorkStationId().toString())));
+    }
+
+    @Test
+    void editBooking() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        Booking savedBooking = savedBookingTemplate();
+        String str = "2024-05-06T10:15:30+01:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+        ZonedDateTime newZonedDateTime = ZonedDateTime.parse(str, formatter).withZoneSameInstant(ZoneOffset.UTC);
+
+        BookingEditDto bookingEditDto = BookingEditDto.builder()
+                .startDate(newZonedDateTime)
+                .endDate(newZonedDateTime.plusHours(1))
+                .workStationId(savedBooking.getWorkStation().getId())
+                .build();
+        String bookingEditJson = objectMapper.writeValueAsString(bookingEditDto);
+
+        mvc.perform(
+                        put("/bookings/edit/{bookingId}", savedBooking.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(bookingEditJson)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.startDate", is(bookingEditDto.getStartDate().format(DateTimeFormatter.ISO_ZONED_DATE_TIME))))
+                .andExpect(jsonPath("$.endDate", is(bookingEditDto.getEndDate().format(DateTimeFormatter.ISO_ZONED_DATE_TIME))));
+    }
+
+
+
+
+
+
+
+
+
 
     @Test
     void getBookingsByCompanyId_WithDateRange() throws Exception {
