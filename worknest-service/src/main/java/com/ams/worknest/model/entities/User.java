@@ -1,8 +1,20 @@
 package com.ams.worknest.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -86,5 +98,11 @@ public class User {
     @ManyToOne()
     @JoinColumn(name = "company_id")
     private Company company;
+
+    /**
+     * The business booking associated with the user.
+     */
+    @OneToOne(mappedBy = "user")
+    private BookingBusiness bookingBusiness;
 
 }
