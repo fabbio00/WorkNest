@@ -209,8 +209,8 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                       </v-list-item-title>
                       <v-list-item-subtitle class="d-flex align-center">
                         <v-icon
-                        v-for="(equip, index) in item.value.split(', ')"
-                          :key="index"  
+                          v-for="(equip, index) in item.value.split(', ')"
+                          :key="index"
                           class="mr-2"
                           >{{ getEquipmentIcon(equip) }}</v-icon
                         >

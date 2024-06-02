@@ -187,7 +187,6 @@ export default {
 </script>
 
 <style>
-
 .v-list-item .font-weight-black {
   white-space: nowrap;
   overflow: hidden;
@@ -199,5 +198,4 @@ export default {
   white-space: normal;
   text-overflow: clip;
 }
-
 </style>
