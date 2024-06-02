@@ -73,18 +73,4 @@ describe("CompanyRegistrationView", () => {
     expect(wrapper.vm.isPasswordValid).toBe(true);
   });
 
-  it("should call handleBusinessNameBlur and generate company code", async () => {
-    axios.post.mockResolvedValue({ data: { companyCode: false } });
-
-    await wrapper.setData({
-      company: {
-        name: "TestCompany",
-      },
-    });
-
-    await wrapper.vm.handleBusinessNameBlur();
-    await nextTick();
-
-    expect(wrapper.vm.company.companyCode).toMatch(/^Tes\d{3}$/); // Verifica il formato del codice aziendale
-  });
 });

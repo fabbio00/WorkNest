@@ -309,7 +309,6 @@ export default {
 }
 </script>
 
-
 <style>
 .search-field {
   max-width: 200px;

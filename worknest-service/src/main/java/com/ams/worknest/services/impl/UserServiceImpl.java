@@ -19,7 +19,10 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Implementation of the {@link UserService} interface.
@@ -93,7 +96,11 @@ public class UserServiceImpl implements UserService {
             userResource.setUsername(u.getUsername());
             userResource.setRegistrationDate(u.getRegistrationDate());
             userResource.setTaxCode(u.getTaxCode());
-            userResource.setCompanyId(u.getCompany().getId());
+
+            // Check if the company is not null before trying to access its id
+            if (u.getCompany() != null) {
+                userResource.setCompanyId(u.getCompany().getId());
+            }
         });
 
         return userResource;

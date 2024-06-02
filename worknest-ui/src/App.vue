@@ -110,6 +110,17 @@ import { RouterView } from "vue-router";
                 <p class="font-weight-black">View all employees</p>
               </template>
             </v-list-item>
+
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-calendar-multiple"
+              title=""
+              @click="redirect('/businessBookingsListDelete')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">Manage business bookings</p>
+              </template>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
       </v-layout>
@@ -166,7 +177,7 @@ export default {
     };
   },
 
-  async beforeMount() {
+  async mounted() {
     // Here we check if the route requires authentication and set the sidebar visibility.
     // We also make an API call to fetch user details.
     this.showSideBar = this.$route.meta.requiresAuth === true ? true : false;

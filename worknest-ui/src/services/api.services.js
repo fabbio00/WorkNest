@@ -130,6 +130,34 @@ class ApiService {
       });
   }
 
+  get_booking_businesses_by_user_id(userId, startDate = null, endDate = null) {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    return axios
+      .get("http://localhost:8080/business-bookings/list/" + userId + "?" + params.toString())
+      .then((res) => {
+        return res;
+      });
+  }
+
+  get_bookings_by_business_booking_id(businessBookingId, type = '') {
+    return axios
+      .get(`http://localhost:8080/business-bookings/business_user/${businessBookingId}`, {
+        params: { type }
+      })
+      .then((res) => {
+        return res;
+      });
+  }
+
+  cancelBookingsByIds(bookingIds) {
+    return axios.put("http://localhost:8080/business-bookings/business_user/delete", bookingIds)
+      .then((res) => {
+        return res;
+      });
+  }
+  
 }
 
 export default new ApiService();

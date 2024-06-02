@@ -2,7 +2,13 @@ package com.ams.worknest.services;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
-import com.ams.worknest.model.resources.*;
+import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingDeleteResource;
+import com.ams.worknest.model.resources.BookingEditResource;
+import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.BookingFindByCompanyResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
 
 import java.time.LocalDate;
 import java.util.List;

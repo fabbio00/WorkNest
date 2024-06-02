@@ -73,6 +73,15 @@ const router = createRouter({
         role: "BUSINESS",
       },
     },
+    {
+      path: "/businessBookingsListDelete",
+      name: "businessBookingsListDelete",
+      component: () => import("../views/business/bookings/BusinessBookingsDeleteView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
   ],
 });
 

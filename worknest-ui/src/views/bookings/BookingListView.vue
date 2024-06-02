@@ -340,6 +340,7 @@ export default {
 .disabled {
   color: rgb(214, 214, 214);
   cursor: unset;
+  pointer-events: none;
 }
 
 tbody tr:nth-of-type(even) {
