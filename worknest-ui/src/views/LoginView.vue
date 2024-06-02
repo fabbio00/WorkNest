@@ -122,6 +122,12 @@ export default {
       invalidCredentials: false,
     };
   },
+  mounted() {
+    /**
+     * Lifecycle hook to clear the user's data after the logout process.
+     */
+    localStorage.clear();
+  },
   methods: {
     /**
      * login
