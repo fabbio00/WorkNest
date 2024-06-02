@@ -15,11 +15,13 @@ cache:
 stages:
   - install_dependencies
   - build
+  - validate_style
   - test
   - package
+  - lint
   - release
   - generate_documentation
-  - build_container
+  - deploy_doc
 
 clean:
   stage: build
@@ -36,9 +38,20 @@ compile:
     - cd worknest-service
     - mvn $MAVEN_CLI_OPTS compile
 
+spring_validate_style:
+  stage: validate_style
+  needs: [compile]
+  script:
+    - echo "Executing checkstyle..."
+    - mvn $MAVEN_OPTS checkstyle:checkstyle
+  artifacts:
+    paths:
+      - target/checkstyle-result.xml
+    when: on_failure
+
 spring_test:
   stage: test
-  needs: [compile]
+  needs: [spring_validate_style]
   image: maven:3.9.6
   services:
     - name: postgres:14.11
@@ -62,10 +75,21 @@ package_be:
     paths:
       - worknest-service/target/*.jar
 
+spring_verify_spotbugs:
+  stage: lint
+  needs: [package_be]
+  script:
+    - echo "Executing spotbugs..."
+    - mvn $MAVEN_OPTS spotbugs:check
+  artifacts:
+    paths:
+      - target/spotbugsXml.xml
+    when: on_failure
+
 docs_spring:
   stage: generate_documentation
   image: maven:3.9.6
-  needs: [package_be]
+  needs: [spring_verify_spotbugs]
   script:
     - cd worknest-service
     - mvn $MAVEN_CLI_OPTS $MAVEN_OPTS javadoc:javadoc
@@ -73,6 +97,8 @@ docs_spring:
   artifacts:
     paths:
       - worknest-service/public
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
 
 install_dependencies_vue:
   stage: install_dependencies
@@ -92,15 +118,32 @@ build_fe:
   artifacts:
     paths:
       - worknest-ui/dist/
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
 
+check_style_vue:
+  stage: validate_style
+  needs: [install_dependencies_vue]
+  image: node:21.7.1
+  script:
+    - cd worknest-ui
+    - npm run check-style
 
 test_vue:
   stage: test
-  needs: [build_fe]
+  needs: [check_style_vue]
   image: node:21.7.1
   script:
     - cd worknest-ui
     - npm run test:unit
+
+lint_vue:
+  stage: lint
+  needs: [test_vue]
+  image: node:21.7.1
+  script:
+    - cd worknest-ui
+    - npm run lint
 
 docs_vue:
   stage: generate_documentation
@@ -112,3 +155,22 @@ docs_vue:
   artifacts:
     paths:
       - worknest-ui/docs/
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
+
+pages:
+  stage: deploy_doc
+  dependencies:
+    - docs_vue
+    - docs_spring
+  script:
+    - mkdir -p public/fe-docs
+    - cp -r worknest-ui/docs/* public/fe-docs/
+    - mkdir -p public/be-docs
+    - cp -r worknest-service/public/* public/be-docs/
+    - ls -la public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
