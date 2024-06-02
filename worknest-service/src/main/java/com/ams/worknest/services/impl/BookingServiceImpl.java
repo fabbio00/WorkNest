@@ -6,12 +6,21 @@ import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.BookingBusiness;
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
-import com.ams.worknest.model.resources.*;
-import com.ams.worknest.repositories.BookingBusinessRepository;
+import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingDeleteResource;
+import com.ams.worknest.model.resources.BookingEditResource;
+import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.BookingFindByCompanyResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
+import com.ams.worknest.model.resources.UserResource;
+
 import com.ams.worknest.repositories.BookingRepository;
-import com.ams.worknest.repositories.CompanyRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.repositories.WorkStationRepository;
+import com.ams.worknest.repositories.BookingBusinessRepository;
+import com.ams.worknest.repositories.CompanyRepository;
+
 import com.ams.worknest.services.BookingService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +45,11 @@ public class BookingServiceImpl implements BookingService {
     private final WorkStationRepository workStationRepository;
     private final BookingBusinessRepository bookingBusinessRepository;
     private final CompanyRepository companyRepository;
+
     private static final String BOOKING_NOT_FOUND = "Booking not found!";
     private static final String WORKSTATION_NOT_FOUND = "Workstation not found!";
     private static final String COMPANY_NOT_FOUND = "Company not found!";
+    private static final String USER_NOT_FOUND = "User doesn't exist";
 
     /**
      * Creates a booking based on the provided booking data transfer object.
@@ -136,7 +147,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingFindByUserResource> findBookingsByUserId(UUID userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User doesn't exist"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         List<Booking> bookings = bookingRepository.findByUser(user);
 
@@ -331,6 +342,7 @@ public class BookingServiceImpl implements BookingService {
                             .status(booking.getStatus())
                             .hasPenalty(booking.getHasPenalty())
                             .workStationName(booking.getWorkStation().getName())
+                            .workStationType(booking.getWorkStation().getType())
                             .workstationCostPerHour(booking.getWorkStation().getPricePerH())
                             .buildingName(booking.getWorkStation().getBuilding().getName())
                             .floorName("Floor " + booking.getWorkStation().getFloor().getNumberOfFloor())

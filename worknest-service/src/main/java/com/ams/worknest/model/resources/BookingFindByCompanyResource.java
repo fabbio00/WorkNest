@@ -1,6 +1,10 @@
 package com.ams.worknest.model.resources;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -56,6 +60,11 @@ public class BookingFindByCompanyResource {
      * The name of the workstation associated with the booking.
      */
     private String workStationName;
+
+    /**
+     * The type of the workstation associated with the booking (desk, meeting_room).
+     */
+    private String workStationType;
 
     /**
      * The cost per hour of the workstation associated with the booking.

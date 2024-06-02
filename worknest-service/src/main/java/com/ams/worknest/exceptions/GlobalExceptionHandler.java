@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
     private static final String FLOOR_NOT_FOUND = "Floor not found!";
     private static final String FLOORS_NOT_FOUND = "Floors not found for building ID: ";
     private static final String USER_NOT_FOUND = "User not found or credentials are incorrect";
+    private static final String BUSINESS_BOOKING_NOT_FOUND = "Business booking not found!";
     private static final String COMPANY_CODE_NOT_FOUND = "Company code not found!";
     private static final String BUILDING_NOT_FOUND = "Building not found!";
     private static final String COMPANY_NOT_FOUND = "Company not found!";
@@ -47,6 +48,8 @@ public class GlobalExceptionHandler {
         } else if (COMPANY_CODE_NOT_FOUND.equals(ex.getMessage())) {
             status = HttpStatus.OK;
         } else if (COMPANY_NOT_FOUND.equals(ex.getMessage())) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (BUSINESS_BOOKING_NOT_FOUND.equals(ex.getMessage())) {
             status = HttpStatus.NOT_FOUND;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;

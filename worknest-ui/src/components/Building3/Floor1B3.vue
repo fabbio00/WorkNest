@@ -1,5 +1,5 @@
 <script setup>
-import Desk from "@/components/Desk.vue";
+import Desk from "@/components/DeskComponent.vue";
 </script>
 <template>
   <svg
@@ -573,6 +573,7 @@ import Desk from "@/components/Desk.vue";
     <Desk
       v-for="desk in desks"
       :desk="desk"
+      :key="desk.id"
       @deskClicked="$emit('deskClicked', $event)"
       :isOccupied="occupiedDesks.includes(desk.id)"
       :hasRequests="filteredDesks.includes(desk.id)"

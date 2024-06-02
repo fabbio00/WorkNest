@@ -1,6 +1,6 @@
 import { shallowMount } from "@vue/test-utils";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import BookingsView from "../../views/business/bookings/BusinessBookingsListView.vue"; 
+import BookingsView from "../../views/business/bookings/BusinessBookingsListView.vue";
 
 describe("BookingsView", () => {
   let wrapper;
@@ -22,7 +22,11 @@ describe("BookingsView", () => {
               workstationCostPerHour: 10,
             },
             {
-              userResource: { name: "Jane", surname: "Smith", type: "Employee" },
+              userResource: {
+                name: "Jane",
+                surname: "Smith",
+                type: "Employee",
+              },
               status: "inactive",
               userId: "user2",
               startDate: "2023-05-25T08:00:00Z",
@@ -32,12 +36,12 @@ describe("BookingsView", () => {
               workstationCostPerHour: 15,
             },
           ],
-        })
+        }),
       ),
       find_user_by_id: vi.fn(() =>
         Promise.resolve({
           data: { companyId: "company1" },
-        })
+        }),
       ),
     };
 
@@ -50,7 +54,7 @@ describe("BookingsView", () => {
     });
 
     // Mock current date
-    vi.setSystemTime(new Date('2023-05-25T08:00:00Z'));
+    vi.setSystemTime(new Date("2023-05-25T08:00:00Z"));
   });
 
   afterEach(() => {
@@ -69,7 +73,11 @@ describe("BookingsView", () => {
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
     expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
-      "company1", "John", "", null, null
+      "company1",
+      "John",
+      "",
+      null,
+      null,
     );
   });
 
@@ -78,7 +86,11 @@ describe("BookingsView", () => {
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
     expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
-      "company1", "", "Doe", null, null
+      "company1",
+      "",
+      "Doe",
+      null,
+      null,
     );
   });
 
@@ -87,7 +99,11 @@ describe("BookingsView", () => {
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
     expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
-      "company1", "", "", "2023-05-25", null
+      "company1",
+      "",
+      "",
+      "2023-05-25",
+      null,
     );
   });
 
@@ -96,21 +112,39 @@ describe("BookingsView", () => {
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
     expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
-      "company1", "", "", null, "2023-05-26"
+      "company1",
+      "",
+      "",
+      null,
+      "2023-05-26",
     );
   });
 
   it("should search by name, surname, and date range", async () => {
-    wrapper.setData({ searchName: "Jane", searchSurname: "Smith", startDate: "2023-05-25", endDate: "2023-05-26" });
+    wrapper.setData({
+      searchName: "Jane",
+      searchSurname: "Smith",
+      startDate: "2023-05-25",
+      endDate: "2023-05-26",
+    });
     await wrapper.vm.initialize_table();
     await wrapper.vm.$nextTick();
     expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
-      "company1", "Jane", "Smith", "2023-05-25", "2023-05-26"
+      "company1",
+      "Jane",
+      "Smith",
+      "2023-05-25",
+      "2023-05-26",
     );
   });
 
   it("should clear filters and fetch all bookings", async () => {
-    wrapper.setData({ searchName: "John", searchSurname: "Doe", startDate: "2023-05-25", endDate: "2023-05-26" });
+    wrapper.setData({
+      searchName: "John",
+      searchSurname: "Doe",
+      startDate: "2023-05-25",
+      endDate: "2023-05-26",
+    });
     await wrapper.vm.clearFilters();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.searchName).toBe("");
@@ -118,7 +152,11 @@ describe("BookingsView", () => {
     expect(wrapper.vm.startDate).toBe(null);
     expect(wrapper.vm.endDate).toBe(null);
     expect(ApiServiceMock.get_list_by_company_booking).toHaveBeenCalledWith(
-      "company1", "", "", null, null
+      "company1",
+      "",
+      "",
+      null,
+      null,
     );
   });
 
@@ -133,9 +171,18 @@ describe("BookingsView", () => {
   });
 
   it("should get correct status color", () => {
-    const activeColor = wrapper.vm.getStatusColor({ status: "active", startDate: `2023-05-27T08:00:00Z` });
-    const inactiveColor = wrapper.vm.getStatusColor({ status: "active", startDate: "2022-05-25T08:00:00Z" });
-    const canceledColor = wrapper.vm.getStatusColor({ status: "canceled", startDate: "2023-05-25T08:00:00Z" });
+    const activeColor = wrapper.vm.getStatusColor({
+      status: "active",
+      startDate: `2023-05-27T08:00:00Z`,
+    });
+    const inactiveColor = wrapper.vm.getStatusColor({
+      status: "active",
+      startDate: "2022-05-25T08:00:00Z",
+    });
+    const canceledColor = wrapper.vm.getStatusColor({
+      status: "canceled",
+      startDate: "2023-05-25T08:00:00Z",
+    });
 
     expect(activeColor).toBe("green");
     expect(inactiveColor).toBe("gray");

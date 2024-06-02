@@ -26,15 +26,17 @@ describe("BusinessEmployeesListView", () => {
               status: "inactive",
             },
           ],
-        })
+        }),
       ),
       delete_user: vi.fn(() => Promise.resolve({})),
       find_user_by_id: vi.fn((userId) =>
         Promise.resolve({
           data: { id: userId, email: `${userId}@example.com` },
-        })
+        }),
       ),
-      send_mail: vi.fn(() => Promise.resolve({ data: "Email sent successfully" })),
+      send_mail: vi.fn(() =>
+        Promise.resolve({ data: "Email sent successfully" }),
+      ),
       edit_user_type: vi.fn(() => Promise.resolve({})),
     };
 
@@ -52,30 +54,30 @@ describe("BusinessEmployeesListView", () => {
   });
 
   it("should initialize table with employee data", async () => {
-      await wrapper.vm.$nextTick();
-      expect(ApiServiceMock.get_list_employee).toHaveBeenCalled();
-      await wrapper.vm.$nextTick(); // Aggiungi un'altra chiamata a $nextTick per aspettare che i dati vengano assegnati
-      expect(wrapper.vm.employees.length).toBe(2);
-      expect(wrapper.vm.employees[0]).toEqual({
-          name: "John",
-          surname: "Doe",
-          type: "Employee",
-          status: "active",
-          userId: "user1",
-      });
+    await wrapper.vm.$nextTick();
+    expect(ApiServiceMock.get_list_employee).toHaveBeenCalled();
+    await wrapper.vm.$nextTick(); // Aggiungi un'altra chiamata a $nextTick per aspettare che i dati vengano assegnati
+    expect(wrapper.vm.employees.length).toBe(2);
+    expect(wrapper.vm.employees[0]).toEqual({
+      name: "John",
+      surname: "Doe",
+      type: "Employee",
+      status: "active",
+      userId: "user1",
+    });
   });
 
   it("should open delete dialog for active employee", () => {
-      const employee = {
-          id: "user1",
-          name: "John",
-          surname: "Doe",
-          type: "Employee",
-          status: "active",
-      };
-      wrapper.vm.deleteItem(employee);
-      expect(wrapper.vm.dialogDelete).toBe(true);
-      expect(wrapper.vm.editedItem).toEqual(employee);
+    const employee = {
+      id: "user1",
+      name: "John",
+      surname: "Doe",
+      type: "Employee",
+      status: "active",
+    };
+    wrapper.vm.deleteItem(employee);
+    expect(wrapper.vm.dialogDelete).toBe(true);
+    expect(wrapper.vm.editedItem).toEqual(employee);
   });
 
   it("should not open delete dialog for inactive employee", () => {
@@ -85,23 +87,23 @@ describe("BusinessEmployeesListView", () => {
       surname: "Doe",
       type: "Employee",
       status: "inactive",
-  };
+    };
     wrapper.vm.deleteItem(employee);
     expect(wrapper.vm.dialogDelete).toBe(false);
   });
 
-    it("should open edit dialog for active employee", () => {
-      const employee = {
-        id: "user1",
-        name: "John",
-        surname: "Doe",
-        type: "Employee",
-        status: "active",
+  it("should open edit dialog for active employee", () => {
+    const employee = {
+      id: "user1",
+      name: "John",
+      surname: "Doe",
+      type: "Employee",
+      status: "active",
     };
-      wrapper.vm.editTypeItem(employee);
-      expect(wrapper.vm.dialogEdit).toBe(true);
-      expect(wrapper.vm.editedItem).toEqual(employee);
-    });
+    wrapper.vm.editTypeItem(employee);
+    expect(wrapper.vm.dialogEdit).toBe(true);
+    expect(wrapper.vm.editedItem).toEqual(employee);
+  });
 
   it("should not open edit dialog for inactive employee", () => {
     const employee = {
@@ -110,9 +112,8 @@ describe("BusinessEmployeesListView", () => {
       surname: "Doe",
       type: "Employee",
       status: "inactive",
-  };
+    };
     wrapper.vm.editTypeItem(employee);
     expect(wrapper.vm.dialogEdit).toBe(false);
   });
-
 });

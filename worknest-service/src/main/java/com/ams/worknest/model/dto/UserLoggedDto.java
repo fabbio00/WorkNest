@@ -1,6 +1,10 @@
 package com.ams.worknest.model.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 /**
  * Data transfer object for user login credentials.

@@ -5,7 +5,8 @@
       :headers="headers"
       :items="bookings"
       :sort-by="[{ key: 'surname', order: 'asc' }]"
-      style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3)">
+      style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3)"
+    >
       <template v-slot:top>
         <v-toolbar flat class="bg-blue-grey-lighten-3">
           <v-toolbar-title>Bookings</v-toolbar-title>
@@ -79,7 +80,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="showStartDateDialog = false">Cancel</v-btn>
+          <v-btn text color="primary" @click="showStartDateDialog = false"
+            >Cancel</v-btn
+          >
           <v-btn text color="primary" @click="confirmStartDate">OK</v-btn>
         </v-card-actions>
       </v-card>
@@ -93,7 +96,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="showEndDateDialog = false">Cancel</v-btn>
+          <v-btn text color="primary" @click="showEndDateDialog = false"
+            >Cancel</v-btn
+          >
           <v-btn text color="primary" @click="confirmEndDate">OK</v-btn>
         </v-card-actions>
       </v-card>
@@ -151,29 +156,28 @@ export default {
       { title: "Cost", key: "cost" },
     ],
     bookings: [],
-    searchName: '',
-    searchSurname: '',
+    searchName: "",
+    searchSurname: "",
     startDate: null,
     endDate: null,
     tempStartDate: null,
     tempEndDate: null,
-    formattedStartDate: '',
-    formattedEndDate: '',
+    formattedStartDate: "",
+    formattedEndDate: "",
     showStartDateDialog: false,
     showEndDateDialog: false,
   }),
 
   watch: {
-    searchName: 'initialize_table',
-    searchSurname: 'initialize_table',
+    searchName: "initialize_table",
+    searchSurname: "initialize_table",
   },
 
   mounted() {
     this.userId = localStorage.getItem("userId");
-    this.fetchCompanyId()
-      .then(() => {
-        this.initialize_table();
-      });
+    this.fetchCompanyId().then(() => {
+      this.initialize_table();
+    });
   },
 
   methods: {
@@ -201,14 +205,14 @@ export default {
      * Clears all filters and resets the bookings table.
      */
     clearFilters() {
-      this.searchName = '';
-      this.searchSurname = '';
+      this.searchName = "";
+      this.searchSurname = "";
       this.startDate = null;
       this.endDate = null;
       this.tempStartDate = null;
       this.tempEndDate = null;
-      this.formattedStartDate = '';
-      this.formattedEndDate = '';
+      this.formattedStartDate = "";
+      this.formattedEndDate = "";
       this.initialize_table();
     },
 
@@ -217,11 +221,12 @@ export default {
      * @returns {Promise} - Promise representing the completion of the fetch operation.
      */
     fetchCompanyId() {
-      return this.$ApiService.find_user_by_id(this.userId)
-        .then(response => {
+      return this.$ApiService
+        .find_user_by_id(this.userId)
+        .then((response) => {
           this.companyId = response.data.companyId;
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error fetching company ID:", error);
         });
     },
@@ -230,14 +235,15 @@ export default {
      * Initializes the table by fetching booking data and populating the bookings array.
      */
     initialize_table() {
-      this.$ApiService.get_list_by_company_booking(
-        this.companyId, 
-        this.searchName, 
-        this.searchSurname, 
-        this.formatDateForApi(this.startDate), 
-        this.formatDateForApi(this.endDate)
-      )
-        .then(response => {
+      this.$ApiService
+        .get_list_by_company_booking(
+          this.companyId,
+          this.searchName,
+          this.searchSurname,
+          this.formatDateForApi(this.startDate),
+          this.formatDateForApi(this.endDate),
+        )
+        .then((response) => {
           const bookings = response.data;
           console.log(bookings);
 
@@ -255,8 +261,11 @@ export default {
             cost: `${booking.workstationCostPerHour * 8}€`,
           }));
         })
-        .catch(error => {
-          console.error("Errore durante il recupero delle prenotazioni:", error);
+        .catch((error) => {
+          console.error(
+            "Errore durante il recupero delle prenotazioni:",
+            error,
+          );
         });
     },
 
@@ -266,10 +275,10 @@ export default {
      * @returns {string} - The formatted date string.
      */
     formatDate(dateString) {
-      if (!dateString) return '';
+      if (!dateString) return "";
       const date = new Date(dateString);
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
       return `${day}-${month}-${year}`;
     },
@@ -282,11 +291,11 @@ export default {
     formatDateForApi(date) {
       if (!date) return null;
       const d = new Date(date);
-      const month = '' + (d.getMonth() + 1);
-      const day = '' + d.getDate();
+      const month = "" + (d.getMonth() + 1);
+      const day = "" + d.getDate();
       const year = d.getFullYear();
 
-      return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
+      return [year, month.padStart(2, "0"), day.padStart(2, "0")].join("-");
     },
 
     /**
@@ -297,18 +306,17 @@ export default {
     getStatusColor(item) {
       const today = new Date().setHours(0, 0, 0, 0);
       const startDate = new Date(item.startDate).setHours(0, 0, 0, 0);
-      if (item.status === 'canceled') {
-        return 'red';
-      } else if (item.status === 'active' && today > startDate) {
-        return 'gray';
+      if (item.status === "canceled") {
+        return "red";
+      } else if (item.status === "active" && today > startDate) {
+        return "gray";
       } else {
-        return 'green';
+        return "green";
       }
     },
-  }
-}
+  },
+};
 </script>
-
 
 <style>
 .search-field {

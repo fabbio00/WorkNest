@@ -24,7 +24,7 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
       Book desk for your employee
     </p>
     <p
-      v-else-if = "bookingId"
+      v-else-if="bookingId"
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
@@ -37,7 +37,6 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
     >
       Book your desk
     </p>
-
   </div>
   <Transition
     enter-active-class="animate__animated animate__fadeIn"
@@ -217,7 +216,8 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                       </v-list-item-title>
                       <v-list-item-subtitle class="d-flex align-center">
                         <v-icon
-                          v-for="equip in item.value.split(', ')"
+                          v-for="(equip, index) in item.value.split(', ')"
+                          :key="index"
                           class="mr-2"
                           >{{ getEquipmentIcon(equip) }}</v-icon
                         >
@@ -640,7 +640,7 @@ export default {
   },
 
   mounted() {
-    if(this.employeeId) {
+    if (this.employeeId) {
       this.booking.userId = this.employeeId;
     } else {
       this.booking.userId = localStorage.getItem("userId");
@@ -698,13 +698,13 @@ export default {
      * Additionally, it highlights desks that are unavailable, such as those already booked or restricted
      * based on user permissions.
      */
-     findOccupiedDesks() {
+    findOccupiedDesks() {
       if (this.selectedDate !== null && this.selectedBuilding !== null) {
         this.chooseDeskAlertVisible = false;
         const date = this.formatDate(this.selectedDate);
 
         let userId = "";
-        if(this.employeeId) {
+        if (this.employeeId) {
           userId = this.employeeId;
         } else {
           userId = this.booking.userId;
@@ -716,7 +716,7 @@ export default {
             .map((ws) => ws.workStationId);
           this.isSvgVisible = true;
           occupiedDesks.data.forEach((ws) => {
-            if(ws.user.id === userId) {
+            if (ws.user.id === userId) {
               this.alertVisible = true;
               this.alertType = "error";
               this.alertText = "You already have a booking for this date!";
@@ -761,7 +761,7 @@ export default {
     createBooking() {
       let date = new Date(this.selectedDate);
       date.setDate(date.getDate() + 1);
-      let dateToSave = date.toISOString().replace('Z', '+00:00');
+      let dateToSave = date.toISOString().replace("Z", "+00:00");
       const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
       const newDate = dateToSave.replace(regexTime, "00:00:00.000");
 
@@ -772,7 +772,7 @@ export default {
 
       this.$ApiService
         .create_booking(this.booking)
-        .then((res) => {
+        .then(() => {
           this.alertVisible = true;
           this.alertType = "success";
           this.alertText = "Booking was successful!";
@@ -784,7 +784,7 @@ export default {
           }
 
           let userId = "";
-          if(this.employeeId) {
+          if (this.employeeId) {
             userId = this.employeeId;
           } else {
             userId = this.booking.userId;
@@ -808,7 +808,7 @@ export default {
 
                 this.$ApiService
                   .send_mail(emailData)
-                  .then((emailRes) => {})
+                  .then(() => {})
                   .catch((emailError) => {
                     console.error("Error sending email:", emailError);
                   });
@@ -818,7 +818,7 @@ export default {
               });
           });
         })
-        .catch((error) => {
+        .catch(() => {
           this.alertVisible = true;
           this.alertType = "error";
           this.alertText = "Something went wrong, please try again!";
@@ -835,7 +835,7 @@ export default {
     editBooking() {
       let date = new Date(this.selectedDate);
       date.setDate(date.getDate() + 1);
-      let dateToSave = date.toISOString().replace('Z', '+00:00');
+      let dateToSave = date.toISOString().replace("Z", "+00:00");
       const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
       const newDate = dateToSave.replace(regexTime, "00:00:00.000");
 
@@ -858,7 +858,7 @@ export default {
           }
 
           let userId = "";
-          if(this.employeeId) {
+          if (this.employeeId) {
             userId = this.employeeId;
           } else {
             userId = this.booking.userId;
@@ -891,7 +891,7 @@ export default {
               console.error("Error finding user:", userError);
             });
         })
-        .catch((error) => {
+        .catch(() => {
           this.alertVisible = true;
           this.alertType = "error";
           this.alertText = "Something went wrong, please try again!";
@@ -905,9 +905,9 @@ export default {
     goToRecap() {
       this.alertVisible = false;
       if (this.alertType == "success") {
-        if(this.employeeId){
+        if (this.employeeId) {
           this.$router.push("/businessBookingsList");
-        } else{
+        } else {
           this.$router.push("/bookingList");
         }
       }

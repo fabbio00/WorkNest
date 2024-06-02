@@ -52,6 +52,11 @@ Details of workstations that users can book.
 - `equipment`: Description of equipment provided.
 - `type`: Type of workstation.
 - `floor`: Floor number where the workstation is located.
+- `number_of_seats`: Number of seats available at the workstation.
+- `is_left_position`: Indicates if the workstation is in a left position.
+- `is_present_window`: Indicates if the workstation is near a window.
+- `building_id`: Reference to the building where the workstation is located.
+- `floor_id`: Reference to the floor where the workstation is located.
 
 ### `booking`
 Tracks booking records for workstations by users.
@@ -65,6 +70,14 @@ Tracks booking records for workstations by users.
 - `has_penalty`: Indicates if there was a penalty.
 - `user_id`: Reference to the user who made the booking.
 - `workstation_id`: Reference to the booked workstation.
+- `booking_business_id`: Reference to the business booking.
+
+### `booking_business`
+Captures business-related booking information.
+
+- `id`: Unique identifier (UUID) for the booking business.
+- `booking_date`: Date of the booking.
+- `user_id`: Reference to the user who made the booking.
 
 ### `economic_transaction`
 Records financial transactions, such as booking payments.
@@ -119,6 +132,24 @@ Used for managing support tickets submitted by users.
 - `user_id`: Reference to the reporting user.
 - `owner_user_id`: Reference to the user owning the ticket resolution.
 
+### `floor`
+Details of floors within buildings.
+
+- `id`: Unique identifier (UUID) for the floor.
+- `number_of_floor`: Number of current floor in the building.
+- `num_bathrooms`: Number of bathrooms on the floor.
+- `building_id`: Reference to the building where the floor is located.
+
+### `building`
+Stores information about buildings.
+
+- `id`: Unique identifier (UUID) for the building.
+- `name`: Name of the building.
+- `city`: City where the building is located.
+- `province`: Province where the building is located.
+- `address`: Street address of the building.
+- `street_number`: Street number of the building.
+
 ## Design Decisions
 
 - **UUIDs for IDs**: The use of UUIDs as primary keys
@@ -132,4 +163,4 @@ Used for managing support tickets submitted by users.
 - **Flyway Migrations**: All schema changes should be managed through Flyway migrations. Each change should be a new migration script with a version higher than the last.
 - **Backups**: Regular backups of the database are recommended. Implement automated backups according to the data recovery requirements.
 
-![Database Schema](./db-schemas/db-schema_v1.1.png)
+![Database Schema](./db-schemas/db-schema_v2.3.png)

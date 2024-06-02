@@ -294,7 +294,7 @@ export default {
           ...this.user,
           password: encryptedPassword,
         };
-        this.$ApiService.create_user(userWithEncryptedPassword).then((res) => {
+        this.$ApiService.create_user(userWithEncryptedPassword).then(() => {
           this.$router.push("/login");
         });
       }

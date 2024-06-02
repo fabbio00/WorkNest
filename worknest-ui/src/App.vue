@@ -27,7 +27,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type !== 'ADMINISTRATOR'"
               prepend-icon="mdi-calendar-plus-outline"
-              title=""
+              title="Make a booking"
               @click="redirect('/booking')"
             >
               <template v-slot:title>
@@ -37,7 +37,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type !== 'ADMINISTRATOR'"
               prepend-icon="mdi-calendar-month-outline"
-              title=""
+              title="View your bookings"
               @click="redirect('/bookingList')"
             >
               <template v-slot:title>
@@ -48,7 +48,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'ADMINISTRATOR'"
               prepend-icon="mdi-office-building-plus"
-              title=""
+              title="Add new company"
               @click="redirect('/company-registration')"
             >
               <template v-slot:title>
@@ -59,7 +59,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'ADMINISTRATOR'"
               prepend-icon="mdi-calendar-multiple"
-              title=""
+              title="View all bookings"
               @click="redirect('/')"
             >
               <template v-slot:title>
@@ -70,7 +70,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'ADMINISTRATOR'"
               prepend-icon="mdi-domain"
-              title=""
+              title="View all companies"
               @click="redirect('/')"
             >
               <template v-slot:title>
@@ -81,7 +81,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'ADMINISTRATOR'"
               prepend-icon="mdi-account-multiple"
-              title=""
+              title="View all users"
               @click="redirect('/')"
             >
               <template v-slot:title>
@@ -92,7 +92,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'BUSINESS'"
               prepend-icon="mdi-calendar-multiple"
-              title=""
+              title="View all bookings"
               @click="redirect('/businessBookingsList')"
             >
               <template v-slot:title>
@@ -103,7 +103,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'BUSINESS'"
               prepend-icon="mdi-account-multiple"
-              title=""
+              title="View all employees"
               @click="redirect('/businessEmployeesList')"
             >
               <template v-slot:title>
@@ -114,7 +114,7 @@ import { RouterView } from "vue-router";
             <v-list-item
               v-if="user.type === 'BUSINESS'"
               prepend-icon="mdi-table"
-              title=""
+              title="Make a booking for employees"
               @click="redirect('/businessBookingDesks')"
             >
               <template v-slot:title>
@@ -122,6 +122,16 @@ import { RouterView } from "vue-router";
               </template>
             </v-list-item>
 
+            <v-list-item
+              v-if="user.type === 'BUSINESS'"
+              prepend-icon="mdi-table-cog"
+              title="Manage business bookings"
+              @click="redirect('/businessBookingsListDelete')"
+            >
+              <template v-slot:title>
+                <p class="font-weight-black">Manage business bookings</p>
+              </template>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
       </v-layout>
@@ -133,54 +143,17 @@ import { RouterView } from "vue-router";
 </template>
 
 <script>
-/**
- * The root component for a Vue application.
- * It sets up the main layout of the application, including a header with a sidebar navigation drawer
- * and a main content area where router views are displayed.
- *
- * Features:
- * <ol>
- * <li>A persistent navigation drawer for navigating different parts of the application.</li>
- * <li>Automatic redirection to the login page if the user is not authenticated.</li>
- * <li>Dynamic display of the sidebar based on the route's metadata requiring authentication.</li>
- * </ol>
- *
- * @vue-data {boolean} showSidebar - Controls the visibility of the sidebar based on user authentication.
- * @vue-data {string} current - Represents the current active route.
- * @vue-data {Object} user - Stores the current user's details.
- *
- * Computed properties:
- * @vue-computed {boolean} showSidebar - Determines if the sidebar should be displayed based on the current route's metadata.
- *
- * Lifecycle hooks:
- * @vue-mount {Function} beforeMount - Checks user authentication status and fetches user details before the component mounts.
- * @vue-update {Function} beforeUpdate - Checks the user's session expiration and redirects to the login page if necessary.
- *
- * Methods:
- * @vue-method {Function} redirect - Redirects the user to a specified route.
- *
- * Usage:
- * <App/>
- * This component should be used as the root component in a Vue application that requires user authentication and navigation.
- * It depends on Vue Router for routing and Vuetify for UI components.
- */
-
 export default {
   data() {
     return {
-      // showSidebar: Determines whether the navigation drawer should be visible.
-      // It is false by default and set based on route meta in beforeMount hook.
       showSideBar: false,
-      // current: Tracks the current route that the user navigated to.
       current: "",
-      // user: Stores information about the currently authenticated user.
       user: null,
+      isExpanded: false,
     };
   },
 
   async beforeMount() {
-    // Here we check if the route requires authentication and set the sidebar visibility.
-    // We also make an API call to fetch user details.
     this.showSideBar = this.$route.meta.requiresAuth === true ? true : false;
     const userId = localStorage.getItem("userId");
     if (userId) {
@@ -191,8 +164,6 @@ export default {
   },
 
   beforeUpdate() {
-    // This hook checks if the user's session has expired and, if so,
-    // redirects them to the login page and clears the local storage.
     const expirationTime = localStorage.getItem("expriationTime");
     if (!expirationTime || Date.now() > parseInt(expirationTime)) {
       this.$router.replace("/login");
@@ -201,21 +172,12 @@ export default {
   },
 
   computed: {
-    /**
-     * Computed property that determines if the sidebar should be shown
-     * based on the authentication requirement from the current route's meta.
-     */
     showSidebar() {
       return this.$route.meta.requiresAuth;
     },
   },
 
   methods: {
-    /**
-     * Method to redirect the user to a different route programmatically.
-     * It updates the current route and uses Vue Router to change the view.
-     * @param {string} url - The route path to redirect to.
-     */
     redirect(url) {
       this.current = url;
       this.$router.push(url);
@@ -223,3 +185,19 @@ export default {
   },
 };
 </script>
+
+<style>
+
+.v-list-item .font-weight-black {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.v-list-item:hover .font-weight-black {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+}
+
+</style>

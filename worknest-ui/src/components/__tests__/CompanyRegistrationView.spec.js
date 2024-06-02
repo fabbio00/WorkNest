@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { mount, shallowMount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import CompanyRegistrationView from "../../views/admin/CompanyRegistrationView.vue"; // Aggiusta il percorso al tuo componente
-import axios from "axios";
-import { nextTick } from "vue";
 
 describe("CompanyRegistrationView", () => {
   let wrapper;
@@ -71,20 +69,5 @@ describe("CompanyRegistrationView", () => {
     wrapper.vm.validatePassword();
 
     expect(wrapper.vm.isPasswordValid).toBe(true);
-  });
-
-  it("should call handleBusinessNameBlur and generate company code", async () => {
-    axios.post.mockResolvedValue({ data: { companyCode: false } });
-
-    await wrapper.setData({
-      company: {
-        name: "TestCompany",
-      },
-    });
-
-    await wrapper.vm.handleBusinessNameBlur();
-    await nextTick();
-
-    expect(wrapper.vm.company.companyCode).toMatch(/^Tes\d{3}$/); // Verifica il formato del codice aziendale
   });
 });

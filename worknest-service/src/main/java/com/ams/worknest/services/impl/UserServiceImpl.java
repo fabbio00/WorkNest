@@ -19,7 +19,10 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Implementation of the {@link UserService} interface.

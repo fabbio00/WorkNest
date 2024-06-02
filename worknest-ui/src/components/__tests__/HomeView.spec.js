@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { shallowMount } from "@vue/test-utils";
 import HomeView from "../../views/HomeView.vue";
-import { mount } from "@vue/test-utils";
 
 describe("HomeView", () => {
   let wrapper;
