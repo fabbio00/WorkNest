@@ -46,7 +46,7 @@ spring_validate_style:
     - mvn $MAVEN_OPTS checkstyle:checkstyle
   artifacts:
     paths:
-      - target/checkstyle-result.xml
+      - target/checkstyle.xml
     when: on_failure
 
 spring_test:
@@ -83,7 +83,7 @@ spring_verify_spotbugs:
     - mvn $MAVEN_OPTS spotbugs:check
   artifacts:
     paths:
-      - target/spotbugsXml.xml
+      - target/spotbugs-include.xml
     when: on_failure
 
 docs_spring:
@@ -148,7 +148,7 @@ lint_vue:
 docs_vue:
   stage: generate_documentation
   image: node:21.7.1
-  needs: [build_fe]
+  needs: [lint_vue]
   script:
     - cd worknest-ui
     - npm run docs
