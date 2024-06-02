@@ -43,11 +43,12 @@ spring_validate_style:
   needs: [compile]
   image: maven:3.9.6
   script:
+    - cd worknest-service
     - echo "Executing checkstyle..."
     - mvn $MAVEN_OPTS checkstyle:checkstyle
   artifacts:
     paths:
-      - target/checkstyle.xml
+      - target/checkstyle-result.xml
     when: on_failure
 
 spring_test:
@@ -81,6 +82,7 @@ spring_verify_spotbugs:
   needs: [package_be]
   image: maven:3.9.6
   script:
+    - cd worknest-service
     - echo "Executing spotbugs..."
     - mvn $MAVEN_OPTS spotbugs:check
   artifacts:
