@@ -1,12 +1,16 @@
 package com.ams.worknest.services.impl;
 
+import com.ams.worknest.model.dto.BookingBusinessCreateDto;
 import com.ams.worknest.model.dto.BookingBusinessListDeleteDto;
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.BookingBusiness;
+import com.ams.worknest.model.entities.User;
+import com.ams.worknest.model.resources.BookingBusinessCreateResource;
 import com.ams.worknest.model.resources.BookingBusinessResource;
 import com.ams.worknest.model.resources.BookingDeleteResource;
 import com.ams.worknest.model.resources.BookingFindByCompanyResource;
 import com.ams.worknest.model.resources.UserResource;
+
 import com.ams.worknest.repositories.BookingBusinessRepository;
 import com.ams.worknest.repositories.UserRepository;
 import com.ams.worknest.services.BookingBusinessService;
@@ -31,6 +35,32 @@ public class BookingBusinessServiceImpl implements BookingBusinessService {
 
     private static final String BUSINESS_BOOKING_NOT_FOUND = "Business booking not found!";
     private static final String BUSINESS_USER_NOT_FOUND = "User not found!";
+
+
+    /**
+     * Creates a booking business based on the provided booking business data transfer object.
+     *
+     * @param bookingBusinessCreateDto the booking business data transfer object containing booking business details
+     * @return the created booking business as a resource
+     * @throws RuntimeException if the user associated with the booking business is not found
+     */
+    @Override
+    public BookingBusinessCreateResource createBookingBusiness(BookingBusinessCreateDto bookingBusinessCreateDto) {
+        User user = userRepository.findById(bookingBusinessCreateDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        BookingBusiness bookingBusiness = BookingBusiness.builder()
+                .bookingDate(bookingBusinessCreateDto.getBookingDate())
+                .user(user)
+                .build();
+
+        BookingBusiness bookingBusinessSaved = bookingBusinessRepository.save(bookingBusiness);
+
+        return BookingBusinessCreateResource.builder()
+                .bookingBusinessId(bookingBusinessSaved.getId())
+                .build();
+    }
+
 
     /**
      * Finds bookings by business booking id and optionally by workstation type.

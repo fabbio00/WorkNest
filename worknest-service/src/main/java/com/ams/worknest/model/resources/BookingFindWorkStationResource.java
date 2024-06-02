@@ -1,5 +1,6 @@
 package com.ams.worknest.model.resources;
 
+import com.ams.worknest.model.entities.User;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,5 @@ public class BookingFindWorkStationResource {
      */
     private String status;
 
+    private User user;
 }

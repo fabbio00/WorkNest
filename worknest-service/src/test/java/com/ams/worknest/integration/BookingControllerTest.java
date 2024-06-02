@@ -3,9 +3,18 @@ package com.ams.worknest.integration;
 import com.ams.worknest.BaseMvcTest;
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
+import com.ams.worknest.model.entities.Booking;
+import com.ams.worknest.model.entities.User;
+import com.ams.worknest.model.entities.WorkStation;
+import com.ams.worknest.repositories.BookingRepository;
+import com.ams.worknest.repositories.UserRepository;
+import com.ams.worknest.repositories.WorkStationRepository;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ams.worknest.model.entities.*;
 import com.ams.worknest.repositories.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -15,22 +24,25 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.Arrays;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
@@ -181,6 +193,47 @@ class BookingControllerTest extends BaseMvcTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray());
     }
+
+    @Test
+    void saveBooking() throws Exception {
+        BookingCreateDto bookingCreateDto = bookingDtoCreation2();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String bookingCreateDtosJson = mapper.writeValueAsString(bookingCreateDto);
+
+        mvc.perform(
+                        post(BOOKING_ENDPOINT)
+                                .content(bookingCreateDtosJson)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void saveMultipleBookings() throws Exception {
+        List<BookingCreateDto> bookingCreateDtos = Arrays.asList(bookingDtoCreation2(), bookingDtoCreation2());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String bookingCreateDtosJson = mapper.writeValueAsString(bookingCreateDtos);
+
+        mvc.perform(
+                        post(BOOKING_ENDPOINT + "/save-list")
+                                .content(bookingCreateDtosJson)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+
 
     @Test
     void getBookingsByCompanyId_NonMatchingEmployeeNameSurname() throws Exception {
@@ -375,6 +428,48 @@ class BookingControllerTest extends BaseMvcTest {
     }
 
     private BookingCreateDto bookingDtoCreation() {
+        String str = "2024-04-06T10:15:30+01:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter);
+
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("prova.user@gmail.com")
+                .password("password")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("basic_user")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .build();
+
+        user = userRepository.saveAndFlush(user);
+        createdUserIds.add(user.getId());
+
+        WorkStation workStation = WorkStation.builder()
+                .name("WorkStation1")
+                .pricePerH(3.0)
+                .equipment("monitor")
+                .type("desk")
+                .build();
+
+        workStation = workStationRepository.saveAndFlush(workStation);
+        createdWorkStationIds.add(workStation.getId());
+
+        return BookingCreateDto.builder()
+                .startDate(zonedDateTime)
+                .endDate(zonedDateTime)
+                .status("active")
+                .hasPenalty(false)
+                .userId(user.getId())
+                .workStationId(workStation.getId())
+                .build();
+    }
+
+    BookingCreateDto bookingDtoCreation2(){
+
         String str = "2024-04-06T10:15:30+01:00";
         DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter);

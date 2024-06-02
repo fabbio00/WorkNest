@@ -31,6 +31,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/booking/employee/:employeeId",
+      name: "create_booking_for_employee",
+      props: (route) => ({ employeeId: route.params.employeeId }),
+      component: () => import("../views/bookings/BookingWorkStationView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
       path: "/booking",
       name: "booking",
       component: () => import("../views/bookings/BookingWorkStationView.vue"),
@@ -58,7 +68,8 @@ const router = createRouter({
     {
       path: "/businessEmployeesList",
       name: "businessEmployeesList",
-      component: () => import("../views/business/employees/BusinessEmployeesListView.vue"),
+      component: () =>
+        import("../views/business/employees/BusinessEmployeesListView.vue"),
       meta: {
         requiresAuth: true,
         role: "BUSINESS",
@@ -67,7 +78,8 @@ const router = createRouter({
     {
       path: "/businessBookingsList",
       name: "businessBookingsList",
-      component: () => import("../views/business/bookings/BusinessBookingsListView.vue"),
+      component: () =>
+        import("../views/business/bookings/BusinessBookingsListView.vue"),
       meta: {
         requiresAuth: true,
         role: "BUSINESS",
@@ -76,7 +88,20 @@ const router = createRouter({
     {
       path: "/businessBookingsListDelete",
       name: "businessBookingsListDelete",
-      component: () => import("../views/business/bookings/BusinessBookingsDeleteView.vue"),
+      component: () =>
+        import("../views/business/bookings/BusinessBookingsDeleteView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
+      path: "/businessBookingDesks",
+      name: "businessBookingDesks",
+      component: () =>
+        import(
+          "../views/business/bookings/BusinessBookingWorkStationsView.vue"
+        ),
       meta: {
         requiresAuth: true,
         role: "BUSINESS",
@@ -105,7 +130,10 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.role) {
     try {
       const res = await apiServices.find_user_by_id(user);
-      if (to.meta.role === "ADMINISTRATOR" && res.data.type !== "ADMINISTRATOR") {
+      if (
+        to.meta.role === "ADMINISTRATOR" &&
+        res.data.type !== "ADMINISTRATOR"
+      ) {
         // User does not have the required role, redirect to login
         alert("You are not an admin!");
         return next("/login");

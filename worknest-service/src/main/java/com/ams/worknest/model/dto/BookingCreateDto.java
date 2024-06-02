@@ -51,4 +51,9 @@ public class BookingCreateDto {
      */
     private UUID workStationId;
 
+    /**
+     * The unique identifier of the booking-business associated with the booking.
+     */
+    private UUID bookingBusinessId;
+
 }

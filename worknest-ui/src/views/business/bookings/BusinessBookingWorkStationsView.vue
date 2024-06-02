@@ -17,25 +17,18 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
       align="center"
     />
     <p
-      v-if="employeeId"
+      v-if="!bookingId"
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
-      Book desk for your employee
-    </p>
-    <p
-      v-else-if="bookingId"
-      class="text-h3 d-inline font-italic ml-5"
-      style="vertical-align: middle"
-    >
-      Modify your booking
+      Book desks for your team
     </p>
     <p
       v-else
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
-      Book your desk
+      Modify your booking
     </p>
   </div>
   <Transition
@@ -49,7 +42,7 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
           <v-row>
             <v-col>
               <v-date-picker
-                v-model="selectedDate"
+                v-model="this.selectedDate"
                 :min="new Date(new Date().setDate(new Date().getDate() - 1))"
                 no-title
                 scrollable
@@ -216,8 +209,8 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                       </v-list-item-title>
                       <v-list-item-subtitle class="d-flex align-center">
                         <v-icon
-                          v-for="(equip, index) in item.value.split(', ')"
-                          :key="index"
+                        v-for="(equip, index) in item.value.split(', ')"
+                          :key="index"  
                           class="mr-2"
                           >{{ getEquipmentIcon(equip) }}</v-icon
                         >
@@ -412,7 +405,11 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
     >
       <Transition enter-active-class="animate__animated animate__fadeIn">
         <div v-if="deskDetails && isSvgVisible" class="desk-details">
-          <v-card elevation="5" class="rounded-lg">
+          <v-card
+            elevation="5"
+            class="rounded-lg"
+            v-if="deskDetails.type !== 'meeting_room'"
+          >
             <v-card-title class="headline">Desk Details</v-card-title>
             <v-card-text>
               <v-list>
@@ -460,13 +457,102 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                     >
                   </v-list-item-content>
                 </v-list-item>
+
+                <v-list-item>
+                  <p>Assign to:<br /><br /></p>
+                  <v-select
+                    :items="employeeList"
+                    item-value="user.id"
+                    item-title="fullName"
+                    label="User"
+                    v-model="booking.userId"
+                    :disabled="isAddClicked"
+                    variant="outlined"
+                  >
+                  </v-select>
+                </v-list-item>
               </v-list>
             </v-card-text>
             <v-card-actions>
-              <v-btn v-if="!bookingId" color="primary" @click="createBooking"
-                >Book</v-btn
+              <v-btn
+                color="primary"
+                @click="assignBookingToUser"
+                :disabled="!booking.userId"
+                >Add</v-btn
               >
-              <v-btn v-else color="primary" @click="editBooking">Modify</v-btn>
+            </v-card-actions>
+          </v-card>
+          <v-card elevation="5" v-else>
+            <v-card-title class="headline">Meeting Room Details</v-card-title>
+            <v-card-text>
+              <v-list>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title
+                      ><strong>Name room:</strong>
+                      {{ deskDetails.name }}</v-list-item-title
+                    >
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title
+                      ><strong>Number of seats:</strong>
+                      {{ deskDetails.numberOfSeats }}</v-list-item-title
+                    >
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title
+                      ><strong>Floor:</strong>
+                      {{ selectedFloor }}</v-list-item-title
+                    >
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title
+                      ><strong>Price:</strong>
+                      {{ deskDetails.pricePerH * 8 }}€</v-list-item-title
+                    >
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item>
+                  <p>Assign to:<br /><br /></p>
+                  <v-select
+                    class="mt-4"
+                    clearable
+                    label="Select"
+                    :items="employeeList"
+                    item-value="user"
+                    item-title="fullName"
+                    v-model="meetingRoomList"
+                    chips
+                    multiple
+                    variant="outlined"
+                    :disabled="
+                      isAddClicked ||
+                      (savedUsersMeetingRoomList.find(
+                        (desk) => desk.meeting_room_name === deskDetails.name,
+                      ) &&
+                        savedUsersMeetingRoomList.find(
+                          (desk) => desk.meeting_room_name === deskDetails.name,
+                        ).users.length >= deskDetails.numberOfSeats)
+                    "
+                  >
+                  </v-select>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="primary"
+                @click="assignMeetingRoomToUsers"
+                :disabled="meetingRoomList.length == 0 || isAddClicked"
+                >Add</v-btn
+              >
             </v-card-actions>
           </v-card>
         </div>
@@ -485,15 +571,21 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
           min-width="500"
           max-width="800"
           :title="
-            alertType === 'success' ? 'Confirmed booking' : 'Error booking'
+            alertType === 'success'
+              ? 'Confirmed booking'
+              : alertType === 'warning'
+                ? 'Warning!'
+                : 'Error booking'
           "
+          :text="alertText"
+          style="white-space: pre-line"
         >
-          <v-divider></v-divider>
+          <v-divider v-if="alertType !== 'warning'"></v-divider>
 
-          <div class="py-12 text-center">
+          <div class="py-12 text-center" v-if="alertType !== 'warning'">
             <v-icon
               class="mb-6"
-              size="128"
+              size="100"
               :color="alertType === 'success' ? 'success' : 'error'"
             >
               {{
@@ -502,10 +594,6 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                   : "mdi-alert-outline"
               }}
             </v-icon>
-
-            <div class="text-h4 font-weight-bold" style="word-wrap: break-word">
-              {{ alertText }}
-            </div>
           </div>
 
           <v-divider></v-divider>
@@ -526,57 +614,94 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
       </v-dialog>
     </v-fade-transition>
   </v-row>
+
+  <v-row class="d-flex justify-center align-center">
+    <div class="mx-16" v-if="isSvgVisible && bookingList.length > 0">
+      <v-data-table
+        class="mx-auto my-16"
+        :headers="headers"
+        :items="bookingList"
+        style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3)"
+      >
+        <template v-slot:top>
+          <v-toolbar flat class="bg-blue-grey-lighten-3">
+            <v-toolbar-title>Bookings</v-toolbar-title>
+            <v-divider class="mx-4" inset vertical></v-divider>
+            <v-spacer></v-spacer>
+            <v-dialog v-model="dialog" max-width="500px">
+              <template v-slot:activator>
+                <v-btn class="mb-2" color="primary" dark @click="createBooking">
+                  Confirm booking
+                </v-btn>
+              </template>
+            </v-dialog>
+          </v-toolbar>
+        </template>
+
+        <template v-slot:item.actions="{ item }">
+          <v-icon
+            size="small"
+            @click="deleteItem(item)"
+            :class="{
+              disabled: item.status !== 'inactive' ? false : true,
+            }"
+          >
+            mdi-delete
+          </v-icon>
+        </template>
+      </v-data-table>
+    </div>
+  </v-row>
 </template>
 
 <script>
 /**
- * Vue component for managing desk booking.
- * This component allows users to view available desks, select a desk for booking,
- * and create a new booking.
+ * Vue component for managing desk and meeting room bookings.
+ * This component allows users to view available desks, select a desk or meeting room for booking,
+ * and create new bookings for individual employees or groups.
  *
  * Features:
  * - Displays a date picker to select the booking start date.
  * - Highlights available desks and marks occupied desks.
  * - Allows users to select a desk and view its details before booking.
- * - Submits booking details to create a new booking.
+ * - Submits booking details to create new bookings.
+ * - Manages bookings for meeting rooms with multiple users.
+ * - Shows alerts for booking conflicts or errors.
  *
  * Data properties:
  * @vue-data {boolean} isSvgVisible - Flag to determine SVG visibility.
+ * @vue-data {boolean} isAddClicked - Flag to determine if the 'Add' button has been clicked.
+ * @vue-data {Array} savedUsersMeetingRoomList - List of users already assigned to the selected meeting room.
+ * @vue-data {Array} meetingRoomList - List of users to be assigned to the selected meeting room.
+ * @vue-data {Array} selectedEmployees - List of employees selected for booking.
+ * @vue-data {Array} employeeWithBooking - List of employees with existing bookings.
+ * @vue-data {Array} employeeList - List of employees available for booking.
+ * @vue-data {Array} bookingList - List of bookings created in the current session.
+ * @vue-data {boolean} dataLoaded - Flag to determine if the data has been fully loaded.
+ * @vue-data {string} companyId - ID of the user's company.
+ * @vue-data {string} userId - ID of the current user.
+ * @vue-data {Date|null} selectedDate - The date selected for booking.
  * @vue-data {Object} booking - Contains details for the booking, including startDate, endDate, status, hasPenalty, workStationId, and userId.
+ * @vue-data {Array} headers - Column headers for displaying employee bookings in a table.
  * @vue-data {Object|null} deskDetails - Details of the selected desk.
  * @vue-data {boolean} alertVisible - Flag to control the visibility of alerts.
  * @vue-data {string} alertText - Text content for the alert.
- * @vue-data {string} alertType - Type of alert.
- * @vue-data {Object} modifyBooking - Contains details for modifying an existing booking, including startDate, endDate, and workStationId.
- * @vue-data {Array} buildings - List of buildings available for booking.
- * @vue-data {Object|null} selectedBuilding - Currently selected building object.
- * @vue-data {Boolean} chooseDeskAlertVisible - Flag to show/hide the alert to prompt user selection.
- * @vue-data {Array} occupiedDesks - List of desks that are already booked and not available.
- * @vue-data {String} userType - User type derived from user session to tailor available options.
- * @vue-data {Array} equipmentItems - List of available equipment types for desks.
- * @vue-data {Number} selectedFloor - Currently selected floor number.
- * @vue-data {Object|null} selectedEquipment - Currently selected equipment options.
- * @vue-data {Boolean|null} wantsWindow - User preference for a desk near a window.
- *
- * Props:
- * @vue-prop {String} bookingId - The ID of the booking to modify.
+ * @vue-data {string} alertType - Type of alert (e.g., "success", "error").
  *
  * Methods:
- * @vue-method {Function} formatDate - Formats date to YYYY-MM-DD format.
- * @vue-method {Function} formatDate2 - Formats date to ISO 8601 format.
- * @vue-method {Function} findOccupiedDesks - Finds available desks for booking and updates UI accordingly.
- * @vue-method {Function} bookingDesk - Handles desk booking event, retrieves desk details.
+ * @vue-method {Function} formatDate - Formats a date to 'YYYY-MM-DD' format.
+ * @vue-method {Function} findOccupiedDesks - Finds available desks for booking and updates the UI.
+ * @vue-method {Function} bookingDesk - Handles the event when a user selects a desk for booking.
  * @vue-method {Function} createBooking - Creates a new booking with the provided details.
- * @vue-method {Function} editBooking - Modifies an existing booking with the provided details.
- * @vue-method {Function} goToRecap - Redirects the user to the booking list page after successful booking or modification.
- * @vue-method getBuildings - Fetches the list of available buildings from the server.
- * @vue-method countWorkstations - Counts desks and meeting rooms available on the selected floor.
- * @vue-method getEquipmentIcon - Returns the appropriate icon class for given equipment type.
+ * @vue-method {Function} goToRecap - Redirects the user to the booking list page after successful booking.
+ * @vue-method {Function} assignBookingToUser - Assigns a booking to a user and updates the booking list.
+ * @vue-method {Function} assignMeetingRoomToUsers - Assigns a meeting room to multiple users and updates the booking list.
+ * @vue-method {Function} deleteItem - Deletes a booking from the booking list.
  *
  * Usage:
- * This component is used within a Vue application to manage desk booking functionality.
- * It integrates with backend APIs to retrieve desk availability and create new bookings.
- * @subcategory views / bookings
+ * This component is used within a Vue application to manage desk and meeting room booking functionality.
+ * It integrates with backend APIs to retrieve desk availability, create new bookings, and manage bookings for multiple users.
+ * @subcategory views/company
  */
 
 export default {
@@ -584,14 +709,21 @@ export default {
     bookingId: {
       type: String,
     },
-    employeeId: {
-      type: String,
-    },
   },
 
   data() {
     return {
       isSvgVisible: false,
+      isAddClicked: false,
+      savedUsersMeetingRoomList: [],
+      meetingRoomList: [],
+      selectedEmployees: [],
+      employeeWithBooking: [],
+      employeeList: [],
+      bookingList: [],
+      dataLoaded: false,
+      companyId: "",
+      userId: "",
       selectedDate: null,
       booking: {
         startDate: "",
@@ -601,16 +733,20 @@ export default {
         workStationId: "",
         userId: "",
       },
-      modifyBooking: {
-        startDate: "",
-        endDate: "",
-        workStationId: "",
-      },
+
+      headers: [
+        { title: "Surname", key: "user.surname" },
+        { title: "Name", key: "user.name" },
+        { title: "User type", key: "user.type" },
+        { title: "WorkStation", key: "workstation.name" },
+        { title: "Actions", key: "actions", sortable: false },
+      ],
+
       deskDetails: null,
       alertVisible: false,
       alertText: "",
       alertType: "success",
-      alreadyBooked: false,
+
       buildings: [],
       selectedBuilding: null,
       chooseDeskAlertVisible: false,
@@ -640,55 +776,29 @@ export default {
   },
 
   mounted() {
-    if (this.employeeId) {
-      this.booking.userId = this.employeeId;
-    } else {
-      this.booking.userId = localStorage.getItem("userId");
-    }
-    this.$ApiService.find_user_by_id(this.booking.userId).then((res) => {
+    this.userId = localStorage.getItem("userId");
+    this.$ApiService.find_user_by_id(this.userId).then((res) => {
       this.userType = res.data.type;
+      this.companyId = res.data.companyId;
     });
     this.getBuildings();
   },
+
   methods: {
     /**
-     * Formats date to YYYY-MM-DD format.
+     * Formats date to 'YYYY-MM-DD' format.
      * This method takes a Date object and returns a string representation of the date
      * in the format 'YYYY-MM-DD'. This format is commonly used for sending dates to APIs
      * or displaying them in input fields.
      * @param {Date} date - The date to format.
      * @returns {string} - The formatted date string.
      */
-
     formatDate(date) {
       const year = date.getFullYear();
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const day = date.getDate().toString().padStart(2, "0");
 
       return `${year}-${month}-${day}`;
-    },
-
-    /**
-     * Formats date to ISO 8601 format.
-     * This method takes a string representation of a date and formats it to conform to the
-     * ISO 8601 standard. The resulting string includes the date and time in 'YYYY-MM-DDTHH:MM:SSZ' format,
-     * suitable for APIs that expect dates in ISO format.
-     * @param {string} dateString - The date string to format.
-     * @returns {string} - The formatted ISO 8601 date string.
-     */
-    formatDate2(dateString) {
-      const date = new Date(dateString);
-
-      const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const day = date.getDate().toString().padStart(2, "0");
-      const hours = date.getHours().toString().padStart(2, "0");
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      const seconds = date.getSeconds().toString().padStart(2, "0");
-
-      const isoString = `${year}-${month.padStart(2, "0")}-${parseInt(day).toString().padStart(2, "0")}T${hours}:${minutes}:${seconds}+00:00`;
-
-      return isoString;
     },
 
     /**
@@ -700,31 +810,44 @@ export default {
      */
     findOccupiedDesks() {
       if (this.selectedDate !== null && this.selectedBuilding !== null) {
+        this.deskDetails = null;
         this.chooseDeskAlertVisible = false;
+        this.bookingList = [];
+        this.employeeWithBooking = [];
+        this.employeeList = [];
         const date = this.formatDate(this.selectedDate);
-
-        let userId = "";
-        if (this.employeeId) {
-          userId = this.employeeId;
-        } else {
-          userId = this.booking.userId;
-        }
 
         this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
           this.occupiedDesks = occupiedDesks.data
             .filter((ws) => ws.status != "canceled")
             .map((ws) => ws.workStationId);
           this.isSvgVisible = true;
-          occupiedDesks.data.forEach((ws) => {
-            if (ws.user.id === userId) {
-              this.alertVisible = true;
-              this.alertType = "error";
-              this.alertText = "You already have a booking for this date!";
-              this.alreadyBooked = true;
+
+          occupiedDesks.data.forEach((wsOccupied) => {
+            if (
+              wsOccupied.status !== "canceled" &&
+              wsOccupied.user.company.id == this.companyId
+            ) {
+              this.employeeWithBooking.push({
+                user: wsOccupied.user,
+              });
             }
           });
+          this.dataLoaded = true;
+          if (this.employeeWithBooking.length > 0) {
+            this.alertVisible = true;
+            this.alertType = "warning";
+            let employeeNames = this.employeeWithBooking
+              .map(
+                (employee) =>
+                  `• ${employee.user.name} ${employee.user.surname}${employee.user.id === this.userId ? " (You)" : ""}`,
+              )
+              .join("\n");
+            this.alertText =
+              "It is not possible to reserve a desk for the following users because they alredy have a booking for the current day:\n\n" +
+              employeeNames;
+          }
         });
-        this.countWorkstations();
       } else {
         this.chooseDeskAlertVisible = true;
       }
@@ -738,7 +861,9 @@ export default {
      * @param {Event} event - The click event triggered when selecting a desk.
      */
     bookingDesk(deskId) {
+      this.isAddClicked = false;
       const workStationId = deskId;
+      this.employeeList = [];
 
       this.$ApiService
         .find_desk_by_id(workStationId)
@@ -749,6 +874,27 @@ export default {
         .catch((deskError) => {
           console.error("Error finding desk:", deskError);
         });
+
+      this.$ApiService.get_list_employee(this.companyId).then((res) => {
+        res.data.forEach((employee) => {
+          if (
+            employee.status !== "inactive" &&
+            !this.employeeWithBooking.some((e) => e.user.id === employee.id)
+          ) {
+            if (employee.id != this.userId) {
+              this.employeeList.push({
+                user: employee,
+                fullName: `${employee.surname} ${employee.name}`,
+              });
+            } else {
+              this.employeeList.push({
+                user: employee,
+                fullName: `${employee.surname} ${employee.name} (You)`,
+              });
+            }
+          }
+        });
+      });
     },
 
     /**
@@ -756,165 +902,322 @@ export default {
      * This method is called when the user confirms the booking after selecting a desk.
      * It sends the booking details to the backend API to create a new booking record.
      * Upon successful booking creation, it displays a success message to the user.
-     * If an error occurs during the booking process, it displays an error message instead.
+     * If an error occurs during the booking process, an error message is displayed.
      */
     createBooking() {
-      let date = new Date(this.selectedDate);
-      date.setDate(date.getDate() + 1);
-      let dateToSave = date.toISOString().replace("Z", "+00:00");
-      const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
-      const newDate = dateToSave.replace(regexTime, "00:00:00.000");
+      let bookingListOnly = this.bookingList.map((item) => item.booking);
+      let mailingList = this.bookingList.map((item) => item.user.email);
+      let bookingBusiness = {
+        bookingDate: this.booking.startDate,
+        userId: this.userId,
+      };
 
-      this.booking.startDate = newDate;
-      this.booking.endDate = this.booking.startDate;
-      this.booking.status = "active";
-      const wsId = this.booking.workStationId;
+      let bookingBusinessId = "";
 
       this.$ApiService
-        .create_booking(this.booking)
-        .then(() => {
-          this.alertVisible = true;
-          this.alertType = "success";
-          this.alertText = "Booking was successful!";
-
-          const deskElement = document.querySelector(`[data-id="${wsId}"]`);
-          if (deskElement) {
-            deskElement.setAttribute("fill", "red");
-            deskElement.style.pointerEvents = "none";
-          }
-
-          let userId = "";
-          if (this.employeeId) {
-            userId = this.employeeId;
-          } else {
-            userId = this.booking.userId;
-          }
-          const bookingDate = new Date(this.booking.startDate);
-          const formattedDate = bookingDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-
-          this.$ApiService.find_desk_by_id(wsId).then((res) => {
-            this.$ApiService
-              .find_user_by_id(userId)
-              .then((u) => {
-                const emailData = {
-                  to: u.data.email,
-                  subject: "Desk Booking Confirmation",
-                  text: `Your booking for the ${res.data.name} has been successfully confirmed for ${formattedDate}.`,
-                };
-
-                this.$ApiService
-                  .send_mail(emailData)
-                  .then(() => {})
-                  .catch((emailError) => {
-                    console.error("Error sending email:", emailError);
-                  });
-              })
-              .catch((userError) => {
-                console.error("Error finding user:", userError);
-              });
-          });
-        })
-        .catch(() => {
-          this.alertVisible = true;
-          this.alertType = "error";
-          this.alertText = "Something went wrong, please try again!";
-        });
-    },
-
-    /**
-     * Modifies an existing booking with the provided details.
-     * This method is called when the user confirms the modification of a booking.
-     * It sends the modified booking details to the backend API to update the booking record.
-     * Upon successful modification, it displays a success message to the user.
-     * If an error occurs during the modification process, it displays an error message instead.
-     */
-    editBooking() {
-      let date = new Date(this.selectedDate);
-      date.setDate(date.getDate() + 1);
-      let dateToSave = date.toISOString().replace("Z", "+00:00");
-      const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
-      const newDate = dateToSave.replace(regexTime, "00:00:00.000");
-
-      this.modifyBooking.startDate = newDate;
-      this.modifyBooking.endDate = this.modifyBooking.startDate;
-      this.modifyBooking.workStationId = this.booking.workStationId;
-      const wsId = this.modifyBooking.workStationId;
-
-      this.$ApiService
-        .modify_booking(this.bookingId, this.modifyBooking)
+        .create_booking_business(bookingBusiness)
         .then((res) => {
-          this.alertVisible = true;
-          this.alertType = "success";
-          this.alertText = "Modify was successful!";
-
-          const deskElement = document.querySelector(`[data-id="${wsId}"]`);
-          if (deskElement) {
-            deskElement.setAttribute("fill", "red");
-            deskElement.style.pointerEvents = "none";
-          }
-
-          let userId = "";
-          if (this.employeeId) {
-            userId = this.employeeId;
-          } else {
-            userId = this.booking.userId;
-          }
-          const bookingDate = new Date(this.booking.startDate);
-          const formattedDate = bookingDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
+          bookingBusinessId = res.data.bookingBusinessId;
+          bookingListOnly.forEach((booking) => {
+            booking.bookingBusinessId = bookingBusinessId;
           });
-          this.$ApiService
-            .find_user_by_id(userId)
-            .then((u) => {
-              const emailData = {
-                to: u.data.email,
-                subject: "Edit Booking Confirmed",
-                text: `Your booking for the ${res.data.workStation.name} has been successfully updated for ${formattedDate}.`,
-              };
 
+          this.$ApiService
+            .save_booking_list(bookingListOnly)
+            .then((res) => {
+              console.log(res);
+              this.alertType = "success";
+              this.alertText = "Booking confirmed successfully!";
+              this.alertVisible = true;
+
+              bookingListOnly.forEach((booking) => {
+                const deskElement = document.querySelector(
+                  `[data-id="${booking.workStationId}"]`,
+                );
+                if (deskElement) {
+                  deskElement.setAttribute("fill", "red");
+                  deskElement.style.pointerEvents = "none";
+                }
+              });
+
+              let messages = this.bookingList.map((item) => {
+                return `${item.user.name} ${item.user.surname} -> ${item.workstation.name}`;
+              });
+              let messageString = messages.join("\n");
+              let bookingDate = this.formatDate(this.selectedDate);
+              console.log(bookingDate);
+
+              const emailData = {
+                to: mailingList,
+                subject: "New booking",
+                text:
+                  `A reservation has been created for your team for ${bookingDate}.\n Below is the list of users with the available desk: \n` +
+                  messageString,
+              };
+              console.log(emailData);
               this.$ApiService
-                .send_mail(emailData)
-                .then((emailRes) => {
-                  console.log(emailRes.data);
+                .send_mail_list(emailData)
+                .then((res) => {
+                  console.log(res);
                 })
-                .catch((emailError) => {
-                  console.error("Error sending email:", emailError);
+                .catch((error) => {
+                  console.log(error);
                 });
             })
-            .catch((userError) => {
-              console.error("Error finding user:", userError);
+            .catch((error) => {
+              this.alertVisible = true;
+              this.alertType = "error";
+              this.alertText = "Something went wrong, please try again!";
+              console.log(error);
             });
         })
-        .catch(() => {
-          this.alertVisible = true;
-          this.alertType = "error";
-          this.alertText = "Something went wrong, please try again!";
+        .catch((error) => {
+          console.log(error);
         });
     },
+
     /**
-     * Redirects the user to the bookings recap page after a successful booking or booking modification.
-     * This method checks the type of alert ('success' or 'error') and redirects based on the result of the booking process.
-     * Upon successful booking actions, the user is navigated to a page where all their bookings are listed.
+     * Redirects to the booking recap page.
+     * This method is called after a successful booking creation. It hides the alert and redirects the user to the booking list page.
      */
     goToRecap() {
       this.alertVisible = false;
       if (this.alertType == "success") {
-        if (this.employeeId) {
-          this.$router.push("/businessBookingsList");
-        } else {
-          this.$router.push("/bookingList");
-        }
-      }
-      if (this.alreadyBooked) {
-        window.location.reload();
+        this.$router.push("/businessBookingsList");
       }
     },
+
+    /**
+     * Assigns a booking to a user.
+     * This method assigns the booking details to the selected user and updates the booking list.
+     * It ensures that the desk is marked as booked and prevents further selections until the booking is modified or canceled.
+     */
+    assignBookingToUser() {
+      this.isAddClicked = true;
+
+      let date = new Date(this.selectedDate);
+      date.setDate(date.getDate() + 1);
+      let dateToSave = date.toISOString().replace("Z", "+00:00");
+      const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+      const newData = dateToSave.replace(regexTime, "00:00:00.000");
+
+      this.booking.startDate = newData;
+      this.booking.endDate = this.booking.startDate;
+      this.booking.status = "active";
+
+      console.log(this.booking.startDate);
+
+      let desk = document.querySelector(
+        `[data-id="${this.booking.workStationId}"]`,
+      );
+      if (desk) {
+        desk.setAttribute("fill", "gray");
+        desk.style.pointerEvents = "auto";
+        desk.style.cursor = "pointer";
+      }
+
+      const newBooking = Object.assign({}, this.booking);
+      const index = this.bookingList.findIndex(
+        (booking) => booking.booking.workStationId === newBooking.workStationId,
+      );
+      let removedBooking;
+      if (index !== -1) {
+        removedBooking = this.bookingList.splice(index, 1);
+      }
+
+      if (removedBooking) {
+        this.employeeWithBooking = this.employeeWithBooking.filter(
+          (employee) => employee.user.id !== removedBooking[0].booking.userId,
+        );
+      }
+
+      this.$ApiService.find_user_by_id(this.booking.userId).then((u) => {
+        this.employeeWithBooking.push({
+          user: u.data,
+        });
+        this.bookingList.push({
+          booking: newBooking,
+          user: u.data,
+          workstation: this.deskDetails,
+        });
+      });
+
+      this.booking.userId = null;
+    },
+
+    /**
+     * Assigns a meeting room to multiple users.
+     * This method assigns the selected meeting room to multiple users and updates the booking list accordingly.
+     * It checks if the number of users does not exceed the number of available seats in the meeting room.
+     * If there are too many users selected, it displays an error message.
+     */
+    assignMeetingRoomToUsers() {
+      let users = this.savedUsersMeetingRoomList.find(
+        (room) => room.meeting_room_name === this.deskDetails.name,
+      )
+        ? this.savedUsersMeetingRoomList.find(
+            (room) => room.meeting_room_name === this.deskDetails.name,
+          ).users
+        : [];
+      let usersInMeetingRoom = users.length + this.meetingRoomList.length;
+      console.log(users.length, this.meetingRoomList.length);
+      if (usersInMeetingRoom > this.deskDetails.numberOfSeats) {
+        this.alertVisible = true;
+        this.alertType = "error";
+        this.alertText =
+          "You have selected more users than the number of seats available!";
+        return;
+      } else {
+        this.isAddClicked = true;
+
+        let date = new Date(this.selectedDate);
+        date.setDate(date.getDate() + 1);
+        let dateToSave = date.toISOString().replace("Z", "+00:00");
+        const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+        const newData = dateToSave.replace(regexTime, "00:00:00.000");
+
+        this.booking.startDate = newData;
+        this.booking.endDate = this.booking.startDate;
+        this.booking.status = "active";
+
+        let desk = document.querySelector(
+          `[data-id="${this.booking.workStationId}"]`,
+        );
+        if (desk) {
+          desk.setAttribute("fill", "gray");
+          desk.style.pointerEvents = "auto";
+          desk.style.cursor = "pointer";
+        }
+
+        this.meetingRoomList.forEach((user) => {
+          const newBooking = Object.assign({}, this.booking);
+          newBooking.userId = user.id;
+          const index = this.bookingList.findIndex(
+            (booking) => booking.user.id === newBooking.userId,
+          );
+          let removedBooking;
+          if (index !== -1) {
+            removedBooking = this.bookingList.splice(index, 1);
+          }
+
+          if (removedBooking) {
+            this.employeeWithBooking = this.employeeWithBooking.filter(
+              (employee) =>
+                employee.user.id !== removedBooking[0].booking.userId,
+            );
+          }
+
+          this.$ApiService.find_user_by_id(user.id).then((u) => {
+            this.employeeWithBooking.push({
+              user: u.data,
+            });
+            this.bookingList.push({
+              booking: newBooking,
+              user: u.data,
+              workstation: this.deskDetails,
+            });
+          });
+        });
+        //this.savedUsersMeetingRoomList = this.savedUsersMeetingRoomList.concat(this.meetingRoomList.filter(user => !this.savedUsersMeetingRoomList.some(u => u.id === user.id)));
+        let room = this.savedUsersMeetingRoomList.find(
+          (room) => room.meeting_room_name === this.deskDetails.name,
+        );
+        if (room) {
+          room.users.push(...this.meetingRoomList);
+        } else {
+          this.savedUsersMeetingRoomList.push({
+            meeting_room_name: this.deskDetails.name,
+            users: this.meetingRoomList,
+          });
+        }
+
+        this.meetingRoomList = [];
+      }
+    },
+
+    /**
+     * Deletes a booking.
+     * This method removes the selected booking from the booking list and updates the list of employees with existing bookings.
+     * It also updates the UI to mark the desk as available if there are no more bookings for it.
+     * @param {Object} item - The booking item to delete.
+     */
+    deleteItem(item) {
+      let deskName = item.workstation.name;
+      let usersInMeetingRoom = [];
+      this.employeeList = [];
+
+      let index = this.bookingList.findIndex(
+        (booking) => booking.user.id === item.user.id,
+      );
+      this.bookingList.splice(index, 1);
+
+      index = this.employeeWithBooking.findIndex(
+        (employee) => employee.user.id === item.booking.userId,
+      );
+      this.employeeWithBooking.splice(index, 1);
+
+      if (item.workstation.type === "meeting_room") {
+        index = this.meetingRoomList.findIndex(
+          (user) => user.id === item.booking.userId,
+        );
+        this.meetingRoomList.splice(index, 1);
+
+        usersInMeetingRoom = this.savedUsersMeetingRoomList.find(
+          (room) => room.meeting_room_name === deskName,
+        ).users;
+        index = usersInMeetingRoom.findIndex(
+          (user) => user.id === item.booking.userId,
+        );
+        usersInMeetingRoom.splice(index, 1);
+        let room = this.savedUsersMeetingRoomList.find(
+          (room) => room.meeting_room_name === deskName,
+        );
+        if (room) {
+          room.users = usersInMeetingRoom;
+        }
+      }
+
+      let desk = document.querySelector(
+        `[data-id="${item.booking.workStationId}"]`,
+      );
+      if (
+        desk &&
+        item.workstation.type === "meeting_room" &&
+        usersInMeetingRoom.length === 0
+      ) {
+        desk.setAttribute("fill", "green");
+        desk.style.pointerEvents = "auto";
+        desk.style.cursor = "pointer";
+      } else if (desk && item.workstation.type !== "meeting_room") {
+        desk.setAttribute("fill", "green");
+        desk.style.pointerEvents = "auto";
+        desk.style.cursor = "pointer";
+      }
+
+      this.$ApiService.get_list_employee(this.companyId).then((res) => {
+        res.data.forEach((employee) => {
+          if (
+            employee.status !== "inactive" &&
+            !this.employeeWithBooking.some((e) => e.user.id === employee.id)
+          ) {
+            if (employee.id != this.userId) {
+              this.employeeList.push({
+                user: employee,
+                fullName: `${employee.surname} ${employee.name}`,
+              });
+            } else {
+              this.employeeList.push({
+                user: employee,
+                fullName: `${employee.surname} ${employee.name} (You)`,
+              });
+            }
+          }
+        });
+      });
+      console.log(this.employeeList);
+      console.log(this.savedUsersMeetingRoomList);
+    },
+
     /**
      * Fetches and stores the list of available buildings for booking from the server.
      * Each building includes floors and each floor has its specific details such as available desks and rooms,

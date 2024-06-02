@@ -109,7 +109,7 @@ import { required, email, minLength, maxLength } from "@vuelidate/validators";
             @click:append-inner="passwordVisible = !passwordVisible"
             :error-messages="
               v$.user.password.$invalid
-                ? 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and be at least 8 characters long'
+                ? 'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character and be at least 8 characters long'
                 : []
             "
             @blur="v$.user.password.$touch"
@@ -258,6 +258,7 @@ export default {
         taxCode: "",
         companyId: "",
         type: "PRIVATE",
+        status: "active",
         barrerFreeFlag: false,
       },
       companyCode: "",
@@ -283,8 +284,9 @@ export default {
      * Upon successful creation, the user is redirected to the login page.
      * If the password validation fails, it alerts the user.
      */
-    createUser() {
-      if (this.isPasswordValid) {
+    async createUser() {
+      const isFormValid = await this.v$.$validate();
+      if (this.isPasswordValid && isFormValid) {
         let encryptedPassword = UserServices.encryptPassword(
           this.user.password,
         );
@@ -292,11 +294,9 @@ export default {
           ...this.user,
           password: encryptedPassword,
         };
-        this.$ApiService.create_user(userWithEncryptedPassword).then((res) => {
+        this.$ApiService.create_user(userWithEncryptedPassword).then(() => {
           this.$router.push("/login");
         });
-      } else {
-        alert("Passwords do not match!");
       }
     },
   },

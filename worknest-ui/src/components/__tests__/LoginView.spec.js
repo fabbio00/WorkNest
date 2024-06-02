@@ -52,7 +52,9 @@ describe("LoginView", () => {
     window.location = { href: "/login" };
 
     mockLogin.mockResolvedValue({ data: { id: "user_id" } });
-    mockFindUserById.mockResolvedValue({ data: { type: "USER", status: "active" } });
+    mockFindUserById.mockResolvedValue({
+      data: { type: "USER", status: "active" },
+    });
 
     wrapper.setData({ email: "test@example.com", password: "correctpassword" });
 
@@ -76,9 +78,14 @@ describe("LoginView", () => {
     window.location = { href: "/login" };
 
     mockLogin.mockResolvedValue({ data: { id: "admin_id" } });
-    mockFindUserById.mockResolvedValue({ data: { type: "ADMINISTRATOR", status: "active" } });
+    mockFindUserById.mockResolvedValue({
+      data: { type: "ADMINISTRATOR", status: "active" },
+    });
 
-    wrapper.setData({ email: "admin@example.com", password: "correctpassword" });
+    wrapper.setData({
+      email: "admin@example.com",
+      password: "correctpassword",
+    });
 
     await wrapper.find("v-btn").trigger("click");
     await wrapper.vm.$nextTick();
@@ -100,9 +107,14 @@ describe("LoginView", () => {
     window.location = { href: "/login" };
 
     mockLogin.mockResolvedValue({ data: { id: "business_id" } });
-    mockFindUserById.mockResolvedValue({ data: { type: "BUSINESS", status: "active" } });
+    mockFindUserById.mockResolvedValue({
+      data: { type: "BUSINESS", status: "active" },
+    });
 
-    wrapper.setData({ email: "business@example.com", password: "correctpassword" });
+    wrapper.setData({
+      email: "business@example.com",
+      password: "correctpassword",
+    });
 
     await wrapper.find("v-btn").trigger("click");
     await wrapper.vm.$nextTick();

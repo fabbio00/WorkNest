@@ -1,7 +1,9 @@
 package com.ams.worknest.services;
 
+import com.ams.worknest.model.dto.BookingBusinessCreateDto;
 import com.ams.worknest.model.dto.BookingBusinessListDeleteDto;
 import com.ams.worknest.model.entities.BookingBusiness;
+import com.ams.worknest.model.resources.BookingBusinessCreateResource;
 import com.ams.worknest.model.resources.BookingBusinessResource;
 import com.ams.worknest.model.resources.BookingDeleteResource;
 import com.ams.worknest.model.resources.BookingFindByCompanyResource;
@@ -15,6 +17,14 @@ import java.util.UUID;
  * This interface handles the business logic for the BookingBusiness entity.
  */
 public interface BookingBusinessService {
+
+    /**
+     * Creates a new booking business.
+     *
+     * @param bookingBusinessCreateDto The details of the booking business to be created.
+     * @return A resource representing the created booking business.
+     */
+    BookingBusinessCreateResource createBookingBusiness(BookingBusinessCreateDto bookingBusinessCreateDto);
 
     /**
      * Finds bookings by user id in booking business and optionally by workstation type.
@@ -32,7 +42,6 @@ public interface BookingBusinessService {
      * @return A list of BookingDeleteResource representing the result of the deletion.
      */
     List<BookingDeleteResource> cancelBookingsByIds(BookingBusinessListDeleteDto bookingIds);
-
 
     /**
      * Finds a booking business by its unique identifier.

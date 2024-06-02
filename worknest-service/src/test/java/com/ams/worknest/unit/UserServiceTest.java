@@ -79,6 +79,14 @@ class UserServiceTest {
     @DisplayName("Get user by id successfully")
     @Test
      void getUserByIdSuccessfully() {
+        Company company = Company.builder()
+                .name("Test Company")
+                .email("test@company.com")
+                .vatCode("IT12345678901")
+                .phone("1234567890")
+                .companyCode("TEST123")
+                .build();
+
         UUID userId = UUID.randomUUID();
 
         User user = new User();
@@ -94,6 +102,7 @@ class UserServiceTest {
         user.setBarrierFreeFlag(true);
         user.setCompany(new Company());
         user.setRegistrationDate(ZonedDateTime.now());
+        user.setCompany(company);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 

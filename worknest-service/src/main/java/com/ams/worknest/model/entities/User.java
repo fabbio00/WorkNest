@@ -1,12 +1,13 @@
 package com.ams.worknest.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Builder;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -102,7 +104,8 @@ public class User {
     /**
      * The business booking associated with the user.
      */
-    @OneToOne(mappedBy = "user")
-    private BookingBusiness bookingBusiness;
+    @JsonBackReference
+    @OneToMany(mappedBy = "user")
+    private List<BookingBusiness> bookingBusiness;
 
 }

@@ -1,6 +1,8 @@
 package com.ams.worknest.controllers;
 
+import com.ams.worknest.model.dto.BookingBusinessCreateDto;
 import com.ams.worknest.model.dto.BookingBusinessListDeleteDto;
+import com.ams.worknest.model.resources.BookingBusinessCreateResource;
 import com.ams.worknest.model.resources.BookingBusinessResource;
 import com.ams.worknest.model.resources.BookingDeleteResource;
 import com.ams.worknest.model.resources.BookingFindByCompanyResource;
@@ -10,14 +12,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,11 +33,26 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/business-bookings", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/booking-business", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class BookingBusinessController {
 
+    /**
+     * The booking business service.
+     */
     private final BookingBusinessService bookingBusinessService;
+
+    /**
+     * Create a booking business with the provided booking business details.
+     *
+     * @param bookingBusinessCreateDto the booking business data transfer object containing the details of the booking business to be created
+     * @return a booking business resource indicating the success of the operation
+     */
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookingBusinessCreateResource bookingBusinessCreation(@RequestBody BookingBusinessCreateDto bookingBusinessCreateDto){
+        return bookingBusinessService.createBookingBusiness(bookingBusinessCreateDto);
+    }
 
     /**
      * Retrieves a list of bookings associated with a specific user in booking business and optionally filters them by workstation type.

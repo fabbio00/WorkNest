@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { mount, shallowMount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import CompanyRegistrationView from "../../views/admin/CompanyRegistrationView.vue"; // Aggiusta il percorso al tuo componente
-import axios from "axios";
-import { nextTick } from "vue";
 
 describe("CompanyRegistrationView", () => {
   let wrapper;
@@ -72,5 +70,4 @@ describe("CompanyRegistrationView", () => {
 
     expect(wrapper.vm.isPasswordValid).toBe(true);
   });
-
 });

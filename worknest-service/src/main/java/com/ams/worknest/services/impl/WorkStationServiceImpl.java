@@ -57,6 +57,7 @@ public class WorkStationServiceImpl implements WorkStationService {
                 .equipment(workStation.getEquipment())
                 .type(workStation.getType())
                 .name(workStation.getName())
+                .numberOfSeats(workStation.getNumberOfSeats())
                 .cx(workStation.getCx() != null ? workStation.getCx() : 0.0f)
                 .cy(workStation.getCy() != null ? workStation.getCy() : 0.0f)
                 .isLeftPosition(workStation.getIsLeftPosition() != null && workStation.getIsLeftPosition())

@@ -1,5 +1,6 @@
 package com.ams.worknest.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -94,7 +95,7 @@ public class Booking {
      * The business booking associated with this booking.
      */
     @ManyToOne
-    @JsonManagedReference
+    @JsonBackReference
     @JoinColumn(name = "booking_business_id")
     private BookingBusiness bookingBusiness;
 

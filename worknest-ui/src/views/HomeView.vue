@@ -1,14 +1,27 @@
 <template>
-    <v-card class="mx-auto pa-12 pb-8" style="margin-top: 10%;" elevation="12" max-width="800" rounded="lg" align="center">
-        <p class="text-h2">Hi
-  <span class="font-weight-bold">{{ user.name }} {{ user.surname }}</span>! </p>
-        <p v-if="user.type === 'ADMINISTRATOR'" class="text-h5 font-italic">Welcome admin</p>
-        <p v-else-if="user.type === 'BUSINESS'" class="text-h5 font-italic">Welcome business user</p>
-        <p v-else class="text-h5 font-italic">Welcome to your productivity hub</p>
-        <Transition enter-active-class="animate__animated animate__zoomIn" appear>
-            <img class="mt-5" style="max-height: 225px" src="/worknest-logo.png"/>
-        </Transition>
-    </v-card>
+  <v-card
+    class="mx-auto pa-12 pb-8"
+    style="margin-top: 10%"
+    elevation="12"
+    max-width="800"
+    rounded="lg"
+    align="center"
+  >
+    <p class="text-h2">
+      Hi <span class="font-weight-bold">{{ user.name }} {{ user.surname }}</span
+      >!
+    </p>
+    <p v-if="user.type === 'ADMINISTRATOR'" class="text-h5 font-italic">
+      Welcome admin
+    </p>
+    <p v-else-if="user.type === 'BUSINESS'" class="text-h5 font-italic">
+      Welcome business user
+    </p>
+    <p v-else class="text-h5 font-italic">Welcome to your productivity hub</p>
+    <Transition enter-active-class="animate__animated animate__zoomIn" appear>
+      <img class="mt-5" style="max-height: 225px" src="/worknest-logo.png" />
+    </Transition>
+  </v-card>
 </template>
 
 <script>

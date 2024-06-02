@@ -349,6 +349,7 @@ export default {
         password: "",
         taxCode: "",
         companyCode: "",
+        status: "active",
         type: "BUSINESS",
         barrerFreeFlag: false,
       },
@@ -386,7 +387,8 @@ export default {
         let isUnique = false;
         while (!isUnique) {
           const code =
-            this.company.name.slice(0, 3) + Math.floor(Math.random() * 1000);
+            this.company.name.slice(0, 3) +
+            String(Math.floor(Math.random() * 1000)).padStart(3, "0");
           isUnique = await isCompanyCodeUnique(code);
           if (isUnique) {
             this.company.companyCode = code;
@@ -413,7 +415,7 @@ export default {
         .then((res) => {
           this.createBusinessUser(res.data.id);
         })
-        .catch((error) => {
+        .catch(() => {
           this.alertVisible = true;
           this.alertType = "error";
           this.alertText = "Something went wrong, please try again!";
@@ -453,7 +455,7 @@ export default {
                 console.error("Error sending email:", emailError);
               });
           })
-          .catch((error) => {
+          .catch(() => {
             this.alertVisible = true;
             this.alertType = "error";
             this.alertText = "Something went wrong, please try again!";

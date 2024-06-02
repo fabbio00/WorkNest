@@ -1,10 +1,13 @@
 package com.ams.worknest.integration;
 
 import com.ams.worknest.BaseMvcTest;
+import com.ams.worknest.model.dto.BookingBusinessCreateDto;
 import com.ams.worknest.model.dto.BookingBusinessListDeleteDto;
 import com.ams.worknest.model.entities.*;
 import com.ams.worknest.repositories.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
@@ -54,7 +56,7 @@ class BookingBusinessControllerTest extends BaseMvcTest {
     @Autowired
     private BookingBusinessRepository bookingBusinessRepository;
 
-    private static final String BOOKING_BUSINESS_ENDPOINT = "/business-bookings";
+    private static final String BOOKING_BUSINESS_ENDPOINT = "/booking-business";
 
     private final List<UUID> createdBookingIds = new ArrayList<>();
     private final List<UUID> createdUserIds = new ArrayList<>();
@@ -260,7 +262,24 @@ class BookingBusinessControllerTest extends BaseMvcTest {
     }
 
 
+    @Test
+    void saveBusinessBooking() throws Exception {
+        BookingBusinessCreateDto bookingBusinessCreateDto = bookingBusinessDtoCreation();
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String bookingCreateDtosJson = mapper.writeValueAsString(bookingBusinessCreateDto);
+
+        mvc.perform(
+                        post(BOOKING_BUSINESS_ENDPOINT)
+                                .content(bookingCreateDtosJson)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
 
 
     private BookingBusiness savedBusinessBookingTemplate() {
@@ -301,6 +320,50 @@ class BookingBusinessControllerTest extends BaseMvcTest {
         createdBookingBusinessIds.add(bookingBusiness.getId());
 
         return bookingBusiness;
+    }
+
+
+    BookingBusiness savedBookingBusiness() {
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("prova22.user@gmail.com")
+                .password("password")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("basic_user")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .build();
+        userRepository.save(user);
+
+        BookingBusiness savedBookingBusiness = BookingBusiness.builder()
+                .bookingDate(ZonedDateTime.now())
+                .user(user)
+                .build();
+        return bookingBusinessRepository.save(savedBookingBusiness);
+    }
+
+    BookingBusinessCreateDto bookingBusinessDtoCreation() {
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("prova.user@gmail.com")
+                .password("password")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("basic_user")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .build();
+        userRepository.save(user);
+
+        return BookingBusinessCreateDto.builder()
+                .bookingDate(ZonedDateTime.now())
+                .userId(user.getId())
+                .build();
     }
 
     private Booking savedBookingTemplate() {

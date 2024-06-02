@@ -49,7 +49,7 @@
           </v-dialog>
         </v-toolbar>
       </template>
-      <template v-slot:item.actions="{ item }">
+      <template #item.actions="{ item }">
         <v-icon
           class="me-2"
           size="small"
@@ -81,7 +81,7 @@
         </v-icon>
       </template>
 
-      <template v-slot:item.startDate="{ item }">
+      <template #item.startDate="{ item }">
         <v-icon
           class="me-2"
           size="small"
@@ -107,7 +107,7 @@
         </v-icon>
         {{ item.startDate }}
       </template>
-      <template v-slot:item.status="{ item }">
+      <template #item.status="{ item }">
         <v-chip
           :color="
             item.status == 'canceled'
