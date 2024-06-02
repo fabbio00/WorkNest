@@ -41,6 +41,7 @@ compile:
 spring_validate_style:
   stage: validate_style
   needs: [compile]
+  image: maven:3.9.6
   script:
     - echo "Executing checkstyle..."
     - mvn $MAVEN_OPTS checkstyle:checkstyle
@@ -78,6 +79,7 @@ package_be:
 spring_verify_spotbugs:
   stage: lint
   needs: [package_be]
+  image: maven:3.9.6
   script:
     - echo "Executing spotbugs..."
     - mvn $MAVEN_OPTS spotbugs:check
