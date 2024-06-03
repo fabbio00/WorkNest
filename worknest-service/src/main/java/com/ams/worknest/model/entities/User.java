@@ -1,13 +1,29 @@
 package com.ams.worknest.model.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Entity representing a user in the Worknest system.
+ * This class is used to store user data in the database.
  */
 @Entity
 @Getter
@@ -19,68 +35,77 @@ import java.util.UUID;
 public class User {
 
     /**
-     * Unique identifier for the user.
+     * The unique identifier of the user.
      */
     @Id
     @GeneratedValue(generator = "uuid")
     private UUID id;
 
     /**
-     * First name of the user.
+     * The first name of the user.
      */
     private String name;
 
     /**
-     * Last name of the user.
+     * The last name of the user.
      */
     private String surname;
 
     /**
-     * Username of the user.
+     * The username of the user.
      */
     private String username;
 
     /**
-     * Email address of the user.
+     * The email address of the user.
      */
     private String email;
 
     /**
-     * The encrypted password for the user.
-     * It is stored in a hashed format for security reasons.
+     * The encrypted password of the user.
      */
     private String password;
 
     /**
-     * Tax code of the user.
+     * The tax code of the user.
      */
     @Column(name = "tax_code")
     private String taxCode;
 
     /**
-     * Type of the user, indicating their role within the system.
-     * - Private: An individual user with personal access.
-     * - Employee: A standard business or company user.
-     * - Business: A business user with additional privileges, like managing or booking for others.
-     * - Administrator: A user with full administrative access to the entire Worknest system.
+     * The type of the user, indicating their role within the system.
      */
     private String type;
 
     /**
-     * Flag indicating whether the user requires barrier-free access.
+     * The flag indicating whether the user requires barrier-free access.
      */
     @Column(name = "barrier_free_flag")
     private boolean barrierFreeFlag;
 
     /**
-     * Date and time when the user registered.
+     * The date and time when the user registered.
      */
     private ZonedDateTime registrationDate;
 
     /**
-     * Current status of the user.
-     * Can be 'active' or 'inactive'.
+     * The current status of the user.
      */
     private String status;
+
+    /**
+     * The company associated with the user.
+     */
+    @JsonManagedReference
+    @ManyToOne()
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    /**
+     * The business booking associated with the user.
+     */
+    @JsonBackReference
+    @OneToMany(mappedBy = "user")
+    private List<BookingBusiness> bookingBusiness;
 
 }

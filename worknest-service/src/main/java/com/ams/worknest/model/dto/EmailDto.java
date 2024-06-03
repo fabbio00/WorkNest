@@ -1,6 +1,10 @@
 package com.ams.worknest.model.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 /**
  * Data Transfer Object (DTO) for email details.
@@ -26,4 +30,5 @@ public class EmailDto {
      * The text content of the email.
      */
     private String text;
+
 }

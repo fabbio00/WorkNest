@@ -1,6 +1,10 @@
 package com.ams.worknest.model.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -46,5 +50,10 @@ public class BookingCreateDto {
      * The unique identifier of the workstation associated with the booking.
      */
     private UUID workStationId;
+
+    /**
+     * The unique identifier of the booking-business associated with the booking.
+     */
+    private UUID bookingBusinessId;
 
 }

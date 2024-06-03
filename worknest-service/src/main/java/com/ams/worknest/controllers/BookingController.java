@@ -2,25 +2,39 @@ package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.BookingCreateDto;
 import com.ams.worknest.model.dto.BookingEditDto;
-import com.ams.worknest.model.resources.*;
+import com.ams.worknest.model.resources.BookingCreateResource;
+import com.ams.worknest.model.resources.BookingDeleteResource;
+import com.ams.worknest.model.resources.BookingEditResource;
+import com.ams.worknest.model.resources.BookingFindResource;
+import com.ams.worknest.model.resources.BookingFindWorkStationResource;
+import com.ams.worknest.model.resources.BookingFindByCompanyResource;
+import com.ams.worknest.model.resources.BookingFindByUserResource;
+
 import com.ams.worknest.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-
 /**
  * Controller for managing bookings.
  * Provides endpoints for creating and retrieving booking details.
  */
-
 @Slf4j
 @RestController
 @RequestMapping(value = "/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,7 +66,6 @@ public class BookingController {
     public BookingFindResource bookingFindById(@PathVariable("bookingId") UUID bookingId){
         return bookingService.findBookingById(bookingId);
     }
-
 
     /**
      * Retrieve bookings for a specific date.
@@ -103,6 +116,54 @@ public class BookingController {
     @ResponseStatus(HttpStatus.OK)
     public BookingEditResource bookingEdit(@PathVariable("bookingId") UUID bookingId, @RequestBody BookingEditDto bookingEditDto){
         return bookingService.editBooking(bookingId, bookingEditDto);
+    }
+
+    /**
+     * Retrieves a list of bookings associated with a specific company.
+     *
+     * @param companyId the UUID of the company whose bookings are to be retrieved
+     * @param employeeName the name of the employee (optional)
+     * @param employeeSurname the surname of the employee (optional)
+     * @param startDate the start date for the booking period (optional)
+     * @param endDate the end date for the booking period (optional)
+     * @return a list of booking resources associated with the specified company
+     */
+    @GetMapping("/list_by_company/{companyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingFindByCompanyResource> getBookingsByCompanyId(
+            @PathVariable("companyId") UUID companyId,
+            @RequestParam(value = "employeeName", required = false) String employeeName,
+            @RequestParam(value = "employeeSurname", required = false) String employeeSurname,
+            @RequestParam(value = "startDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname, startDate, endDate);
+    }
+
+    /**
+     * Saves a list of bookings.
+     * This endpoint accepts a list of booking creation DTOs, processes them to create multiple bookings,
+     * and returns a list of resources representing the created bookings.
+     *
+     * @param bookingCreateDtos A list of {@link BookingCreateDto} objects containing the details for each booking to be created.
+     * @return A list of {@link BookingCreateResource} objects representing the created bookings.
+     */
+    @PostMapping("/save-list")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<BookingCreateResource> saveBookings(@RequestBody List<BookingCreateDto> bookingCreateDtos){
+        return bookingService.saveBookings(bookingCreateDtos);
+    }
+
+    /**
+     * Deletes all bookings associated with a specific booking business.
+     *
+     * @param bookingBusinessId the UUID of the booking business whose bookings are to be deleted
+     * @return a list of booking resources representing the deleted bookings
+     */
+    @DeleteMapping("/delete_by_booking_business/{bookingBusinessId}")
+    public List<BookingDeleteResource> bookingDeleteByBookingBusinessId(@PathVariable("bookingBusinessId") UUID bookingBusinessId){
+        return bookingService.deleteBookingByBookingBusinessId(bookingBusinessId);
     }
 
 

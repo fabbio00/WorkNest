@@ -1,6 +1,10 @@
 package com.ams.worknest.model.resources;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 /**
  * Resource class representing the response structure for email operations.
@@ -17,4 +21,5 @@ public class EmailResource {
      * The message indicating the result of the email operation.
      */
     String message;
+
 }

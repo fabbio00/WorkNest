@@ -1,13 +1,24 @@
 package com.ams.worknest.model.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.util.UUID;
 
 /**
- * Entity class representing a workstation.
- * Contains details of a workstation available for booking.
+ * WorkStation entity class.
+ * Represents a workstation on a floor in a building in the system.
  */
 @Entity
 @Getter
@@ -34,7 +45,7 @@ public class WorkStation {
      * The price per hour for using the workstation.
      */
     @Column(name = "price_per_h")
-    private double pricePerH;
+    private Double pricePerH;
 
     /**
      * Equipment available at the workstation.
@@ -47,8 +58,47 @@ public class WorkStation {
     private String type;
 
     /**
-     * The floor where the workstation is located.
+     * The x-coordinate of the workstation's position.
      */
-    private int floor;
+    private Float cx;
+
+    /**
+     * The y-coordinate of the workstation's position.
+     */
+    private Float cy;
+
+    /**
+     * The number of seats at the workstation.
+     */
+    @Column(name = "number_of_seats")
+    private int numberOfSeats;
+
+    /**
+     * Indicates if the workstation is in a left position.
+     */
+    @Column(name = "is_left_position")
+    private Boolean isLeftPosition;
+
+    /**
+     * Indicates if there is a window present near the workstation.
+     */
+    @Column(name = "is_present_window")
+    private Boolean isPresentWindow;
+
+    /**
+     * The building associated with the workstation.
+     */
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "building_id")
+    private Building building;
+
+    /**
+     * The floor associated with the workstation.
+     */
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "floor_id")
+    private Floor floor;
 
 }

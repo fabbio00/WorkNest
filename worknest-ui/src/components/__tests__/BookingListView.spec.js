@@ -44,17 +44,6 @@ describe("BookingListView", () => {
 
   it("should fetch bookings and workstations", async () => {
     await wrapper.vm.initialize_table();
-
-    const expectedBookings = [
-      {
-        startDate: "2024-04-06T10:15:30+01:00",
-        checkIn: null,
-        checkOut: null,
-        workStationId: "workStationId1",
-        status: "active",
-      },
-    ];
-
     expect(wrapper.vm.$ApiService.get_list_booking).toHaveBeenCalled();
   });
 

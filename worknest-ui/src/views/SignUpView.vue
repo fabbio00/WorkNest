@@ -1,6 +1,6 @@
 <script setup>
 import { useVuelidate } from "@vuelidate/core";
-import { required, email } from "@vuelidate/validators";
+import { required, email, minLength, maxLength } from "@vuelidate/validators";
 </script>
 
 <template>
@@ -32,6 +32,9 @@ import { required, email } from "@vuelidate/validators";
             label="First name"
             variant="outlined"
             color="indigo"
+            :error-messages="v$.user.name.$errors.map((e) => e.$message)"
+            @blur="v$.user.name.$touch"
+            @input="v$.user.name.$touch"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="6">
@@ -41,6 +44,9 @@ import { required, email } from "@vuelidate/validators";
             label="Last name"
             variant="outlined"
             color="indigo"
+            :error-messages="v$.user.surname.$errors.map((e) => e.$message)"
+            @blur="v$.user.surname.$touch"
+            @input="v$.user.surname.$touch"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -80,10 +86,13 @@ import { required, email } from "@vuelidate/validators";
         <v-col cols="12" md="6">
           <div class="text-overline text-large-emphasis">Company code</div>
           <v-text-field
-            v-model="user.companyCode"
+            v-model="companyCode"
             label="Company code"
             variant="outlined"
             color="indigo"
+            :error-messages="v$.companyCode.$errors.map((e) => e.$message)"
+            @blur="v$.companyCode.$touch"
+            @input="v$.companyCode$touch"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -100,7 +109,7 @@ import { required, email } from "@vuelidate/validators";
             @click:append-inner="passwordVisible = !passwordVisible"
             :error-messages="
               v$.user.password.$invalid
-                ? 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and be at least 8 characters long'
+                ? 'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character and be at least 8 characters long'
                 : []
             "
             @blur="v$.user.password.$touch"
@@ -122,7 +131,7 @@ import { required, email } from "@vuelidate/validators";
             "
             :error-messages="
               !isPasswordValid && v$.password_confirmed.$dirty
-                ? 'Password are different!'
+                ? 'Passwords are different!'
                 : []
             "
             @blur="v$.password_confirmed.$touch"
@@ -183,6 +192,21 @@ const emailUsed = (value) =>
       return !res.data.email;
     });
 
+const companyCodeValid = function (value) {
+  return axios
+    .post("http://localhost:8080/companies/companyCode", { companyCode: value })
+    .then((res) => {
+      if (res.data.id) {
+        this.user.companyId = res.data.id;
+        this.user.type = "EMPLOYEE";
+      } else {
+        this.user.companyId = "";
+        this.user.type = "PRIVATE";
+      }
+      return res.data.companyCode || value === "";
+    });
+};
+
 const checkPassword = helpers.regex(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&,-.#'^"£=(){}%€;:~<>+|/])[A-Za-z\d@$!%*?&,-.#'^"£=(){}%€;:~<>+|/]{8,30}$/,
 );
@@ -199,12 +223,13 @@ const checkPassword = helpers.regex(
  *   <li>Password and confirm password fields with visibility toggle.</li>
  *   <li>Form validation including email format and password requirements.</li>
  *   <li>Password encryption before submission.</li>
+ *   <li>Company code validation: handle the submission as an employee user or as a private user</li>
  *   <li>Redirects to the login page upon successful registration.</li>
  * </ol>
  *
- *
  * Data properties:
- * @vue-data {Object} user - Contains user input fields including name, surname, email, username, password, taxCode, companyCode, and barrerFreeFlag.
+ * @vue-data {Object} user - Contains user input fields including name, surname, email, username, password, taxCode, companyId, and barrerFreeFlag.
+ * @vue-data {String} companyCode - Stores the input for the company code.
  * @vue-data {Boolean} isPasswordValid - Indicates whether the password matches the confirmation password.
  * @vue-data {String} password_confirmed - Stores the user's input for password confirmation.
  * @vue-data {Boolean} passwordVisible - Controls the visibility of the password field.
@@ -231,10 +256,12 @@ export default {
         username: "",
         password: "",
         taxCode: "",
-        companyCode: "",
-        type: "Employee",
+        companyId: "",
+        type: "PRIVATE",
+        status: "active",
         barrerFreeFlag: false,
       },
+      companyCode: "",
       isPasswordValid: false,
       password_confirmed: "",
       passwordVisible: false,
@@ -257,8 +284,9 @@ export default {
      * Upon successful creation, the user is redirected to the login page.
      * If the password validation fails, it alerts the user.
      */
-    createUser() {
-      if (this.isPasswordValid) {
+    async createUser() {
+      const isFormValid = await this.v$.$validate();
+      if (this.isPasswordValid && isFormValid) {
         let encryptedPassword = UserServices.encryptPassword(
           this.user.password,
         );
@@ -266,16 +294,17 @@ export default {
           ...this.user,
           password: encryptedPassword,
         };
-        this.$ApiService.create_user(userWithEncryptedPassword).then((res) => {
+        this.$ApiService.create_user(userWithEncryptedPassword).then(() => {
           this.$router.push("/login");
         });
-      } else {
-        alert("Passwords do not match!");
       }
     },
   },
+
   validations: {
     user: {
+      name: { required },
+      surname: { required },
       email: {
         required,
         email,
@@ -285,6 +314,14 @@ export default {
         ),
       },
       password: { required, checkPassword },
+    },
+    companyCode: {
+      minLength: minLength(6),
+      maxLength: maxLength(6),
+      companyCodeValid: helpers.withMessage(
+        "The company code doesn't exists, please contact your company administrator.",
+        helpers.withAsync(companyCodeValid),
+      ),
     },
     password_confirmed: { required },
   },

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-
+import apiServices from "@/services/api.services";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +31,32 @@ const router = createRouter({
       },
     },
     {
+      path: "/booking/employee/:employeeId",
+      name: "create_booking_for_employee",
+      props: (route) => ({ employeeId: route.params.employeeId }),
+      component: () => import("../views/bookings/BookingWorkStationView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
+      path: "/businessBookingDesks/bookingBusiness/:bookingBusinessId/:building",
+      name: "edit_business_booking",
+      props: (route) => ({
+        bookingBusinessId: route.params.bookingBusinessId,
+        building: route.params.building,
+      }),
+      component: () =>
+        import(
+          "../views/business/bookings/BusinessBookingWorkStationsView.vue"
+        ),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
       path: "/booking",
       name: "booking",
       component: () => import("../views/bookings/BookingWorkStationView.vue"),
@@ -46,25 +72,102 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: "/company-registration",
+      name: "company_registration",
+      component: () => import("../views/admin/CompanyRegistrationView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "ADMINISTRATOR",
+      },
+    },
+    {
+      path: "/businessEmployeesList",
+      name: "businessEmployeesList",
+      component: () =>
+        import("../views/business/employees/BusinessEmployeesListView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
+      path: "/businessBookingsList",
+      name: "businessBookingsList",
+      component: () =>
+        import("../views/business/bookings/BusinessBookingsListView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
+      path: "/businessBookingsListDelete",
+      name: "businessBookingsListDelete",
+      component: () =>
+        import("../views/business/bookings/BusinessBookingsDeleteView.vue"),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
+      path: "/businessBookingDesks",
+      name: "businessBookingDesks",
+      component: () =>
+        import(
+          "../views/business/bookings/BusinessBookingWorkStationsView.vue"
+        ),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
   ],
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const user = localStorage.getItem("userId");
-    const expirationTime = localStorage.getItem("expirationTime");
-    if (user && expirationTime && Date.now() < parseInt(expirationTime)) {
-      // User is authenticated, proceed to the route
-      next();
-    } else {
-      localStorage.removeItem("userId");
-      // User is not authenticated, redirect to login
-      next("/login");
-    }
-  } else {
+router.beforeEach(async (to, from, next) => {
+  const user = localStorage.getItem("userId");
+  const expirationTime = localStorage.getItem("expirationTime");
+
+  if (!to.meta.requiresAuth) {
     // Non-protected route, allow access
-    next();
+    return next();
   }
+
+  // Check if user is authenticated
+  if (!user || !expirationTime || Date.now() >= parseInt(expirationTime)) {
+    localStorage.removeItem("userId");
+    // User is not authenticated, redirect to login
+    return next("/login");
+  }
+
+  // Check if the route requires a specific role
+  if (to.meta.role) {
+    try {
+      const res = await apiServices.find_user_by_id(user);
+      if (
+        to.meta.role === "ADMINISTRATOR" &&
+        res.data.type !== "ADMINISTRATOR"
+      ) {
+        // User does not have the required role, redirect to login
+        alert("You are not an admin!");
+        return next("/login");
+      } else if (to.meta.role === "BUSINESS" && res.data.type !== "BUSINESS") {
+        // User does not have the required role, redirect to login
+        alert("You are not a business user!");
+        return next("/login");
+      }
+    } catch (error) {
+      // Handle error or log error
+      alert("Error fetching user details or insufficient permissions!");
+      console.error("Error fetching user details:", error);
+      return next("/login");
+    }
+  }
+
+  // If all checks pass, proceed to the route
+  return next();
 });
 
 export default router;

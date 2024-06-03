@@ -1,12 +1,17 @@
 package com.ams.worknest.model.resources;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.util.UUID;
 
 /**
  * Resource class representing a workstation.
  * Contains details about a workstation.
+ *
  */
 @Getter
 @Setter
@@ -41,8 +46,28 @@ public class WorkStationResource {
     private String type;
 
     /**
-     * The floor where the workstation is located.
+     * The x-coordinate of the workstation's position.
      */
-    private int floor;
+    private float cx;
+
+    /**
+     * The y-coordinate of the workstation's position.
+     */
+    private float cy;
+
+    /**
+     * The number of seats at the workstation.
+     */
+    private int numberOfSeats;
+
+    /**
+     * Indicates if the workstation is in a left position.
+     */
+    private boolean isLeftPosition;
+
+    /**
+     * Indicates if there is a window present near the workstation.
+     */
+    private boolean isPresentWindow;
 
 }

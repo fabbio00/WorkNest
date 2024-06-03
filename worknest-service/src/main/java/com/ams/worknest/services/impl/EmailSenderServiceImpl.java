@@ -1,21 +1,23 @@
 package com.ams.worknest.services.impl;
 
+import com.ams.worknest.model.dto.EmailDto;
 import com.ams.worknest.services.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
- * Implementation of the EmailSenderService.
- * Provides functionality to send simple text emails.
+ * Implementation of the {@link EmailSenderService} interface.
+ * Provides methods for sending email messages.
  */
 @Component
 public class EmailSenderServiceImpl implements EmailSenderService {
 
     private final JavaMailSender emailSender;
 
-    // Email address from which the email will be sent
     private static final String SENDER_EMAIL_ADDRESS = "testerdev149@gmail.com";
 
     /**
@@ -44,4 +46,23 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         message.setText(text);
         emailSender.send(message);
     }
+
+    /**
+     * Sends a simple email message to multiple recipients.
+     *
+     * @param to      The list of recipients' email addresses.
+     * @param subject The subject of the email.
+     * @param text    The text content of the email.
+     */
+    @Override
+    public void sendSimpleMessages(List<String> to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(SENDER_EMAIL_ADDRESS);
+        message.setTo(to.toArray(new String[0]));
+        message.setSubject(subject);
+        message.setText(text);
+        emailSender.send(message);
+    }
+
+
 }

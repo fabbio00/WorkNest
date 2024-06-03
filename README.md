@@ -9,30 +9,24 @@ To streamline the development and deployment process, we utilize Docker with Doc
   -  [Architectural Approach](#architectural-approach)
 
 # Technologies Used
-### Frontend:
-
-- **Vue.js**: A progressive JavaScript framework for building user interfaces.
-- **npm**: A package manager for Node.js modules.
-- **CSS**: Cascading Style Sheets for styling the frontend components.
+### Frontend: 
+**Vue.js** as frontend framework, **npm** as packet manager for Javascript, **CSS** and **Vuetify** for the styling of frontend components
 
 ### Backend:
-
-- **Java/Spring**: A powerful and comprehensive framework for building enterprise-level applications based on Java.
-- **Maven**: A build automation tool for managing Java projects and dependencies.
+**Java/Spring** as backend framework, **Maven** as an automation tool for the Java projects and dependencies management.
 
 
 ### Database:
-
-- **PostgreSQL**: An open-source relational database management system.
+**PostgreSQL** as Database and **Flyway** as database migration tool manager
 
 ### Containerization and Orchestration:
-
-- **Docker**: A platform for developing, shipping, and running applications in containers. Docker simplifies the deployment of the application components (frontend, backend, and database) by encapsulating them in containers, which can be easily deployed and managed.
-- **Docker Compose**: A tool for defining and running multi-container Docker applications. With Docker Compose, you can configure all the components of the application in a single YAML file and start them with a single command.
+**Docker** and **Docker-compose** to effectively manage create and manage containers
 
 
 # Architectural Approach
-- **MVC Pattern**: The application architecture follows the Model-View-Controller (MVC) pattern to separate concerns and improve maintainability.
-- **Model**: Represents the data and business logic of the application. In WorkNest, models handle data related to users, bookings, workspaces, and companies.
-- **View**: Represents the user interface of the application. Vue.js components are used to create dynamic and interactive views for users.
-- **Controller**: Handles user input and interaction, as well as business logic execution. Java Spring controllers manage HTTP requests, process data, and interact with the backend services.
+- **Multi-Tier Architecture**: The application architecture follows a multi-tier approach to separate concerns and improve maintainability.
+    - **Frontend (View Tier)**: The user interface of the application is built using Vue.js. This tier is responsible for presenting the data to the user and handling user interactions.
+    - **Backend (Application Tier)**: The business logic and application functionality are handled by the Java/Spring backend. This tier processes user requests, performs business operations, and communicates with the database.
+    - **Database (Data Tier)**: PostgreSQL is used as the database management system to store and manage application data. This tier ensures data integrity, storage, and retrieval.
+
+![Project Architecture](./project_architecture.png)

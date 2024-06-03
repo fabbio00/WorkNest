@@ -1,8 +1,21 @@
 package com.ams.worknest.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ManyToOne;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -60,13 +73,13 @@ public class Booking {
      * Indicates whether the booking has a penalty associated with it.
      */
     @Column(name = "has_penalty")
-    private boolean hasPenalty;
+    private Boolean hasPenalty;
 
     /**
      * The user associated with the booking.
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -74,8 +87,16 @@ public class Booking {
      * The workstation associated with the booking.
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "workstation_id")
     private WorkStation workStation;
+
+    /**
+     * The business booking associated with this booking.
+     */
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "booking_business_id")
+    private BookingBusiness bookingBusiness;
 
 }

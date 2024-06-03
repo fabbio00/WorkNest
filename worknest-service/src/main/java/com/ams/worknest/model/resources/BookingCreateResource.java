@@ -2,7 +2,11 @@ package com.ams.worknest.model.resources;
 
 import com.ams.worknest.model.entities.User;
 import com.ams.worknest.model.entities.WorkStation;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.ZonedDateTime;
 
@@ -36,6 +40,5 @@ public class BookingCreateResource {
      * The workstation associated with the booking.
      */
     private WorkStation workStation;
-
 
 }

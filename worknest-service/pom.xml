@@ -82,7 +82,59 @@
 				<configuration>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.3.1</version>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+					<linkXRef>false</linkXRef>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.8.5.0</version>
+				<configuration>
+					<includeFilterFile>spotbugs-include.xml</includeFilterFile>
+					<xmlOutput>true</xmlOutput>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+					<failOnError>true</failOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.8.5.0</version>
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+					<failOnError>true</failOnError>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

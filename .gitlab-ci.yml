@@ -6,6 +6,13 @@ variables:
     -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
     -Dorg.slf4j.simpleLogger.showDateTime=true
   SPRING_PROFILES_ACTIVE: testcicd
+  DOCKER_IMAGE_NAME_BE: "worknest-backend"
+  DOCKER_IMAGE_NAME_FE: "worknest-frontend"
+  DOCKER_IMAGE_TAG: "$CI_COMMIT_REF_SLUG"
+  POSTGRES_DB: postgres
+  POSTGRES_USER: root
+  POSTGRES_PASSWORD: root
+  DOCKER_DRIVER: overlay2
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -15,11 +22,15 @@ cache:
 stages:
   - install_dependencies
   - build
+  - validate_style
   - test
   - package
+  - lint
   - release
   - generate_documentation
-  - build_container
+  - deploy_doc
+  - docker_build_and_push
+  - deploy
 
 clean:
   stage: build
@@ -36,9 +47,22 @@ compile:
     - cd worknest-service
     - mvn $MAVEN_CLI_OPTS compile
 
+spring_validate_style:
+  stage: validate_style
+  needs: [compile]
+  image: maven:3.9.6
+  script:
+    - cd worknest-service
+    - echo "Executing checkstyle..."
+    - mvn $MAVEN_OPTS checkstyle:checkstyle
+  artifacts:
+    paths:
+      - target/checkstyle-result.xml
+    when: on_failure
+
 spring_test:
   stage: test
-  needs: [compile]
+  needs: [spring_validate_style]
   image: maven:3.9.6
   services:
     - name: postgres:14.11
@@ -62,10 +86,23 @@ package_be:
     paths:
       - worknest-service/target/*.jar
 
+spring_verify_spotbugs:
+  stage: lint
+  needs: [package_be]
+  image: maven:3.9.6
+  script:
+    - cd worknest-service
+    - echo "Executing spotbugs..."
+    - mvn $MAVEN_OPTS spotbugs:check
+  artifacts:
+    paths:
+      - target/spotbugs-include.xml
+    when: on_failure
+
 docs_spring:
   stage: generate_documentation
   image: maven:3.9.6
-  needs: [package_be]
+  needs: [spring_verify_spotbugs]
   script:
     - cd worknest-service
     - mvn $MAVEN_CLI_OPTS $MAVEN_OPTS javadoc:javadoc
@@ -73,6 +110,8 @@ docs_spring:
   artifacts:
     paths:
       - worknest-service/public
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
 
 install_dependencies_vue:
   stage: install_dependencies
@@ -80,7 +119,6 @@ install_dependencies_vue:
   script:
     - cd worknest-ui
     - npm ci
-
 
 build_fe:
   stage: build
@@ -92,23 +130,123 @@ build_fe:
   artifacts:
     paths:
       - worknest-ui/dist/
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
 
+check_style_vue:
+  stage: validate_style
+  needs: [install_dependencies_vue]
+  image: node:21.7.1
+  script:
+    - cd worknest-ui
+    - npm run check-style
 
 test_vue:
   stage: test
-  needs: [build_fe]
+  needs: [check_style_vue]
   image: node:21.7.1
   script:
     - cd worknest-ui
     - npm run test:unit
 
+lint_vue:
+  stage: lint
+  needs: [test_vue]
+  image: node:21.7.1
+  script:
+    - cd worknest-ui
+    - npm run lint
+
 docs_vue:
   stage: generate_documentation
   image: node:21.7.1
-  needs: [build_fe]
+  needs: [lint_vue]
   script:
     - cd worknest-ui
     - npm run docs
   artifacts:
     paths:
       - worknest-ui/docs/
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "sprint2" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "sprint2"'
+
+pages:
+  stage: deploy_doc
+  dependencies:
+    - docs_vue
+    - docs_spring
+  script:
+    - mkdir -p public/fe-docs
+    - cp -r worknest-ui/docs/* public/fe-docs/
+    - mkdir -p public/be-docs
+    - cp -r worknest-service/public/* public/be-docs/
+    - cp doc-index.html public/index.html
+    - cp worknest-ui/public/worknest-logo.ico public/worknest-logo.ico
+    - ls -la public
+  artifacts:
+    paths:
+      - public
+  only:
+  - main
+
+docker_build_and_push_be:
+  stage: docker_build_and_push
+  image: docker:24.0.2
+  services:
+    - docker:24.0.2-dind
+  script:
+    - cd worknest-service
+    - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_BE:$DOCKER_IMAGE_TAG .
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_BE:$DOCKER_IMAGE_TAG
+  only:
+    - main
+
+docker_build_and_push_fe:
+  stage: docker_build_and_push
+  image: docker:24.0.2
+  services:
+    - docker:24.0.2-dind
+  script:
+    - cd worknest-ui
+    - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_TAG .
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_TAG
+  only:
+    - main
+
+deploy_backend_to_heroku:
+  stage: deploy
+  image: docker:24.0.2
+  services:
+    - docker:24.0.2-dind
+  before_script:
+    - apk add --no-cache curl bash nodejs
+  script:
+    - bash -c "curl https://cli-assets.heroku.com/install.sh | sh"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+    - docker pull $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_BE:$DOCKER_IMAGE_TAG
+    - docker tag $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_BE:$DOCKER_IMAGE_TAG registry.heroku.com/$HEROKU_APP_NAME_BE/web
+    - docker push registry.heroku.com/$HEROKU_APP_NAME_BE/web
+    - heroku container:release web -a $HEROKU_APP_NAME_BE
+  only:
+    - main
+    
+deploy_frontend_to_heroku:
+  stage: deploy
+  image: docker:24.0.2
+  services:
+    - docker:24.0.2-dind
+  before_script:
+    - apk add --no-cache curl bash nodejs
+  script:
+    - bash -c "curl https://cli-assets.heroku.com/install.sh | sh"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+    - docker pull $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_TAG
+    - docker tag $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME_FE:$DOCKER_IMAGE_TAG registry.heroku.com/$HEROKU_APP_NAME_FE/web
+    - docker push registry.heroku.com/$HEROKU_APP_NAME_FE/web
+    - heroku container:release web -a $HEROKU_APP_NAME_FE
+  only:
+    - main

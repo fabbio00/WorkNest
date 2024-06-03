@@ -1,11 +1,15 @@
 package com.ams.worknest.controllers;
 
 import com.ams.worknest.model.dto.EmailDto;
+import com.ams.worknest.model.dto.EmailListDto;
 import com.ams.worknest.model.resources.EmailResource;
 import com.ams.worknest.services.EmailSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 /**
@@ -25,6 +29,8 @@ public class EmailSenderController {
      * @param emailDto the email data transfer object containing the details of the email to be sent
      * @return an email resource indicating the success of the operation
      */
+
+
     @PostMapping()
     public EmailResource sendEmail(@RequestBody EmailDto emailDto) {
         emailService.sendSimpleMessage(emailDto.getTo(), emailDto.getSubject(), emailDto.getText());
@@ -32,6 +38,26 @@ public class EmailSenderController {
                 .message("Email sent successfully")
                 .build();
     }
+
+
+    /**
+     * Email a list of users with the provided email details.
+     *
+     * @param emailListDto the email data transfer object containing the details of the email to be sent
+     * @return an email resource indicating the success of the operation
+     */
+    @PostMapping("/send-list")
+    public EmailResource sendEmails(@RequestBody EmailListDto emailListDto) {
+        emailService.sendSimpleMessages(emailListDto.getTo(), emailListDto.getSubject(), emailListDto.getText());
+        return EmailResource.builder()
+                .message("Email sent successfully")
+                .build();
+    }
+
+
+
+
+
 
 }
 
