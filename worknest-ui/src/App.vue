@@ -132,6 +132,19 @@ import { RouterView } from "vue-router";
                 <p class="font-weight-black">Manage business bookings</p>
               </template>
             </v-list-item>
+            <v-list-item
+              prepend-icon="mdi-logout"
+              title="Logout"
+              class="logout-icon"
+              @click="redirect('/login')"
+            >
+              <template v-slot:prepend>
+                <v-icon style="transform: rotate(180deg)">mdi-logout</v-icon>
+              </template>
+              <template v-slot:title>
+                <p class="font-weight-black">Logout</p>
+              </template>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
       </v-layout>
@@ -164,7 +177,7 @@ export default {
   },
 
   beforeUpdate() {
-    const expirationTime = localStorage.getItem("expriationTime");
+    const expirationTime = localStorage.getItem("expirationTime");
     if (!expirationTime || Date.now() > parseInt(expirationTime)) {
       this.$router.replace("/login");
       localStorage.removeItem("userId");
