@@ -12,6 +12,7 @@ describe("LoginView", () => {
     mockLogin = vi.fn();
     mockRouterPush = vi.fn();
     mockFindUserById = vi.fn();
+    localStorage.clear();
     wrapper = shallowMount(LoginView, {
       global: {
         mocks: {

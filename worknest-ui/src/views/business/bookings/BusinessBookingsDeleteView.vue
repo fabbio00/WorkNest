@@ -478,7 +478,6 @@ export default {
             buildingName: associatedBooking.buildingName,
             floorName: associatedBooking.floorName,
           }));
-          console.log(this.associatedBooking);
           this.lastSelectedBookingId = booking;
           this.lastSelectedSearchType = this.searchType;
         })

@@ -349,12 +349,10 @@ export default {
      * Initializes the table by fetching employee data and populating the employees array.
      */
     initialize_table() {
-      console.log(this.companyId);
       this.$ApiService
         .get_list_employee(this.companyId)
         .then((response) => {
           const employees = response.data;
-          console.log(employees);
 
           employees.forEach((employee) => {
             if (employee.id !== this.userId) {
