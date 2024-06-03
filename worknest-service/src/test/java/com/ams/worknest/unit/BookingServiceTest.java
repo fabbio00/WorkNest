@@ -423,5 +423,28 @@ class BookingServiceTest {
         assertThrows(RuntimeException.class, () -> bookingService.findBookingsByCompanyId(companyId, employeeName, employeeSurname, startDate, endDate));
     }
 
+    @DisplayName("Test delete booking by booking business id")
+    @Test
+    void testDeleteBookingByBookingBusinessId() {
+        UUID bookingBusinessId = UUID.randomUUID();
+        List<Booking> bookings = new ArrayList<>();
+
+        Booking booking1 = new Booking();
+        booking1.setId(UUID.randomUUID());
+        bookings.add(booking1);
+
+        Booking booking2 = new Booking();
+        booking2.setId(UUID.randomUUID());
+        bookings.add(booking2);
+
+        when(bookingRepository.findByBookingBusinessId(bookingBusinessId)).thenReturn(bookings);
+        doNothing().when(bookingRepository).deleteByBookingBusinessId(bookingBusinessId);
+
+        List<BookingDeleteResource> deletedBookings = bookingService.deleteBookingByBookingBusinessId(bookingBusinessId);
+
+        verify(bookingRepository, times(1)).deleteByBookingBusinessId(bookingBusinessId);
+        assertEquals(booking1.getId(), deletedBookings.get(0).getBookingId());
+        assertEquals(booking2.getId(), deletedBookings.get(1).getBookingId());
+    }
 
 }

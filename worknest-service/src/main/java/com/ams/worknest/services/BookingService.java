@@ -94,4 +94,12 @@ public interface BookingService {
             LocalDate startDate,
             LocalDate endDate
     );
+
+    /**
+     * Deletes bookings by booking business id.
+     *
+     * @param bookingBusinessId The unique identifier of the booking business.
+     * @return A list of resources representing the deleted bookings.
+     */
+    List<BookingDeleteResource> deleteBookingByBookingBusinessId(UUID bookingBusinessId);
 }

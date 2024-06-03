@@ -67,6 +67,10 @@
               >
                 <v-icon>mdi-arrow-down-drop-circle</v-icon>
               </v-btn>
+
+              <v-icon class="me-2 ms-2" size="small" @click="editItem(item)">
+                mdi-pencil
+              </v-icon>
             </span>
           </td>
         </tr>
@@ -559,6 +563,15 @@ export default {
       } else {
         return "green";
       }
+    },
+
+    editItem(item) {
+      const bookingBusinessId = item.id;
+      const building = item.building;
+      this.$router.push({
+        name: "edit_business_booking",
+        params: { bookingBusinessId, building },
+      });
     },
   },
 };

@@ -351,4 +351,23 @@ public class BookingServiceImpl implements BookingService {
                 })
                 .toList();
     }
+
+    /**
+     * Deletes bookings associated with a specific booking business.
+     *
+     * @param bookingBusinessId The UUID of the booking business to delete bookings for.
+     * @return A list of {@link BookingDeleteResource} representing the deleted bookings.
+     */
+    @Override
+    public List<BookingDeleteResource> deleteBookingByBookingBusinessId(UUID bookingBusinessId) {
+        List<Booking> bookings = bookingRepository.findByBookingBusinessId(bookingBusinessId);
+
+        bookingRepository.deleteByBookingBusinessId(bookingBusinessId);
+
+        return bookings.stream()
+                .map(booking -> BookingDeleteResource.builder()
+                        .bookingId(booking.getId())
+                        .build())
+                .toList();
+    }
 }

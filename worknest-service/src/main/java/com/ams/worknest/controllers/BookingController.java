@@ -16,15 +16,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -153,4 +154,18 @@ public class BookingController {
     public List<BookingCreateResource> saveBookings(@RequestBody List<BookingCreateDto> bookingCreateDtos){
         return bookingService.saveBookings(bookingCreateDtos);
     }
+
+    /**
+     * Deletes all bookings associated with a specific booking business.
+     *
+     * @param bookingBusinessId the UUID of the booking business whose bookings are to be deleted
+     * @return a list of booking resources representing the deleted bookings
+     */
+    @DeleteMapping("/delete_by_booking_business/{bookingBusinessId}")
+    public List<BookingDeleteResource> bookingDeleteByBookingBusinessId(@PathVariable("bookingBusinessId") UUID bookingBusinessId){
+        return bookingService.deleteBookingByBookingBusinessId(bookingBusinessId);
+    }
+
+
+
 }

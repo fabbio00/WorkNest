@@ -71,6 +71,9 @@ class BookingControllerTest extends BaseMvcTest {
    @Autowired
    private FloorRepository floorRepository;
 
+   @Autowired
+   private BookingBusinessRepository bookingBusinessRepository;
+
     private static final String BOOKING_ENDPOINT = "/bookings";
 
     private final List<UUID> createdBookingIds = new ArrayList<>();
@@ -332,6 +335,32 @@ class BookingControllerTest extends BaseMvcTest {
                 .andExpect(jsonPath("$[0].endDate", containsString(endDate.toString())));
     }
 
+    @Test
+    void deleteBookingByBookingBusinessId() throws Exception {
+        BookingBusiness bookingBusiness = savedBookingBusinessTemplate();
+
+                mvc.perform(
+                                delete("/bookings/delete_by_booking_business/{bookingBusinessId}", bookingBusiness.getId())
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", hasSize(1))) // assuming there is only one booking associated with this bookingBusinessId
+                        .andExpect(jsonPath("$[0].bookingId", is(notNullValue())));
+    }
+
+    @Test
+    void deleteBookingByBookingBusinessId_InvalidBookingBusinessId() throws Exception {
+        UUID invalidBookingBusinessId = UUID.randomUUID(); // this ID does not exist in the database
+
+        mvc.perform(
+                        delete("/bookings/delete_by_booking_business/{bookingBusinessId}", invalidBookingBusinessId)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0))); // no bookings should be deleted
+    }
+
+
     private Company savedCompanyTemplate() {
         Company company = Company.builder()
                 .name("ProvaBusiness")
@@ -344,6 +373,62 @@ class BookingControllerTest extends BaseMvcTest {
         createdCompanyIds.add(company.getId());
 
         return savedCompany;
+    }
+
+    private BookingBusiness savedBookingBusinessTemplate() {
+        Company company = savedCompanyTemplate();
+        User user = User.builder()
+                .barrierFreeFlag(true)
+                .email("prova.user@gmail.com")
+                .password("password")
+                .name("Mario")
+                .surname("Rossi")
+                .username("username")
+                .type("basic_user")
+                .taxCode("FDSAFDAR343")
+                .registrationDate(ZonedDateTime.now())
+                .status("active")
+                .company(company)
+                .build();
+
+        user = userRepository.saveAndFlush(user);
+        createdUserIds.add(user.getId());
+
+        BookingBusiness bookingBusiness = BookingBusiness.builder()
+                .user(user)
+                .bookingDate(ZonedDateTime.now())
+                .build();
+
+        bookingBusiness = bookingBusinessRepository.saveAndFlush(bookingBusiness);
+        createdBookingIds.add(bookingBusiness.getId());
+
+        WorkStation workStation = WorkStation.builder()
+                .name("WorkStation1")
+                .pricePerH(3.0)
+                .equipment("monitor")
+                .type("desk")
+                .build();
+
+        workStation = workStationRepository.saveAndFlush(workStation);
+        createdWorkStationIds.add(workStation.getId());
+
+        Booking booking = Booking.builder()
+                .startDate(ZonedDateTime.now())
+                .endDate(ZonedDateTime.now())
+                .checkIn(null)
+                .checkOut(null)
+                .status("active")
+                .hasPenalty(false)
+                .user(user)
+                .workStation(workStation)
+                .bookingBusiness(bookingBusiness)
+                .build();
+
+        Booking savedBooking = bookingRepository.saveAndFlush(booking);
+        createdBookingIds.add(booking.getId());
+
+        return bookingBusiness;
+
     }
 
     private Booking savedBookingTemplate() {

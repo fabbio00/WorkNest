@@ -79,7 +79,7 @@ public class Booking {
      * The user associated with the booking.
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -87,7 +87,7 @@ public class Booking {
      * The workstation associated with the booking.
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "workstation_id")
     private WorkStation workStation;
 
