@@ -924,8 +924,7 @@ export default {
 
           this.$ApiService
             .save_booking_list(bookingListOnly)
-            .then((res) => {
-              console.log(res);
+            .then(() => {
               this.alertType = "success";
               this.alertText = "Booking confirmed successfully!";
               this.alertVisible = true;
@@ -945,7 +944,6 @@ export default {
               });
               let messageString = messages.join("\n");
               let bookingDate = this.formatDate(this.selectedDate);
-              console.log(bookingDate);
 
               const emailData = {
                 to: mailingList,
@@ -1005,8 +1003,6 @@ export default {
       this.booking.endDate = this.booking.startDate;
       this.booking.status = "active";
 
-      console.log(this.booking.startDate);
-
       let desk = document.querySelector(
         `[data-id="${this.booking.workStationId}"]`,
       );
@@ -1060,7 +1056,6 @@ export default {
           ).users
         : [];
       let usersInMeetingRoom = users.length + this.meetingRoomList.length;
-      console.log(users.length, this.meetingRoomList.length);
       if (usersInMeetingRoom > this.deskDetails.numberOfSeats) {
         this.alertVisible = true;
         this.alertType = "error";
@@ -1214,8 +1209,6 @@ export default {
           }
         });
       });
-      console.log(this.employeeList);
-      console.log(this.savedUsersMeetingRoomList);
     },
 
     /**

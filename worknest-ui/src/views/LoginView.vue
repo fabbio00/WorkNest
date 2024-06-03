@@ -146,7 +146,6 @@ export default {
           } else {
             this.prova = res.data.id;
             this.$ApiService.find_user_by_id(res.data.id).then((u) => {
-              console.log(u.data);
               if (u.data.status == "inactive") {
                 this.invalidCredentials = true;
               } else if (res.data && res.data.id) {
