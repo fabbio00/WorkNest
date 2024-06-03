@@ -103,6 +103,7 @@ public class BookingBusinessServiceImpl implements BookingBusinessService {
                             .hasPenalty(booking.getHasPenalty())
                             .workStationName(booking.getWorkStation().getName())
                             .workStationType(booking.getWorkStation().getType())
+                            .workStationId(booking.getWorkStation().getId())
                             .workstationCostPerHour(booking.getWorkStation().getPricePerH())
                             .buildingName(booking.getWorkStation().getBuilding().getName())
                             .floorName("Floor " + booking.getWorkStation().getFloor().getNumberOfFloor())

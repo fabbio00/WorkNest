@@ -67,6 +67,11 @@ public class BookingFindByCompanyResource {
     private String workStationType;
 
     /**
+     * The unique identifier of the workstation associated with the booking.
+     */
+    private UUID workStationId;
+
+    /**
      * The cost per hour of the workstation associated with the booking.
      */
     private Double workstationCostPerHour;

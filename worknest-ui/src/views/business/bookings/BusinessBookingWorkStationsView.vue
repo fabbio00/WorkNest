@@ -17,11 +17,18 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
       align="center"
     />
     <p
-      v-if="!bookingId"
+      v-if="!bookingId && !bookingBusinessId"
       class="text-h3 d-inline font-italic ml-5"
       style="vertical-align: middle"
     >
       Book desks for your team
+    </p>
+    <p
+      v-else-if="bookingBusinessId"
+      class="text-h3 d-inline font-italic ml-5"
+      style="vertical-align: middle"
+    >
+      Modify your booking
     </p>
     <p
       v-else
@@ -38,7 +45,11 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
   >
     <v-row justify="center" v-show="!isSvgVisible" class="mx-auto px-12">
       <v-col cols="12" md="8" lg="6">
-        <v-card class="mb-4 d-block rounded-lg" elevation="2">
+        <v-card
+          class="mb-4 d-block rounded-lg"
+          elevation="2"
+          v-if="!bookingBusinessId"
+        >
           <v-row>
             <v-col>
               <v-date-picker
@@ -209,8 +220,8 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
                       </v-list-item-title>
                       <v-list-item-subtitle class="d-flex align-center">
                         <v-icon
-                        v-for="(equip, index) in item.value.split(', ')"
-                          :key="index"  
+                          v-for="(equip, index) in item.value.split(', ')"
+                          :key="index"
                           class="mr-2"
                           >{{ getEquipmentIcon(equip) }}</v-icon
                         >
@@ -260,7 +271,7 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
             wantsWindow = null;
             deskDetails = null;
           "
-          v-if="isSvgVisible"
+          v-if="isSvgVisible && !bookingBusinessId"
           elevation="12"
         >
         </v-btn>
@@ -697,6 +708,11 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
  * @vue-method {Function} assignBookingToUser - Assigns a booking to a user and updates the booking list.
  * @vue-method {Function} assignMeetingRoomToUsers - Assigns a meeting room to multiple users and updates the booking list.
  * @vue-method {Function} deleteItem - Deletes a booking from the booking list.
+ * @vue-method {Function} getBuildings - Retrieves the list of buildings from the backend API.
+ * @vue-method {Function} getEquipmentIcon - Returns the icon for the specified equipment item.
+ * @vue-method {Function} initEditBooking - Initializes the edit booking process.
+ * @vue-method {Function} editBooking - Edits an existing booking.
+ * @vue-method {Function} findOccupiedDeskToEdit - Finds the occupied desk to edit.
  *
  * Usage:
  * This component is used within a Vue application to manage desk and meeting room booking functionality.
@@ -707,6 +723,12 @@ import Floor2B3 from "@/components/Building3/Floor2B3.vue";
 export default {
   props: {
     bookingId: {
+      type: String,
+    },
+    bookingBusinessId: {
+      type: String,
+    },
+    building: {
       type: String,
     },
   },
@@ -725,6 +747,7 @@ export default {
       companyId: "",
       userId: "",
       selectedDate: null,
+      editDate: "",
       booking: {
         startDate: "",
         endDate: "",
@@ -782,6 +805,9 @@ export default {
       this.companyId = res.data.companyId;
     });
     this.getBuildings();
+    if (this.bookingBusinessId) {
+      this.initEditBooking();
+    }
   },
 
   methods: {
@@ -905,6 +931,11 @@ export default {
      * If an error occurs during the booking process, an error message is displayed.
      */
     createBooking() {
+      if (this.bookingBusinessId) {
+        this.editBooking();
+        return;
+      }
+
       let bookingListOnly = this.bookingList.map((item) => item.booking);
       let mailingList = this.bookingList.map((item) => item.user.email);
       let bookingBusiness = {
@@ -924,8 +955,7 @@ export default {
 
           this.$ApiService
             .save_booking_list(bookingListOnly)
-            .then((res) => {
-              console.log(res);
+            .then(() => {
               this.alertType = "success";
               this.alertText = "Booking confirmed successfully!";
               this.alertVisible = true;
@@ -945,7 +975,6 @@ export default {
               });
               let messageString = messages.join("\n");
               let bookingDate = this.formatDate(this.selectedDate);
-              console.log(bookingDate);
 
               const emailData = {
                 to: mailingList,
@@ -954,21 +983,17 @@ export default {
                   `A reservation has been created for your team for ${bookingDate}.\n Below is the list of users with the available desk: \n` +
                   messageString,
               };
-              console.log(emailData);
               this.$ApiService
                 .send_mail_list(emailData)
-                .then((res) => {
-                  console.log(res);
-                })
+                .then(() => {})
                 .catch((error) => {
                   console.log(error);
                 });
             })
-            .catch((error) => {
+            .catch(() => {
               this.alertVisible = true;
               this.alertType = "error";
               this.alertText = "Something went wrong, please try again!";
-              console.log(error);
             });
         })
         .catch((error) => {
@@ -995,17 +1020,21 @@ export default {
     assignBookingToUser() {
       this.isAddClicked = true;
 
-      let date = new Date(this.selectedDate);
-      date.setDate(date.getDate() + 1);
-      let dateToSave = date.toISOString().replace("Z", "+00:00");
-      const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
-      const newData = dateToSave.replace(regexTime, "00:00:00.000");
+      if (this.bookingBusinessId) {
+        this.booking.startDate = this.editDate;
+        this.booking.endDate = this.booking.startDate;
+      } else {
+        let date = new Date(this.selectedDate);
+        date.setDate(date.getDate() + 1);
+        let dateToSave = date.toISOString().replace("Z", "+00:00");
+        const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+        const newData = dateToSave.replace(regexTime, "00:00:00.000");
 
-      this.booking.startDate = newData;
-      this.booking.endDate = this.booking.startDate;
+        this.booking.startDate = newData;
+        this.booking.endDate = this.booking.startDate;
+      }
+
       this.booking.status = "active";
-
-      console.log(this.booking.startDate);
 
       let desk = document.querySelector(
         `[data-id="${this.booking.workStationId}"]`,
@@ -1060,7 +1089,6 @@ export default {
           ).users
         : [];
       let usersInMeetingRoom = users.length + this.meetingRoomList.length;
-      console.log(users.length, this.meetingRoomList.length);
       if (usersInMeetingRoom > this.deskDetails.numberOfSeats) {
         this.alertVisible = true;
         this.alertType = "error";
@@ -1070,14 +1098,19 @@ export default {
       } else {
         this.isAddClicked = true;
 
-        let date = new Date(this.selectedDate);
-        date.setDate(date.getDate() + 1);
-        let dateToSave = date.toISOString().replace("Z", "+00:00");
-        const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
-        const newData = dateToSave.replace(regexTime, "00:00:00.000");
+        if (this.bookingBusinessId) {
+          this.booking.startDate = this.editDate;
+          this.booking.endDate = this.booking.startDate;
+        } else {
+          let date = new Date(this.selectedDate);
+          date.setDate(date.getDate() + 1);
+          let dateToSave = date.toISOString().replace("Z", "+00:00");
+          const regexTime = /\d{2}:\d{2}:\d{2}\.\d{3}/;
+          const newData = dateToSave.replace(regexTime, "00:00:00.000");
 
-        this.booking.startDate = newData;
-        this.booking.endDate = this.booking.startDate;
+          this.booking.startDate = newData;
+          this.booking.endDate = this.booking.startDate;
+        }
         this.booking.status = "active";
 
         let desk = document.querySelector(
@@ -1118,7 +1151,7 @@ export default {
             });
           });
         });
-        //this.savedUsersMeetingRoomList = this.savedUsersMeetingRoomList.concat(this.meetingRoomList.filter(user => !this.savedUsersMeetingRoomList.some(u => u.id === user.id)));
+
         let room = this.savedUsersMeetingRoomList.find(
           (room) => room.meeting_room_name === this.deskDetails.name,
         );
@@ -1180,6 +1213,7 @@ export default {
       let desk = document.querySelector(
         `[data-id="${item.booking.workStationId}"]`,
       );
+
       if (
         desk &&
         item.workstation.type === "meeting_room" &&
@@ -1214,8 +1248,6 @@ export default {
           }
         });
       });
-      console.log(this.employeeList);
-      console.log(this.savedUsersMeetingRoomList);
     },
 
     /**
@@ -1266,6 +1298,218 @@ export default {
         return "mdi-monitor";
       }
       return "";
+    },
+
+    /**
+     * Initializes the edit booking process.
+     * This method is called when the user wants to edit an existing booking.
+     * It retrieves the booking details from the server and populates the booking form with the existing data.
+     * The user can then modify the booking details and save the changes.
+     */
+    initEditBooking() {
+      this.$ApiService.get_buildings().then((res) => {
+        this.buildings = res.data;
+
+        this.isSvgVisible = true;
+        this.selectedBuilding = this.buildings.find(
+          (building) => building.name === this.building,
+        );
+        this.$ApiService
+          .get_bookings_by_business_booking_id(this.bookingBusinessId, "desk")
+          .then((res) => {
+            this.bookingList = res.data
+              .filter((booking) => booking.status !== "canceled")
+              .map((booking) => {
+                return {
+                  booking: {
+                    bookingBusinessId: this.bookingBusinessId,
+                    hasPenalty: booking.hasPenalty,
+                    startDate: booking.startDate,
+                    endDate: booking.endDate,
+                    status: booking.status,
+                    workStationId: booking.workStationId,
+                    userId: booking.userResource.id,
+                  },
+                  user: booking.userResource,
+                  workstation: {
+                    name: booking.workStationName,
+                    id: booking.workStationId,
+                    type: booking.workStationType,
+                  },
+                };
+              });
+          });
+
+        this.$ApiService
+          .get_bookings_by_business_booking_id(
+            this.bookingBusinessId,
+            "meeting_room",
+          )
+          .then((res) => {
+            res.data.forEach((booking) => {
+              if (booking.status !== "canceled") {
+                this.bookingList.push({
+                  booking: {
+                    bookingBusinessId: this.bookingBusinessId,
+                    hasPenalty: booking.hasPenalty,
+                    startDate: booking.startDate,
+                    endDate: booking.endDate,
+                    status: booking.status,
+                    workStationId: booking.workStationId,
+                    userId: booking.userResource.id,
+                  },
+                  user: booking.userResource,
+                  workstation: {
+                    name: booking.workStationName,
+                    id: booking.workStationId,
+                    type: booking.workStationType,
+                  },
+                });
+              }
+            });
+
+            this.editDate = this.bookingList[0].booking.startDate;
+
+            this.findOccupiedDesksToEdit();
+
+            this.bookingList.forEach((booking) => {
+              let room = this.savedUsersMeetingRoomList.find(
+                (room) => room.meeting_room_name === booking.workstation.name,
+              );
+
+              if (room) {
+                room.users.push(booking.user);
+              } else {
+                this.savedUsersMeetingRoomList.push({
+                  meeting_room_name: booking.workstation.name,
+                  users: [booking.user],
+                });
+              }
+            });
+          });
+      });
+    },
+
+    /**
+     * Finds occupied desks for editing.
+     * This method retrieves the list of occupied desks for the selected date and building.
+     * It filters out canceled bookings and displays the available desks for editing.
+     */
+    findOccupiedDesksToEdit() {
+      if (this.editDate !== "" && this.selectedBuilding !== null) {
+        this.deskDetails = null;
+        this.chooseDeskAlertVisible = false;
+        this.employeeWithBooking = [];
+        this.employeeList = [];
+        const date = this.editDate.split("T")[0];
+
+        this.$ApiService.find_occupied_desks(date).then((occupiedDesks) => {
+          this.occupiedDesks = occupiedDesks.data
+            .filter(
+              (ws) =>
+                ws.status != "canceled" &&
+                !this.bookingList.some(
+                  (b) => b.booking.workStationId === ws.workStationId,
+                ),
+            )
+            .map((ws) => ws.workStationId);
+          this.isSvgVisible = true;
+
+          occupiedDesks.data.forEach((wsOccupied) => {
+            if (
+              wsOccupied.status !== "canceled" &&
+              wsOccupied.user.company.id == this.companyId
+            ) {
+              this.employeeWithBooking.push({
+                user: wsOccupied.user,
+              });
+            }
+          });
+          this.$nextTick(() => {
+            this.bookingList.forEach((booking) => {
+              console.log(booking.booking.workStationId);
+              let desk = document.querySelector(
+                `[data-id="${booking.booking.workStationId}"]`,
+              );
+              console.log(desk);
+              if (desk) {
+                desk.setAttribute("fill", "gray");
+                desk.style.pointerEvents = "auto";
+                desk.style.cursor = "pointer";
+              }
+            });
+          });
+        });
+      } else {
+        this.chooseDeskAlertVisible = true;
+      }
+    },
+
+    /**
+     * Edits an existing booking.
+     * This method is called when the user wants to modify an existing booking.
+     * It updates the booking details with the new data provided by the user and saves the changes to the server.
+     * Upon successful modification, it displays a success message to the user.
+     * If an error occurs during the editing process, an error message is displayed.
+     */
+    editBooking() {
+      let bookingListOnly = this.bookingList.map((item) => item.booking);
+      let mailingList = this.bookingList.map((item) => item.user.email);
+
+      this.$ApiService
+        .cancel_bookings_by_bookingBusinessId(this.bookingBusinessId)
+        .then(() => {
+          bookingListOnly.forEach((booking) => {
+            booking.bookingBusinessId = this.bookingBusinessId;
+          });
+          this.$ApiService
+            .save_booking_list(bookingListOnly)
+            .then(() => {
+              this.alertType = "success";
+              this.alertText = "The booking was successfully modified";
+              this.alertVisible = true;
+
+              bookingListOnly.forEach((booking) => {
+                const deskElement = document.querySelector(
+                  `[data-id="${booking.workStationId}"]`,
+                );
+                if (deskElement) {
+                  deskElement.setAttribute("fill", "red");
+                  deskElement.style.pointerEvents = "none";
+                }
+              });
+
+              let messages = this.bookingList.map((item) => {
+                return `${item.user.name} ${item.user.surname} -> ${item.workstation.name}`;
+              });
+              let messageString = messages.join("\n");
+              let bookingDate = this.editDate.split("T")[0];
+
+              const emailData = {
+                to: mailingList,
+                subject: "New booking",
+                text:
+                  `A reservation has been created for your team for ${bookingDate}.\n Below is the list of users with the available desk: \n` +
+                  messageString,
+              };
+              this.$ApiService
+                .send_mail_list(emailData)
+                .then((res) => {
+                  console.log(res);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            })
+            .catch(() => {
+              this.alertVisible = true;
+              this.alertType = "error";
+              this.alertText = "Something went wrong, please try again!";
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 };

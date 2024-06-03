@@ -2,7 +2,9 @@ package com.ams.worknest.repositories;
 
 import com.ams.worknest.model.entities.Booking;
 import com.ams.worknest.model.entities.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
@@ -32,4 +34,14 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
      */
     List<Booking> findByUser(User user);
 
+    List<Booking> findByBookingBusinessId(UUID bookingBusinessId);
+
+    /**
+     * Deletes bookings by booking business id.
+     *
+     * @param bookingBusinessId The booking business id to search bookings.
+     */
+    @Transactional
+    @Modifying
+    void deleteByBookingBusinessId(UUID bookingBusinessId);
 }

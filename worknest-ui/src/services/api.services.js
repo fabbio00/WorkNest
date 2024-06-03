@@ -232,6 +232,17 @@ class ApiService {
         return res;
       });
   }
+
+  cancel_bookings_by_bookingBusinessId(bookingBusinessId) {
+    return axios
+      .delete(
+        "http://localhost:8080/bookings/delete_by_booking_business/" +
+          bookingBusinessId,
+      )
+      .then((res) => {
+        return res;
+      });
+  }
 }
 
 export default new ApiService();

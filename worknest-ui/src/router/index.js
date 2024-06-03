@@ -41,6 +41,22 @@ const router = createRouter({
       },
     },
     {
+      path: "/businessBookingDesks/bookingBusiness/:bookingBusinessId/:building",
+      name: "edit_business_booking",
+      props: (route) => ({
+        bookingBusinessId: route.params.bookingBusinessId,
+        building: route.params.building,
+      }),
+      component: () =>
+        import(
+          "../views/business/bookings/BusinessBookingWorkStationsView.vue"
+        ),
+      meta: {
+        requiresAuth: true,
+        role: "BUSINESS",
+      },
+    },
+    {
       path: "/booking",
       name: "booking",
       component: () => import("../views/bookings/BookingWorkStationView.vue"),
