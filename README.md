@@ -2,6 +2,8 @@
 
 Undergraduate project of the course [Design Lab](https://elearning.unimib.it/course/info.php?id=51444) (MSc in Computer Science at [University of Study in Milan-Bicocca](https://en.unimib.it/)).
 
+The purpose of this project, in addition to testing different technologies, was to follow the development done through agile methods, in particular SCRUM
+
 **WorkNest** is a web application designed to facilitate the booking of desks and meeting rooms within a co-working space by end users and companies. The application allows users to browse available workspaces, make bookings, manage their reservations, and create communities. Companies have access to a dedicated section for managing employees and their bookings. WorkNest also includes an administration section for managing user data, bookings, and agreements with other companies. The application is built using `Vue.js` for the frontend, `Java` with `Spring` framework for the backend, and `PostgreSQL` for the database.
 To streamline the development and deployment process, we utilize Docker with Docker Compose. This setup allows us to containerize the frontend, backend, and database components, ensuring that each part of the application can be easily set up, scaled, and maintained across different environments. Docker Compose simplifies the management of these containers by allowing us to define and run multi-container.
 
