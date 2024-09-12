@@ -1,4 +1,7 @@
 # WorkNest-Overview
+
+Undergraduate project of the course [Design Lab](https://elearning.unimib.it/course/info.php?id=51444) (MSc in Computer Science at [University of Study in Milan-Bicocca](https://en.unimib.it/)).
+
 **WorkNest** is a web application designed to facilitate the booking of desks and meeting rooms within a co-working space by end users and companies. The application allows users to browse available workspaces, make bookings, manage their reservations, and create communities. Companies have access to a dedicated section for managing employees and their bookings. WorkNest also includes an administration section for managing user data, bookings, and agreements with other companies. The application is built using `Vue.js` for the frontend, `Java` with `Spring` framework for the backend, and `PostgreSQL` for the database.
 To streamline the development and deployment process, we utilize Docker with Docker Compose. This setup allows us to containerize the frontend, backend, and database components, ensuring that each part of the application can be easily set up, scaled, and maintained across different environments. Docker Compose simplifies the management of these containers by allowing us to define and run multi-container.
 
@@ -7,6 +10,8 @@ To streamline the development and deployment process, we utilize Docker with Doc
 - [WorkNest](#worknest-overview)
   -  [Technologies Used](#technologies-used)
   -  [Architectural Approach](#architectural-approach)
+- [Contributors](#contributors)
+- [License](#license)
 
 # Technologies Used
 ### Frontend: 
@@ -30,3 +35,13 @@ To streamline the development and deployment process, we utilize Docker with Doc
     - **Database (Data Tier)**: PostgreSQL is used as the database management system to store and manage application data. This tier ensures data integrity, storage, and retrieval.
 
 ![Project Architecture](./project_architecture.png)
+
+## Contributors
+
+  - [Riccardo Andena](mailto:r.andena@campus.unimib.it)
+  - [Fabio Marini](mailto:f.marini14@campus.unimib.it)
+  - [Federico Salvo](mailto:f.salvo2@campus.unimib.it)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.
